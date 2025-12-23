@@ -1,13 +1,19 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { buildVisionPrompt } from "./prompt.js";
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  console.error("ERROR: GEMINI_API_KEY is missing or undefined in process.env");
-}
-const genAI = new GoogleGenerativeAI(apiKey);
+// Lazy init to prevent top-level crash on Vercel if env is missing
+let genAI = null;
 
 export async function analyzeWithGemini({ imageBase64, quizAnswers }) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("SERVER ERROR: GEMINI_API_KEY is missing in environment variables.");
+  }
+
+  if (!genAI) {
+    genAI = new GoogleGenerativeAI(apiKey);
+  }
+
   const model = genAI.getGenerativeModel({
     model: "gemini-3-flash-preview"
   });
