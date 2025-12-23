@@ -6,11 +6,12 @@
         },
         {
             "source": "/",
-            "destination": "/Frontend/index_final_corrigido.html"
+            "destination": "/Frontend/index.html"
         },
         {
             "source": "/(.*)",
             "destination": "/Frontend/$1"
         }
     ]
+
 }
