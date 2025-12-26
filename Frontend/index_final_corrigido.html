@@ -1293,7 +1293,7 @@
       position: relative;
       padding: 14px;
       border-radius: var(--radius);
-      overflow: hidden;
+      overflow: visible;
       height: fit-content;
       animation: floatOrbit 4.8s var(--ease) infinite;
     }
@@ -1314,7 +1314,7 @@
       width: 100%;
       aspect-ratio: 4/5;
       border-radius: 32px;
-      overflow: hidden;
+      overflow: visible;
       position: relative;
       background: rgba(255, 255, 255, .12);
       border: 1px solid rgba(255, 255, 255, .45);
@@ -1329,11 +1329,12 @@
       object-fit: cover;
       object-position: center 20%;
       display: block;
+      border-radius: 32px;
     }
 
     .orbit-layer {
       position: absolute;
-      inset: 10px;
+      inset: 0;
       pointer-events: none;
     }
 
@@ -1397,36 +1398,51 @@
       }
     }
 
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
     .swatchCard {
-      padding: 10px;
-      border-radius: 20px;
       display: flex;
-      gap: 10px;
+      flex-direction: column;
       align-items: center;
-      min-height: 58px;
+      justify-content: center;
+      text-align: center;
+      gap: 0.5rem;
+      padding: 1rem 0.5rem;
+      border-radius: 12px;
+      transition: transform 0.2s;
+      overflow: hidden;
+      min-height: 90px;
+    }
+
+    .swatchCard:hover {
+      transform: translateY(-2px);
     }
 
     .swatchDot {
-      width: 34px;
-      height: 34px;
-      border-radius: 14px;
-      box-shadow:
-        inset 8px 8px 14px rgba(20, 30, 50, .10),
-        inset -8px -8px 14px rgba(255, 255, 255, .60);
-      border: 1px solid rgba(255, 255, 255, .45);
-      flex: 0 0 auto;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     .swatchCard strong {
-      font-size: 12px;
+      font-size: 13px;
       letter-spacing: .2px;
       margin: 0;
       display: block;
+      color: var(--text-main);
     }
 
     .swatchCard span {
       font-size: 11px;
-      font-weight: 720;
+      font-weight: 600;
       color: var(--muted);
       display: block;
       margin-top: 2px;
@@ -2080,8 +2096,8 @@
             <div class="neu-card glass orbit-container">
               <div class="main-photo" aria-label="Foto analisada">
                 <img id="resultImg" alt="Foto analisada" />
+                <div class="orbit-layer" id="orbitLayer" aria-hidden="true"></div>
               </div>
-              <div class="orbit-layer" id="orbitLayer" aria-hidden="true"></div>
 
               <div class="divider"></div>
 
@@ -3523,14 +3539,15 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
       // Palette grid
       const grid = $("#paletteGrid");
       grid.innerHTML = "";
-      analysis.report.sections.main_palette.forEach((hex, i) => {
+      analysis.report.sections.main_palette.forEach((item, i) => {
         const card = document.createElement("div");
         card.className = "neu-card glass swatchCard";
+        const hex = item.hex || item;
+        const name = item.name || `Cor ${i + 1}`;
         card.innerHTML = `
         <div class="swatchDot" style="background:${hex}"></div>
-        <div>
-          <strong>${hex}</strong>
-          <span>Cor ${i + 1}</span>
+        <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center;">
+          <strong style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size: 0.95rem;">${name}</strong>
         </div>`;
         grid.appendChild(card);
       });
@@ -3576,7 +3593,7 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
       colors.forEach((c, i) => {
         const orb = document.createElement("div");
         orb.className = "color-orb";
-        orb.style.background = c;
+        orb.style.background = c.hex || c;
         const angle = (i / colors.length) * Math.PI * 2;
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
