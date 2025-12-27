@@ -3619,7 +3619,11 @@
 
         // INTERCEPTED: Go to checkout instead of result
         // Use the session_id returned by backend
+        // Use the session_id returned by backend
         if (data.session_id) {
+          // Backup session to local storage in case URL params are lost
+          localStorage.setItem('colorfy_pending_session', data.session_id);
+
           window.location.href = `Checkout.html?session_id=${data.session_id}`;
         } else {
           throw new Error("Sessão inválida recebida do servidor.");
