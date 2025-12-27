@@ -3825,69 +3825,65 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
 
 
     /* ---------- Session Recovery (Checkout Return) ---------- */
-    async function checkSession() {
-      // Try URL first, then LocalStorage
+
+    /* ---------- Initialization & Session Recovery ---------- */
+    async function initApp() {
+      // 1. Check for pending session (URL or LocalStorage)
       const params = new URLSearchParams(window.location.search);
       let sessionId = params.get('session_id');
 
+      // Fallback to local storage if not in URL
       if (!sessionId) {
         sessionId = localStorage.getItem('colorfy_pending_session');
       }
 
-      if (!sessionId) return;
+      if (sessionId) {
+        console.log("Restaurando sessão:", sessionId);
+        // FORCE switch to loading view immediately
+        // Override any default view set by other scripts
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        document.getElementById('view-loading').classList.add('active');
+        $("#loadingMsg").textContent = "Verificando pagamento...";
 
-      try {
-        console.log("Verificando sessão:", sessionId);
-        // Show loading state if we have a potential session
-        // Note: verify if we are already on a view? defaulting to loading is safe.
-        // But if it fails, we want to go back to landing or just stay put.
-        const currentView = $(".view-section.active")?.id;
-        if (!currentView || currentView === "view-landing") {
-          goTo("view-loading");
-          $("#loadingMsg").textContent = "Verificando pagamento...";
-        }
+        try {
+          const res = await fetch(`/api/get-result?session_id=${sessionId}`);
 
-        const res = await fetch(`/api/get-result?session_id=${sessionId}`);
+          if (res.status === 402) {
+            // Not paid yet
+            console.warn("Pagamento pendente.");
+            if (confirm("Seu pagamento ainda não foi confirmado. Deseja tentar novamente?")) {
+              window.location.href = `Checkout.html?session_id=${sessionId}`;
+              return;
+            }
+            // If canceled, fall through to landing
+          } else if (res.ok) {
+            const data = await res.json();
+            if (data.ok && data.paid) {
+              console.log("Pagamento confirmado, exibindo resultado.");
+              state.analysis = data.result;
+              state.user = data.result.user || "Usuário";
+              renderResult(state.analysis);
+              goTo("view-result");
 
-        if (res.status === 402) {
-          // Not paid yet
-          console.warn("Pagamento pendente.");
-          if (confirm("Seu pagamento ainda não foi confirmado. Deseja tentar novamente?")) {
-            window.location.href = `Checkout.html?session_id=${sessionId}`;
-          } else {
-            goTo("view-landing");
+              // Clear pending session after success
+              localStorage.removeItem('colorfy_pending_session');
+              return; // Crucial: Stop here
+            }
           }
-          return;
+        } catch (err) {
+          console.error("Erro na verificação de sessão:", err);
         }
+      }
 
-        if (!res.ok) {
-          console.warn("Erro ao checar sessão", res.status);
-          if (currentView === "view-loading") goTo("view-landing");
-          return;
-        }
-
-        const data = await res.json();
-        if (data.ok && data.paid) {
-          console.log("Pagamento confirmado!");
-          // Success! Render result
-          state.analysis = data.result;
-          state.user = data.result.user || "Usuário";
-          renderResult(state.analysis);
-          goTo("view-result");
-
-          // Clear pending session after success
-          localStorage.removeItem('colorfy_pending_session');
-        } else {
-          if (currentView === "view-loading") goTo("view-landing");
-        }
-      } catch (err) {
-        console.error("Erro checkSession:", err);
-        if ($(".view-section.active")?.id === "view-loading") goTo("view-landing");
+      // 2. Default start if NO session or check failed
+      const current = $(".view-section.active")?.id;
+      if (!current || current === "view-loading") {
+        goTo("view-landing");
       }
     }
 
-    // Run on consistency check
-    window.addEventListener("load", checkSession);
+    // Run initialization - waiting for load to ensure DOM is ready
+    window.addEventListener("load", initApp);
 
     function resetAll() {
       location.reload();
