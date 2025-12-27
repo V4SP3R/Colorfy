@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>COLORFY — COLOR YOUR STYLE</title>
   <meta name="theme-color" content="#edf0f6" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
       --bg: #edf0f6;
@@ -2076,6 +2080,164 @@
         </div>
       </section>
 
+      <!-- CHECKOUT (Injected) -->
+      <section class="view-section" id="view-checkout" style="text-align:left;">
+        <script>
+          tailwind.config = {
+            theme: {
+              extend: {
+                fontFamily: {
+                  sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                },
+                colors: {
+                  brand: {
+                    primary: '#6366f1',
+                    secondary: '#ec4899',
+                    dark: '#0f172a',
+                  }
+                }
+              }
+            }
+          }
+        </script>
+        <style>
+          .gradient-text {
+            background: linear-gradient(to right, #6366f1, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+
+          .gradient-bg {
+            background: linear-gradient(to right, #6366f1, #ec4899);
+          }
+
+          .mockup-shadow {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          }
+
+          /* Reset some styles for this section to avoid conflicts */
+          #view-checkout h1,
+          #view-checkout h2,
+          #view-checkout h3,
+          #view-checkout p {
+            margin: initial;
+          }
+        </style>
+
+        <div
+          class="relative w-full max-w-md mx-auto bg-white min-h-[80vh] shadow-2xl overflow-hidden rounded-3xl font-sans text-slate-800">
+
+          <!-- Navbar -->
+          <nav class="absolute top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-100">
+            <div class="px-4 h-16 flex items-center justify-between">
+              <div class="text-2xl font-extrabold tracking-tight">
+                <span class="gradient-text">Colorfy</span>
+              </div>
+              <!-- CTA Button Simulating Payment -->
+              <button id="btnCheckoutTop" type="button"
+                class="bg-black text-white px-4 py-2 rounded-full text-xs font-bold hover:scale-105 transition-transform">
+                VER RELATÓRIO
+              </button>
+            </div>
+          </nav>
+
+          <!-- Main Content -->
+          <div class="pt-20 pb-24">
+            <!-- Hero Section -->
+            <section class="px-5 py-8 text-center relative overflow-hidden">
+              <div
+                class="inline-flex items-center gap-1 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full mb-6">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-xs font-semibold text-indigo-600 uppercase tracking-wide">Análise Concluída</span>
+              </div>
+              <h1 class="text-3xl md:text-4xl font-extrabold leading-tight mb-4 text-slate-900">
+                Relatório completo com sua <span class="gradient-text">paleta personalizada</span> pronto para acesso!
+              </h1>
+              <p class="text-gray-500 text-lg mb-8 leading-relaxed">
+                Descubra sua melhor versão com nossa análise profissional de colorimetria.
+              </p>
+
+              <!-- CTA Principal -->
+              <div class="space-y-3">
+                <button id="btnCheckoutHero" type="button"
+                  class="block w-full gradient-bg text-white font-bold text-lg py-4 rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all duration-300">
+                  QUERO ACESSO IMEDIATO
+                  <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+                <p class="text-xs text-gray-400 flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-lock"></i> Compra 100% Segura e Instantânea
+                </p>
+              </div>
+            </section>
+
+            <!-- Features Grid -->
+            <section class="px-5 py-10 bg-gray-50">
+              <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold mb-2">Veja o que você vai receber</h2>
+              </div>
+              <!-- Cards -->
+              <div class="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm mb-4 flex items-start gap-4">
+                <div
+                  class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl shrink-0">
+                  <i class="fa-solid fa-eye"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-lg text-slate-800">Análise da Colorimetria</h3>
+                  <p class="text-sm text-gray-500 mt-1">Descubra sua estação e as características da sua pele.</p>
+                </div>
+              </div>
+              <div class="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm mb-4 flex items-start gap-4">
+                <div
+                  class="w-12 h-12 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center text-xl shrink-0">
+                  <i class="fa-solid fa-palette"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-lg text-slate-800">Cores que te valorizam</h3>
+                  <p class="text-sm text-gray-500 mt-1">Saiba exatamente quais tons realçam sua beleza natural.</p>
+                </div>
+              </div>
+            </section>
+
+            <!-- Offer/Price Section -->
+            <section class="px-5 pb-8 pt-8">
+              <div class="bg-slate-900 rounded-3xl p-8 text-center text-white relative overflow-hidden">
+                <div
+                  class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-full blur-3xl opacity-20 -mr-10 -mt-10">
+                </div>
+                <div
+                  class="absolute bottom-0 left-0 w-32 h-32 bg-pink-500 rounded-full blur-3xl opacity-20 -ml-10 -mb-10">
+                </div>
+
+                <h3 class="text-xl font-medium text-gray-300 mb-2">Oferta Especial Limitada</h3>
+                <div class="flex items-center justify-center gap-3 mb-6">
+                  <span class="text-gray-500 line-through text-lg">R$ 197,00</span>
+                  <span class="text-4xl font-extrabold text-white">R$ 67,00</span>
+                </div>
+
+                <button id="btnCheckoutOffer" type="button"
+                  class="block w-full bg-white text-slate-900 font-bold text-lg py-4 rounded-xl hover:bg-gray-100 transition-colors">
+                  PEGAR OFERTA AGORA
+                </button>
+              </div>
+              <div class="text-center mt-4">
+                <a href="https://buy.stripe.com/test_dRmbJ31LOcBI7jB3vy1Jm00" target="_blank"
+                  class="text-sm text-gray-400 underline hover:text-gray-600">Link original de pagamento (Stripe)</a>
+              </div>
+            </section>
+
+          </div>
+
+          <!-- Sticky Bottom CTA for Mobile -->
+          <div
+            class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40 md:hidden">
+            <button id="btnCheckoutBottom" type="button"
+              class="block w-full gradient-bg text-white text-center font-bold py-3.5 rounded-xl shadow-lg animate-pulse">
+              QUERO COMEÇAR AGORA
+            </button>
+          </div>
+        </div>
+      </section>
+
       <!-- RESULT -->
       <section class="view-section" id="view-result">
         <div class="neu-card glass sectionPad">
@@ -2173,7 +2335,7 @@
     const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
 
     /* ---------- SPA ---------- */
-    const views = ["view-landing", "view-register", "view-upload", "view-quiz", "view-loading", "view-scanner", "view-result"];
+    const views = ["view-landing", "view-register", "view-upload", "view-quiz", "view-loading", "view-scanner", "view-checkout", "view-result"];
     let currentView = "view-landing";
     let viewStack = ["view-landing"];
 
@@ -2183,12 +2345,40 @@
       const next = document.getElementById(id);
       if (!next) return;
 
+      // Special handling for Checkout view: hide main header/progress
+      if (id === "view-checkout") {
+        document.querySelector("header.topbar").style.display = "none";
+        document.querySelector(".progressWrap").style.display = "none";
+      } else {
+        // Restore if leaving checkout (or general navigation)
+        document.querySelector("header.topbar").style.display = "";
+        document.querySelector(".progressWrap").style.display = "";
+      }
+
+      // Force cleanup of all sections to prevent overlaps
+      views.forEach(v => {
+        const el = document.getElementById(v);
+        if (el && v !== id && v !== currentView) {
+          el.classList.remove("active", "exit");
+          el.style.display = "none";
+        }
+      });
+
       cur.classList.add("exit");
       setTimeout(() => {
         cur.classList.remove("active", "exit");
+        cur.style.display = ""; // clear inline override if any
+
+        next.style.display = ""; // FIX: Ensure target is visible despite previous cleanup
         next.classList.add("active");
         currentView = id;
         updateProgress();
+
+        // Final cleanup helper
+        $$(".view-section").forEach(el => {
+          if (el.id !== currentView) el.classList.remove("active");
+        });
+        window.scrollTo(0, 0);
       }, 260);
 
       // stack (for "back" buttons)
@@ -2236,7 +2426,8 @@
         "view-quiz": { p: 55, label: "Etapa 3 de 6" },
         "view-loading": { p: 78, label: "Etapa 4 de 6" },
         "view-scanner": { p: 88, label: "Etapa 5 de 6" },
-        "view-result": { p: 100, label: "Etapa 6 de 6" }
+        "view-checkout": { p: 95, label: "Etapa 6 de 6" },
+        "view-result": { p: 100, label: "Resultados" }
       };
       const m = map[currentView] || { p: Math.round((idx / (views.length - 1)) * 100), label: `Etapa ${idx} de ${views.length - 1}` };
       progressFill.style.width = m.p + "%";
@@ -3421,11 +3612,21 @@
         await sleep(2500);
 
         // Save analysis from Backend
-        state.analysis = data.final;
+        // state.analysis = data.final; // No longer receiving 'final' directly here
 
         // Render result
-        renderResult(state.analysis);
-        goTo("view-result");
+        // renderResult(state.analysis); // Postpone rendering
+
+        // INTERCEPTED: Go to checkout instead of result
+        // Use the session_id returned by backend
+        if (data.session_id) {
+          window.location.href = `Checkout.html?session_id=${data.session_id}`;
+        } else {
+          throw new Error("Sessão inválida recebida do servidor.");
+        }
+
+        // goTo("view-checkout"); // Not a view, but a redirect
+        // goTo("view-result"); // original
 
       } catch (err) {
         clearInterval(interval);
@@ -3605,6 +3806,19 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
     /* ---------- Audit Toggle ---------- */
     $("#btnShowAudit").addEventListener("click", () => $("#auditBlock").style.display = "block");
     $("#btnHideAudit").addEventListener("click", () => $("#auditBlock").style.display = "none");
+
+    /* ---------- Checkout Logic (New) ---------- */
+    function proceedToResult() {
+      goTo("view-result");
+      // Scroll top just in case
+      window.scrollTo(0, 0);
+      // Hide checkout section header if we messed with it (optional)
+    }
+    $("#btnCheckoutTop").addEventListener("click", proceedToResult);
+    $("#btnCheckoutHero").addEventListener("click", proceedToResult);
+    $("#btnCheckoutOffer").addEventListener("click", proceedToResult);
+    $("#btnCheckoutBottom").addEventListener("click", proceedToResult);
+
     function resetAll() {
       location.reload();
     }
