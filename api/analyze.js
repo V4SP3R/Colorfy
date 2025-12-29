@@ -1,10 +1,15 @@
 import crypto from "crypto";
 import { computeFinalResult } from "../scoreEngine.js";
 import { validatePayload } from "../validators.js";
-import { supabase } from "../lib/supabase.js";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 function makeToken() {
-  return crypto.randomBytes(16).toString("hex"); // 32 chars
+  return crypto.randomBytes(16).toString("hex");
 }
 
 export default async function handler(req, res) {
@@ -16,9 +21,8 @@ export default async function handler(req, res) {
     const body = req.body;
     validatePayload(body);
 
-    const { user, quizAnswers, image } = body;
+    const { quizAnswers } = body;
 
-    // Dummy vision (se você não usa gemini agora)
     const vision = { raw: "" };
 
     const finalResult = computeFinalResult({
@@ -26,18 +30,8 @@ export default async function handler(req, res) {
       vision
     });
 
-    if (!supabase) {
-      console.warn("Supabase not configured. Skipping save.");
-      return res.status(200).json({
-        ok: true,
-        session_id: "demo-session-no-db"
-      });
-    }
-
-    // ✅ Gera token único
     const resultToken = makeToken();
 
-    // ✅ Salva no schema real da sua tabela
     const { data, error } = await supabase
       .from("results")
       .insert([
@@ -52,10 +46,10 @@ export default async function handler(req, res) {
       .single();
 
     if (error) {
+      console.error("Supabase insert error:", error);
       throw new Error("Database error: " + error.message);
     }
 
-    // ✅ Retorna o token (não o UUID)
     return res.status(200).json({
       ok: true,
       session_id: data.result_token
