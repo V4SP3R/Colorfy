@@ -4070,7 +4070,31 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
     function resetAll() {
       location.reload();
     }
-  </script>
+  
+
+// -------- Auto-resume after Stripe redirect (PATCH) --------
+async function autoResumeFromSession() {
+  const params = new URLSearchParams(window.location.search);
+  const sessionIdFromUrl = params.get("session_id");
+  const sessionIdFromStorage = localStorage.getItem("colorfy_pending_session");
+  const sessionId = sessionIdFromUrl || sessionIdFromStorage;
+  if (!sessionId) return;
+  localStorage.setItem("colorfy_pending_session", sessionId);
+  try {
+    const res = await fetch(`/api/get-result?session_id=${encodeURIComponent(sessionId)}`);
+    if (res.status === 402) { if (typeof goTo === "function") goTo("view-payment-pending"); return; }
+    if (!res.ok) { console.warn("autoResume status:", res.status); if (typeof goTo === "function") goTo("view-landing"); return; }
+    const data = await res.json();
+    if (typeof renderResult === "function") renderResult(data.result);
+    if (typeof goTo === "function") goTo("view-result");
+  } catch (err) {
+    console.error("autoResume error:", err);
+    if (typeof goTo === "function") goTo("view-landing");
+  }
+}
+document.addEventListener("DOMContentLoaded", autoResumeFromSession);
+// -------- End auto-resume patch --------
+</script>
 </body>
 
 </html>
