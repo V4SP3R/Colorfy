@@ -1,7 +1,11 @@
-// import { analyzeWithGemini } from "../gemini.js";
+import crypto from "crypto";
 import { computeFinalResult } from "../scoreEngine.js";
 import { validatePayload } from "../validators.js";
 import { supabase } from "../lib/supabase.js";
+
+function makeToken() {
+  return crypto.randomBytes(16).toString("hex"); // 32 chars
+}
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -10,24 +14,17 @@ export default async function handler(req, res) {
 
   try {
     const body = req.body;
-
     validatePayload(body);
 
     const { user, quizAnswers, image } = body;
 
-    // const vision = await analyzeWithGemini({
-    //   imageBase64: image.base64,
-    //   quizAnswers
-    // });
-    const vision = { raw: "" }; // Dummy vision data
+    // Dummy vision (se você não usa gemini agora)
+    const vision = { raw: "" };
 
     const finalResult = computeFinalResult({
       quizAnswers,
       vision
     });
-
-    // Save to Supabase
-    // Using user-provided table name 'results'
 
     if (!supabase) {
       console.warn("Supabase not configured. Skipping save.");
@@ -37,32 +34,36 @@ export default async function handler(req, res) {
       });
     }
 
+    // ✅ Gera token único
+    const resultToken = makeToken();
+
+    // ✅ Salva no schema real da sua tabela
     const { data, error } = await supabase
-      .from('results')
+      .from("results")
       .insert([
         {
-          data: finalResult,
-          paid: false // default, waiting for payment
+          result_token: resultToken,
+          answers_json: quizAnswers,
+          result: finalResult,
+          payment_status: "pending"
         }
       ])
-      .select('id')
+      .select("result_token")
       .single();
 
     if (error) {
       throw new Error("Database error: " + error.message);
     }
 
-    // Return only the session ID (row ID)
+    // ✅ Retorna o token (não o UUID)
     return res.status(200).json({
       ok: true,
-      session_id: data.id
+      session_id: data.result_token
     });
-
   } catch (err) {
     console.error("Analyze error:", err);
-    console.error(err.stack);
     return res.status(500).json({
-      error: (err.message || "Erro ao processar análise") + " STACK: " + err.stack
+      error: err.message || "Erro ao processar análise"
     });
   }
 }
