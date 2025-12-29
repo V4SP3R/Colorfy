@@ -143,11 +143,21 @@ export function computeFinalResult({ quizAnswers, vision }) {
   // Get full season data
   const season = SEASON_DATA[finalSeason] || SEASON_DATA["Inverno Frio"];
 
+  // Confidence: based on margin between winner and runner-up
+  const sortedByScore = Object.entries(s).sort((a, b) => b[1] - a[1]);
+  const winnerScore = s[finalSeason] ?? 0;
+  const runnerUp = sortedByScore.find(([name]) => name !== finalSeason);
+  const runnerUpScore = runnerUp ? runnerUp[1] : 0;
+
+  const margin = Math.max(0, winnerScore - runnerUpScore);
+  const computedConfidence = Math.max(0.55, Math.min(0.95, 0.55 + margin * 0.05));
+
+
   // Construct return object matching frontend expectations
   return {
     final_palette: {
       name: finalSeason,
-      confidence: 0.95
+      confidence: Number(computedConfidence.toFixed(2))
     },
     report: {
       sections: {
