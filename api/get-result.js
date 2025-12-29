@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { session_id } = req.query;
+  const { session_id } = req.query; // no front você chama de session_id
 
   if (!session_id) {
     return res.status(400).json({ error: "Missing session_id" });
@@ -13,51 +13,33 @@ export default async function handler(req, res) {
 
   try {
     if (!supabase) {
-      // Demo mode fallback
-      if (session_id === "demo-session-no-db") {
-        return res.status(200).json({
-          ok: true,
-          paid: true,
-          result: {
-            user: "Demo User",
-            final_palette: { name: "Demo Palette" },
-            report: {
-              sections: {
-                technical_note: "Demo mode - DB not configured",
-                feature_inventory: {},
-                main_palette: [],
-                best_combinations: [],
-                use_with_moderation: [],
-                next_steps: [],
-                quick_summary: "Demo Summary"
-              }
-            }
-          }
-        });
-      }
       return res.status(503).json({ error: "Database not configured" });
     }
 
-    // ✅ CORREÇÃO: buscar pelo campo session_id
+    // ✅ session_id DO FRONT = result_token NO BANCO
     const { data, error } = await supabase
       .from("results")
       .select("*")
-      .eq("session_id", session_id)
+      .eq("result_token", session_id)
       .single();
 
     if (error || !data) {
       return res.status(404).json({ error: "Result not found" });
     }
 
-    // ✅ Bloqueio de pagamento
-    if (!data.paid) {
-      return res.status(402).json({ error: "Payment required", paid: false });
+    // ✅ verifica pagamento pelo payment_status
+    if (data.payment_status !== "paid") {
+      return res.status(402).json({
+        error: "Payment required",
+        paid: false,
+        payment_status: data.payment_status
+      });
     }
 
     return res.status(200).json({
       ok: true,
       paid: true,
-      result: data.data // JSON blob com análise
+      result: data.result // ✅ seu JSONB certo
     });
   } catch (err) {
     console.error("Get result error:", err);
