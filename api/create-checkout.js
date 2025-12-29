@@ -51,10 +51,13 @@ export default async function handler(req, res) {
           quantity: 1
         }
       ],
+      // ... dentro de stripe.checkout.sessions.create({ ...
       success_url: `${process.env.SITE_URL}/?session_id=${encodeURIComponent(session_id)}`,
       cancel_url: `${process.env.SITE_URL}/Checkout.html?session_id=${encodeURIComponent(session_id)}`,
+      
+      // AQUI ESTÁ A CORREÇÃO:
       metadata: {
-        result_token: session_id
+        internal_session_id: session_id  // O nome deve ser EXATAMENTE este
       }
     });
 
@@ -64,3 +67,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Internal server error" });
   }
 }
+
