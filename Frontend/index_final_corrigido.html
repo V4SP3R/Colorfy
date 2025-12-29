@@ -2061,6 +2061,24 @@
         </div>
       </section>
 
+      <section class="view-section" id="view-payment-pending">
+        <div class="neu-card glass sectionPad centerStack">
+          <h3 style="margin:0; font-size:18px;">Pagamento ainda não confirmado</h3>
+          <p class="muted" id="pendingMsg" style="margin:10px 0 0; max-width:70ch;">
+            Se você acabou de pagar, pode levar alguns segundos para confirmar. Clique em “Verificar novamente”.
+          </p>
+
+          <div class="row" style="margin-top:14px;">
+            <button class="neu-btn primary" id="btnRetryPayment" type="button">Verificar novamente</button>
+            <button class="neu-btn" id="btnBackToCheckout" type="button">Voltar ao checkout</button>
+          </div>
+
+          <p class="muted small" style="margin:12px 0 0;">
+            Dica: se você pagou em outra aba, volte para esta página e tente novamente.
+          </p>
+        </div>
+      </section>
+
       <!-- SCANNER -->
       <section class="view-section" id="view-scanner">
         <div class="neu-card glass sectionPad centerStack">
@@ -2122,7 +2140,65 @@
           #view-checkout p {
             margin: initial;
           }
-        </style>
+        
+
+    /* ---------- Result micro-interactions (UX polish) ---------- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); filter: blur(2px); }
+      to { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+    .stagger-item {
+      opacity: 0;
+      animation: fadeUp 520ms ease forwards;
+      will-change: transform, opacity, filter;
+    }
+    .swatchCard {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      transition: transform 220ms ease, box-shadow 220ms ease;
+    }
+    .swatchCard:hover {
+      transform: translateY(-3px) scale(1.01);
+    }
+    .swatchDot {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.14);
+      transition: transform 220ms ease;
+      flex: 0 0 auto;
+    }
+    .swatchCard:hover .swatchDot {
+      transform: scale(1.06);
+    }
+
+    /* ---------- Print (Download as PDF) ---------- */
+    @media print {
+      /* Show only the result view */
+      .view-section { display: none !important; }
+      #view-result { display: block !important; }
+      #auditBlock { display: none !important; }
+
+      /* Hide interactive controls */
+      button, .neu-btn, nav, .floating, .toast { display: none !important; }
+
+      html, body {
+        background: #fff !important;
+        color: #111 !important;
+      }
+
+      /* Remove heavy effects for crisp PDF */
+      .glass, .neu-card, .neu-inset {
+        box-shadow: none !important;
+        background: #fff !important;
+        border: 1px solid #e5e7eb !important;
+      }
+
+      /* Prevent awkward breaks */
+      .swatchCard, .resultWrap, .sectionPad { break-inside: avoid; page-break-inside: avoid; }
+    }
+</style>
 
         <div
           class="relative w-full max-w-md mx-auto bg-white min-h-[80vh] shadow-2xl overflow-hidden rounded-3xl font-sans text-slate-800">
@@ -2440,7 +2516,8 @@
       user: { name: "", email: "", phone: "", goal: "" },
       selfie: { file: null, dataUrl: "", approved: false, issues: [] },
       quiz: { answers: {}, cursor: 0, flow: [] },
-      analysis: null
+      analysis: null,
+      session_id: null
     };
 
     /* ---------- Buttons / Nav ---------- */
@@ -3622,6 +3699,7 @@
         // Use the session_id returned by backend
         if (data.session_id) {
           // Backup session to local storage in case URL params are lost
+          state.session_id = data.session_id;
           localStorage.setItem('colorfy_pending_session', data.session_id);
 
           window.location.href = `Checkout.html?session_id=${data.session_id}`;
@@ -3746,7 +3824,8 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
       grid.innerHTML = "";
       analysis.report.sections.main_palette.forEach((item, i) => {
         const card = document.createElement("div");
-        card.className = "neu-card glass swatchCard";
+        card.className = "neu-card glass swatchCard stagger-item";
+        card.style.animationDelay = `${i * 60}ms`;
         const hex = item.hex || item;
         const name = item.name || `Cor ${i + 1}`;
         card.innerHTML = `
@@ -3807,75 +3886,130 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
       });
     }
 
-    /* ---------- Audit Toggle ---------- */
-    $("#btnShowAudit").addEventListener("click", () => $("#auditBlock").style.display = "block");
+    /* ---------- Audit / Download ---------- */
+    function downloadResultPDF() {
+      // Ensure result view is visible for printing
+      const prevView = document.querySelector(".view-section.active")?.id;
+      goTo("view-result");
+      window.scrollTo(0, 0);
+
+      // Restore previous view after print
+      window.addEventListener("afterprint", () => {
+        if (prevView && prevView !== "view-result") goTo(prevView);
+      }, { once: true });
+
+      // Give the browser a tick to paint the result view
+      setTimeout(() => window.print(), 80);
+    }
+
+    $("#btnShowAudit").addEventListener("click", (ev) => {
+      // Shift+click keeps the old "audit" behavior for debugging
+      if (ev.shiftKey) {
+        $("#auditBlock").style.display = "block";
+        return;
+      }
+      downloadResultPDF();
+    });
     $("#btnHideAudit").addEventListener("click", () => $("#auditBlock").style.display = "none");
 
-    /* ---------- Checkout Logic (New) ---------- */
+/* ---------- Checkout Logic (New) ---------- */
     function proceedToResult() {
-      goTo("view-result");
-      // Scroll top just in case
-      window.scrollTo(0, 0);
-      // Hide checkout section header if we messed with it (optional)
+      // Send the user to Checkout preserving the current session id
+      const sessionId = state.session_id || localStorage.getItem('colorfy_pending_session');
+      if (sessionId) {
+        window.location.href = `Checkout.html?session_id=${encodeURIComponent(sessionId)}`;
+        return;
+      }
+      alert("Sessão não encontrada. Faça a análise novamente para continuar.");
+      goTo("view-landing");
     }
     $("#btnCheckoutTop").addEventListener("click", proceedToResult);
     $("#btnCheckoutHero").addEventListener("click", proceedToResult);
     $("#btnCheckoutOffer").addEventListener("click", proceedToResult);
     $("#btnCheckoutBottom").addEventListener("click", proceedToResult);
 
+    // Payment pending actions
+    $("#btnRetryPayment")?.addEventListener("click", async () => {
+      const sessionId = state.session_id || localStorage.getItem('colorfy_pending_session');
+      await checkPaymentAndLoadResult(sessionId, { showPendingView: true });
+    });
+
+    $("#btnBackToCheckout")?.addEventListener("click", () => {
+      const sessionId = state.session_id || localStorage.getItem('colorfy_pending_session');
+      if (sessionId) {
+        window.location.href = `Checkout.html?session_id=${encodeURIComponent(sessionId)}`;
+      } else {
+        goTo("view-landing");
+      }
+    });
+
+
 
     /* ---------- Session Recovery (Checkout Return) ---------- */
 
+    
     /* ---------- Initialization & Session Recovery ---------- */
-    async function initApp() {
-      // 1. Check for pending session (URL or LocalStorage)
-      const params = new URLSearchParams(window.location.search);
-      let sessionId = params.get('session_id');
 
-      // Fallback to local storage if not in URL
-      if (!sessionId) {
-        sessionId = localStorage.getItem('colorfy_pending_session');
+    async function checkPaymentAndLoadResult(sessionId, { showPendingView = true } = {}) {
+      if (!sessionId) return false;
+
+      // Keep a copy for other actions
+      state.session_id = sessionId;
+      localStorage.setItem('colorfy_pending_session', sessionId);
+
+      // FORCE loading view immediately
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      document.getElementById('view-loading').classList.add('active');
+      $("#loadingMsg").textContent = "Verificando pagamento...";
+
+      try {
+        const res = await fetch(`/api/get-result?session_id=${encodeURIComponent(sessionId)}`);
+
+        if (res.status === 402) {
+          // Not paid yet
+          if (showPendingView) {
+            $("#pendingMsg").textContent =
+              "Ainda não confirmamos o pagamento para esta sessão. Se você acabou de pagar, aguarde alguns segundos e clique em “Verificar novamente”.";
+            goTo("view-payment-pending");
+            window.scrollTo(0, 0);
+          }
+          return false;
+        }
+
+        if (!res.ok) {
+          return false;
+        }
+
+        const data = await res.json();
+        if (data.ok && data.paid && data.result) {
+          state.analysis = data.result;
+          state.user = data.result.user || state.user;
+          renderResult(state.analysis);
+          goTo("view-result");
+
+          // Clear pending session after success
+          localStorage.removeItem('colorfy_pending_session');
+          return true;
+        }
+
+        return false;
+      } catch (err) {
+        console.error("Erro na verificação de pagamento:", err);
+        return false;
       }
+    }
+
+    async function initApp() {
+      // 1) Check for pending session (URL or LocalStorage)
+      const params = new URLSearchParams(window.location.search);
+      let sessionId = params.get('session_id') || localStorage.getItem('colorfy_pending_session');
 
       if (sessionId) {
-        console.log("Restaurando sessão:", sessionId);
-        // FORCE switch to loading view immediately
-        // Override any default view set by other scripts
-        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-        document.getElementById('view-loading').classList.add('active');
-        $("#loadingMsg").textContent = "Verificando pagamento...";
-
-        try {
-          const res = await fetch(`/api/get-result?session_id=${sessionId}`);
-
-          if (res.status === 402) {
-            // Not paid yet
-            console.warn("Pagamento pendente.");
-            if (confirm("Seu pagamento ainda não foi confirmado. Deseja tentar novamente?")) {
-              window.location.href = `Checkout.html?session_id=${sessionId}`;
-              return;
-            }
-            // If canceled, fall through to landing
-          } else if (res.ok) {
-            const data = await res.json();
-            if (data.ok && data.paid) {
-              console.log("Pagamento confirmado, exibindo resultado.");
-              state.analysis = data.result;
-              state.user = data.result.user || "Usuário";
-              renderResult(state.analysis);
-              goTo("view-result");
-
-              // Clear pending session after success
-              localStorage.removeItem('colorfy_pending_session');
-              return; // Crucial: Stop here
-            }
-          }
-        } catch (err) {
-          console.error("Erro na verificação de sessão:", err);
-        }
+        const ok = await checkPaymentAndLoadResult(sessionId, { showPendingView: true });
+        if (ok) return;
       }
 
-      // 2. Default start if NO session or check failed
+      // 2) Default start if NO session or check failed
       const current = $(".view-section.active")?.id;
       if (!current || current === "view-loading") {
         goTo("view-landing");
@@ -3884,8 +4018,7 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
 
     // Run initialization - waiting for load to ensure DOM is ready
     window.addEventListener("load", initApp);
-
-    function resetAll() {
+function resetAll() {
       location.reload();
     }
   </script>

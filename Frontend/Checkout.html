@@ -57,15 +57,29 @@
                 class="bg-black text-white px-4 py-2 rounded-full text-xs font-bold hover:scale-105 transition-transform">
                 COMPRAR AGORA
             </a>
+            <a id="btnReturnToResult" href="/"
+                class="ml-2 bg-white text-black border border-gray-200 px-4 py-2 rounded-full text-xs font-bold hover:scale-105 transition-transform">
+                JÁ PAGUEI — VER RESULTADO
+            </a>
+
         </div>
         </div>
     </nav>
     <script>
         // Preserve session_id in Stripe links
         document.addEventListener("DOMContentLoaded", () => {
+            // Hide "return to result" button if session id is missing
+            const returnBtn = document.getElementById('btnReturnToResult');
+            if (returnBtn) returnBtn.style.display = 'none';
             const params = new URLSearchParams(window.location.search);
             const sessionId = params.get('session_id');
             if (sessionId) {
+                // Set return-to-result link
+                const returnBtn = document.getElementById('btnReturnToResult');
+                if (returnBtn) {
+                    returnBtn.href = `/?session_id=${encodeURIComponent(sessionId)}`;
+                }
+
                 const links = document.querySelectorAll('a[href^="https://buy.stripe.com"]');
                 links.forEach(link => {
                     const url = new URL(link.href);
