@@ -24,7 +24,7 @@ export default async function handler(req, res) {
         const { data, error } = await supabase
             .from('results')
             .select('*')
-            .eq('id', session_id)
+            .eq('session_id', session_id)
             .single();
 
         if (error) {
@@ -48,3 +48,4 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
+
