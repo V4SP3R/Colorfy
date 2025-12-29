@@ -2140,65 +2140,102 @@
           #view-checkout p {
             margin: initial;
           }
-        
 
-    /* ---------- Result micro-interactions (UX polish) ---------- */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); filter: blur(2px); }
-      to { opacity: 1; transform: translateY(0); filter: blur(0); }
-    }
-    .stagger-item {
-      opacity: 0;
-      animation: fadeUp 520ms ease forwards;
-      will-change: transform, opacity, filter;
-    }
-    .swatchCard {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      transition: transform 220ms ease, box-shadow 220ms ease;
-    }
-    .swatchCard:hover {
-      transform: translateY(-3px) scale(1.01);
-    }
-    .swatchDot {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.14);
-      transition: transform 220ms ease;
-      flex: 0 0 auto;
-    }
-    .swatchCard:hover .swatchDot {
-      transform: scale(1.06);
-    }
 
-    /* ---------- Print (Download as PDF) ---------- */
-    @media print {
-      /* Show only the result view */
-      .view-section { display: none !important; }
-      #view-result { display: block !important; }
-      #auditBlock { display: none !important; }
+          /* ---------- Result micro-interactions (UX polish) ---------- */
+          @keyframes fadeUp {
+            from {
+              opacity: 0;
+              transform: translateY(10px);
+              filter: blur(2px);
+            }
 
-      /* Hide interactive controls */
-      button, .neu-btn, nav, .floating, .toast { display: none !important; }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+              filter: blur(0);
+            }
+          }
 
-      html, body {
-        background: #fff !important;
-        color: #111 !important;
-      }
+          .stagger-item {
+            opacity: 0;
+            animation: fadeUp 520ms ease forwards;
+            will-change: transform, opacity, filter;
+          }
 
-      /* Remove heavy effects for crisp PDF */
-      .glass, .neu-card, .neu-inset {
-        box-shadow: none !important;
-        background: #fff !important;
-        border: 1px solid #e5e7eb !important;
-      }
+          .swatchCard {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            transition: transform 220ms ease, box-shadow 220ms ease;
+          }
 
-      /* Prevent awkward breaks */
-      .swatchCard, .resultWrap, .sectionPad { break-inside: avoid; page-break-inside: avoid; }
-    }
-</style>
+          .swatchCard:hover {
+            transform: translateY(-3px) scale(1.01);
+          }
+
+          .swatchDot {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+            transition: transform 220ms ease;
+            flex: 0 0 auto;
+          }
+
+          .swatchCard:hover .swatchDot {
+            transform: scale(1.06);
+          }
+
+          /* ---------- Print (Download as PDF) ---------- */
+          @media print {
+
+            /* Show only the result view */
+            .view-section {
+              display: none !important;
+            }
+
+            #view-result {
+              display: block !important;
+            }
+
+            #auditBlock {
+              display: none !important;
+            }
+
+            /* Hide interactive controls */
+            button,
+            .neu-btn,
+            nav,
+            .floating,
+            .toast {
+              display: none !important;
+            }
+
+            html,
+            body {
+              background: #fff !important;
+              color: #111 !important;
+            }
+
+            /* Remove heavy effects for crisp PDF */
+            .glass,
+            .neu-card,
+            .neu-inset {
+              box-shadow: none !important;
+              background: #fff !important;
+              border: 1px solid #e5e7eb !important;
+            }
+
+            /* Prevent awkward breaks */
+            .swatchCard,
+            .resultWrap,
+            .sectionPad {
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
+          }
+        </style>
 
         <div
           class="relative w-full max-w-md mx-auto bg-white min-h-[80vh] shadow-2xl overflow-hidden rounded-3xl font-sans text-slate-800">
@@ -3912,42 +3949,54 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
     });
     $("#btnHideAudit").addEventListener("click", () => $("#auditBlock").style.display = "none");
 
-/* ---------- Checkout Logic (New) ---------- */
-    function proceedToResult() {
-      // Send the user to Checkout preserving the current session id
-      const sessionId = state.session_id || localStorage.getItem('colorfy_pending_session');
-      if (sessionId) {
-        window.location.href = `Checkout.html?session_id=${encodeURIComponent(sessionId)}`;
+    /* ---------- Checkout Logic (New) ---------- */
+    /* ---------- Checkout Logic (New) ---------- */
+
+    async function proceedToResult() {
+      const sessionId =
+        state.session_id || localStorage.getItem("colorfy_pending_session");
+
+      if (!sessionId) {
+        alert("Sessão não encontrada. Faça a análise novamente para continuar.");
+        goTo("view-landing");
         return;
       }
-      alert("Sessão não encontrada. Faça a análise novamente para continuar.");
-      goTo("view-landing");
-    }
-    $("#btnCheckoutTop").addEventListener("click", proceedToResult);
-    $("#btnCheckoutHero").addEventListener("click", proceedToResult);
-    $("#btnCheckoutOffer").addEventListener("click", proceedToResult);
-    $("#btnCheckoutBottom").addEventListener("click", proceedToResult);
 
-    // Payment pending actions
-    $("#btnRetryPayment")?.addEventListener("click", async () => {
-      const sessionId = state.session_id || localStorage.getItem('colorfy_pending_session');
-      await checkPaymentAndLoadResult(sessionId, { showPendingView: true });
-    });
+      try {
+        const res = await fetch("/api/create-checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id: sessionId })
+        });
 
-    $("#btnBackToCheckout")?.addEventListener("click", () => {
-      const sessionId = state.session_id || localStorage.getItem('colorfy_pending_session');
-      if (sessionId) {
-        window.location.href = `Checkout.html?session_id=${encodeURIComponent(sessionId)}`;
-      } else {
-        goTo("view-landing");
+        const data = await res.json();
+
+        if (!res.ok || !data.url) {
+          console.error(data);
+          alert("Não foi possível iniciar o checkout. Tente novamente.");
+          return;
+        }
+
+        window.location.href = data.url; // ✅ redireciona para Stripe Checkout
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao abrir checkout. Verifique sua conexão e tente novamente.");
       }
-    });
+    }
 
+    // Botões que levam ao checkout Stripe
+    $("#btnCheckoutTop")?.addEventListener("click", proceedToResult);
+    $("#btnCheckoutHero")?.addEventListener("click", proceedToResult);
+    $("#btnCheckoutOffer")?.addEventListener("click", proceedToResult);
+    $("#btnCheckoutBottom")?.addEventListener("click", proceedToResult);
+
+    // Botão da tela de pagamento pendente
+    $("#btnBackToCheckout")?.addEventListener("click", proceedToResult);
 
 
     /* ---------- Session Recovery (Checkout Return) ---------- */
 
-    
+
     /* ---------- Initialization & Session Recovery ---------- */
 
     async function checkPaymentAndLoadResult(sessionId, { showPendingView = true } = {}) {
@@ -4018,7 +4067,7 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
 
     // Run initialization - waiting for load to ensure DOM is ready
     window.addEventListener("load", initApp);
-function resetAll() {
+    function resetAll() {
       location.reload();
     }
   </script>
