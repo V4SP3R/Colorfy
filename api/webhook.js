@@ -38,11 +38,15 @@ export default async function handler(req, res) {
 
         if (internalId) {
             await supabase
-                .from("results")
-                .update({ paid: true })
-                .eq("session_id", internalId);
+  .from("results")
+  .update({
+    payment_status: "paid",
+    paid_at: new Date().toISOString()
+  })
+  .eq("result_token", internalId);
         }
     }
 
     res.json({ received: true });
 }
+
