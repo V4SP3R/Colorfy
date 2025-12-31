@@ -728,11 +728,16 @@
     /* ---------- Upload ---------- */
     .upload-zone {
       padding: 16px;
-      border-radius: var(--radius);
+      border-radius: 26px;
       position: relative;
       overflow: hidden;
-      transition: transform var(--t) var(--ease), box-shadow var(--t) var(--ease), filter var(--t) var(--ease);
       cursor: pointer;
+      /* Mantém base anterior e adiciona melhorias */
+      border: 2px dashed rgba(91, 124, 255, 0.3);
+      /* Borda mais visível por padrão */
+      background: rgba(255, 255, 255, 0.4);
+      /* Leve fundo para diferenciar */
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
 
     .upload-zone .inner {
@@ -746,9 +751,19 @@
       position: relative;
     }
 
+    .upload-zone:hover,
     .upload-zone.dragover {
-      transform: translateY(-2px) scale(1.01);
-      filter: brightness(1.03);
+      border-color: var(--brand);
+      background: rgba(255, 255, 255, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(91, 124, 255, 0.15);
+    }
+
+    /* Estado de Sucesso (Novo) */
+    .upload-zone.valid {
+      border-style: solid;
+      border-color: var(--ok);
+      background: rgba(46, 203, 139, 0.05);
     }
 
     .upload-zone .hint {
@@ -1039,36 +1054,63 @@
       cursor: pointer;
       position: relative;
       overflow: hidden;
+      /* Melhoria de legibilidade e touch area */
+      border: 2px solid transparent;
+      /* Reserva espaço para borda sem pular layout */
       background: var(--card);
-      border: 1px solid rgba(255, 255, 255, .42);
-      box-shadow:
-        10px 10px 18px rgba(20, 30, 50, .12),
-        -10px -10px 18px rgba(255, 255, 255, .75);
-      transition: transform var(--t) var(--ease), box-shadow var(--t) var(--ease), filter var(--t) var(--ease);
+      transition: all 0.2s ease-out;
       outline: none;
       text-align: left;
-      min-height: 72px;
+      min-height: 80px;
+      /* Melhora área de toque */
       display: flex;
       gap: 12px;
       align-items: center;
     }
 
     .opt:hover {
-      transform: translateY(-1px) scale(1.01);
-      filter: brightness(1.02);
+      border-color: rgba(91, 124, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+
+      /* Desativa efeitos de hover/tilt complexos no mobile para performance */
+      .upload-zone:hover {
+        transform: none;
+      }
+
+      .opt:hover {
+        transform: none;
+      }
     }
 
     .opt:focus-visible {
       box-shadow: var(--focus), 10px 10px 18px rgba(20, 30, 50, .12), -10px -10px 18px rgba(255, 255, 255, .75);
     }
 
+    /* Estado Selecionado "Premium" */
     .opt.selected {
-      background: linear-gradient(135deg, rgba(91, 124, 255, .92), rgba(123, 77, 255, .92), rgba(255, 74, 162, .92));
-      color: #fff;
-      border-color: rgba(255, 255, 255, .45);
+      background: #fff;
+      border-color: var(--brand);
       box-shadow:
-        14px 14px 26px rgba(20, 30, 50, .18),
-        -14px -14px 26px rgba(255, 255, 255, .55);
+        0 0 0 4px rgba(91, 124, 255, 0.15),
+        /* Anel de foco externo */
+        0 10px 20px rgba(91, 124, 255, 0.2);
+      transform: scale(1.02);
+      z-index: 10;
+      /* Garante que fique acima */
+    }
+
+    /* Ajuste de Texto na Seleção (Contraste) */
+    .opt.selected .txt strong {
+      color: var(--brand);
+    }
+
+    .opt.selected .txt span {
+      color: var(--text);
+      /* Removemos o branco para manter legibilidade em fundo claro */
+      font-weight: 600;
     }
 
     .swatch {
@@ -1117,7 +1159,7 @@
     }
 
     .opt.selected .txt span {
-      color: rgba(255, 255, 255, .85);
+      /* color managed above */
     }
 
     .quizNav {
@@ -1299,7 +1341,11 @@
       border-radius: var(--radius);
       overflow: visible;
       height: fit-content;
-      animation: floatOrbit 4.8s var(--ease) infinite;
+      /* Removemos a animação infinita do container para focar nos elementos internos */
+      animation: none !important;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.3));
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 20px 50px rgba(91, 124, 255, 0.15);
     }
 
     @keyframes floatOrbit {
@@ -1334,6 +1380,12 @@
       object-position: center 20%;
       display: block;
       border-radius: 32px;
+      transform: scale(0.95);
+      transition: transform 1.2s cubic-bezier(0.1, 0, 0, 1);
+    }
+
+    .reveal-visible .main-photo img {
+      transform: scale(1);
     }
 
     .orbit-layer {
@@ -1352,6 +1404,18 @@
       transform: translate(-50%, -50%);
       filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .12));
       opacity: .95;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      animation: orbFloat 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes orbFloat {
+      from {
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      to {
+        transform: translate(-50%, -55%) scale(1.1);
+      }
     }
 
     .color-orb::after {
@@ -1404,8 +1468,9 @@
 
     .palette-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1rem;
+      /* Ajuste para telas pequenas: min 110px permite 2 colunas em iPhone SE */
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 12px;
       margin-top: 1.5rem;
     }
 
@@ -1416,11 +1481,32 @@
       justify-content: center;
       text-align: center;
       gap: 0.5rem;
-      padding: 1rem 0.5rem;
+      padding: 10px;
       border-radius: 12px;
       transition: transform 0.2s;
       overflow: hidden;
-      min-height: 90px;
+      min-height: 80px;
+      /* Mais compacto */
+      font-family: inherit !important;
+      opacity: 0;
+      /* Começa invisível */
+      /* Removemos a transição CSS padrão aqui para controlar via JS/Animation */
+    }
+
+    @keyframes cardPop {
+      0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(10px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .swatchCard.pop-in {
+      animation: cardPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
 
     .swatchCard:hover {
@@ -1428,8 +1514,9 @@
     }
 
     .swatchDot {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
+      /* margin-bottom: 6px; */
       border-radius: 50%;
       border: 2px solid rgba(255, 255, 255, 0.4);
       flex-shrink: 0;
@@ -1589,21 +1676,210 @@
       flex-wrap: wrap;
     }
 
-    .chip {
-      padding: 10px 12px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 11px;
-      letter-spacing: .4px;
-      cursor: pointer;
-      border: 1px solid rgba(255, 255, 255, .45);
-      background: rgba(255, 255, 255, .12);
-      box-shadow:
-        10px 10px 18px rgba(20, 30, 50, .10),
-        -10px -10px 18px rgba(255, 255, 255, .72);
-      color: var(--muted);
-      user-select: none;
+    /* --- 1. Scanner HUD (Biometria Visual) --- */
+    .scanFrame {
+      /* Mantém a base */
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 30px rgba(91, 124, 255, 0.1);
     }
+
+    /* Cantoneiras Tecnológicas */
+    .scanFrame::before,
+    .scanFrame::after {
+      content: "";
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--brand);
+      transition: all 0.5s ease;
+      opacity: 0.8;
+      z-index: 5;
+    }
+
+    .scanFrame::before {
+      top: 10px;
+      left: 10px;
+      border-right: 0;
+      border-bottom: 0;
+      border-radius: 8px 0 0 0;
+    }
+
+    .scanFrame::after {
+      bottom: 10px;
+      right: 10px;
+      border-left: 0;
+      border-top: 0;
+      border-radius: 0 0 8px 0;
+    }
+
+    /* Animação do Scanner (Mais suave) */
+    .scanLine {
+      background: linear-gradient(90deg, transparent, var(--brand), transparent);
+      height: 4px;
+      /* Mais fina e elegante */
+      box-shadow: 0 0 15px var(--brand);
+    }
+
+    /* Efeito de respiração no anel */
+    .spinner {
+      animation: spin 1.5s linear infinite, breathe 3s ease-in-out infinite alternate;
+      box-shadow: 0 0 20px rgba(91, 124, 255, 0.3);
+    }
+
+    @keyframes breathe {
+      0% {
+        box-shadow: 0 0 15px rgba(91, 124, 255, 0.2);
+      }
+
+      100% {
+        box-shadow: 0 0 35px rgba(91, 124, 255, 0.6);
+      }
+    }
+
+    /* --- Animations de Resultado (Storytelling) --- */
+    /* Esconde inicialmente para revelar via JS */
+    .reveal-hidden {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+        transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* Estado visível */
+    .reveal-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Tipografia de Resultado */
+    #resultTitle {
+      font-size: 28px;
+      background: linear-gradient(135deg, #1d2430 0%, #5a687c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    /* --- Checkout Mobile Sticky Fix --- */
+    /* Garante que o botão flutuante não cubra conteúdo importante */
+    #view-checkout {
+      padding-bottom: 100px;
+      /* Espaço extra no final */
+    }
+
+    /* --- Fonte Global (Safety Check) --- */
+    /* Força a fonte no checkout injetado caso o Tailwind não pegue */
+    #view-checkout * {
+      font-family: "Plus Jakarta Sans", sans-serif !important;
+    }
+
+    /* --- Layout de Faces (Sfumato + Stack) --- */
+    /* NOVA REGRA: Quando tiver 3 opções, empilha uma abaixo da outra */
+    /* --- FOTO OVAL + ESFUMADO ENTRE FOTO E COR --- */
+
+    .faceCard {
+      position: relative;
+      aspect-ratio: 1/1;
+      border-radius: 28px;
+      overflow: hidden;
+      cursor: pointer;
+      background: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 4px solid transparent;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .faceCard:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .faceCard.selected {
+      border-color: #fff;
+      box-shadow:
+        0 0 0 4px var(--brand),
+        0 15px 35px rgba(91, 124, 255, 0.25);
+      transform: scale(1.02);
+      z-index: 10;
+    }
+
+    /* --- FOTO OVAL + ESFUMADO ENTRE FOTO E COR --- */
+    .faceCard img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      /* Centraliza perfeitamente */
+
+      /* ✅ FORMATO OVAL (Referência Imagem 2) */
+      /* Largura menor que altura para criar elipse vertical */
+      width: 74%;
+      height: 92%;
+
+      border-radius: 50%;
+      /* Em elemento retangular (74% x 92%) vira oval */
+
+      object-fit: cover;
+      object-position: center 30%;
+      /* Foco no rosto */
+
+      /* ✅ ESFUMADO (Referência Imagem 3) */
+      /* Gradiente mais suave para fundir a borda */
+      -webkit-mask-image: radial-gradient(ellipse at center,
+          black 45%,
+          rgba(0, 0, 0, 0.5) 70%,
+          transparent 90%);
+      mask-image: radial-gradient(ellipse at center,
+          black 45%,
+          rgba(0, 0, 0, 0.5) 70%,
+          transparent 90%);
+
+      transition: transform 0.5s ease;
+      will-change: transform;
+    }
+
+    /* Otimização do overlay de fusão */
+    .faceCard::after {
+      content: "";
+      position: absolute;
+      /* Ajusta o overlay para bater com o tamanho da img oval */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 76%;
+      height: 94%;
+      border-radius: 50%;
+
+      pointer-events: none;
+
+      /* Brilho suave nas bordas para integrar com o fundo (Sfumato blend) */
+      box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.15);
+      opacity: 0.6;
+    }
+
+    /* Hover suave: aumenta levemente a imagem DENTRO da máscara oval */
+    .faceCard:hover img {
+      transform: translate(-50%, -50%) scale(1.03);
+    }
+
+    /* Layout Responsivo */
+    .grid-faces.stack-3 {
+      grid-template-columns: 1fr;
+      max-width: 320px;
+      margin: 0 auto;
+      gap: 24px;
+    }
+
+    /* Esconder botões de reiniciar visualmente */
+    #btnRestartTop,
+    #btnRestart {
+      display: none !important;
+    }
+
+
 
     .chip.active {
       background: linear-gradient(135deg, rgba(91, 124, 255, .92), rgba(123, 77, 255, .92), rgba(255, 74, 162, .92));
@@ -1761,7 +2037,7 @@
       </div>
 
       <div class="row">
-        <button class="neu-btn ghost" id="btnRestartTop" type="button" aria-label="Reiniciar">Reiniciar</button>
+        <!-- Button Removed -->
 
       </div>
     </header>
@@ -1876,8 +2152,7 @@
           <div class="divider" aria-hidden="true"></div>
 
           <div class="row">
-            <span class="muted small">Conecte seu endpoint seguro <span
-                style="font-family:var(--mono);">/api/analyze</span> para ativar a análise.</span>
+            <!-- Footer Removed -->
           </div>
         </div>
       </section>
@@ -2363,7 +2638,7 @@
             </div>
             <div class="row">
               <button class="neu-btn" id="btnShowAudit" type="button">Baixar Análise</button>
-              <button class="neu-btn primary" id="btnRestart" type="button">Refazer teste</button>
+              <!-- Button Removed -->
             </div>
           </div>
 
@@ -2560,8 +2835,8 @@
     /* ---------- Buttons / Nav ---------- */
     $("#btnHow").addEventListener("click", () => $("#howBlock").scrollIntoView({ behavior: "smooth", block: "start" }));
     $("#btnStart").addEventListener("click", () => goTo("view-register"));
-    $("#btnRestartTop").addEventListener("click", resetAll);
-    $("#btnRestart").addEventListener("click", resetAll);
+    // $("#btnRestartTop").addEventListener("click", resetAll);
+    // $("#btnRestart").addEventListener("click", resetAll);
     $("[data-nav='back']")?.addEventListener("click", back);
     $$("[data-nav='back']").forEach(b => b.addEventListener("click", back));
 
@@ -2619,6 +2894,14 @@
       errPhoto.textContent = issues.length ? issues[0] : "Foto validada. Excelente — podemos seguir.";
       errPhoto.classList.toggle("show", true);
       errPhoto.style.color = issues.length ? "var(--bad)" : "var(--ok)";
+
+      // Visual Valid State
+      if (state.selfie.approved) {
+        uploadZone.classList.add("valid");
+      } else {
+        uploadZone.classList.remove("valid");
+      }
+
       setPhotoReady(state.selfie.approved);
     }
 
@@ -2790,18 +3073,25 @@
       handleFile(file);
     });
 
-    // Magnetic hover effect
-    uploadZone.addEventListener("mousemove", (e) => {
-      const r = uploadZone.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width - 0.5;
-      const y = (e.clientY - r.top) / r.height - 0.5;
-      uploadZone.style.transform = `translateY(-2px) scale(1.01) rotateX(${(-y * 3).toFixed(2)}deg) rotateY(${(x * 3).toFixed(2)}deg)`;
-      uploadInner.style.transform = `translate(${(x * 6).toFixed(1)}px, ${(y * 6).toFixed(1)}px)`;
-    });
-    uploadZone.addEventListener("mouseleave", () => {
-      uploadZone.style.transform = "";
-      uploadInner.style.transform = "";
-    });
+    // Magnetic hover effect (Apenas Desktop)
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+    if (!isTouch) {
+      uploadZone.addEventListener("mousemove", (e) => {
+        const r = uploadZone.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+
+        // Reduzi a intensidade da rotação para ser mais sutil (de 3 para 1.5)
+        uploadZone.style.transform = `perspective(1000px) rotateX(${(-y * 1.5).toFixed(2)}deg) rotateY(${(x * 1.5).toFixed(2)}deg) scale(1.01)`;
+        uploadInner.style.transform = `translate(${(x * 4).toFixed(1)}px, ${(y * 4).toFixed(1)}px)`;
+      });
+
+      uploadZone.addEventListener("mouseleave", () => {
+        uploadZone.style.transform = "";
+        uploadInner.style.transform = "";
+      });
+    }
 
     btnToQuiz.addEventListener("click", () => {
       if (!state.selfie.approved) return;
@@ -3189,12 +3479,17 @@
       // Special layout for face grid (Second Image Style)
       if (q.layout === "grid-faces") {
         wrap.className = "grid-faces";
+
+        // Se houver exatamente 3 opções, empilhamos verticalmente para dar foco total às cores
+        if (q.options.length === 3) {
+          wrap.classList.add("stack-3");
+        }
+
         q.options.forEach(opt => {
           const card = document.createElement("div");
           card.className = "faceCard";
 
-          // Set card background from option swatch
-          // Note used 'bg' from swatch object.
+          // Cor de fundo vinda da paleta da pergunta
           const bg = opt.swatch?.bg || "#ccc";
           card.style.background = bg;
 
@@ -3202,15 +3497,15 @@
           img.src = state.selfie.dataUrl;
           img.alt = opt.label;
 
-          // No overlay div needed for this style, just the image inside colored card
-
           card.appendChild(img);
+
+          const chosen = state.quiz.answers[q.id] === opt.key;
+          if (chosen) card.classList.add("selected");
 
           card.onclick = () => {
             state.quiz.answers[q.id] = opt.key;
             $$(".faceCard", wrap).forEach(c => c.classList.remove("selected"));
             card.classList.add("selected");
-            // Hide hint
             $("#qHint").classList.remove("show");
           };
 
@@ -3332,7 +3627,7 @@
         id: "q12",
         title: "Confirmação de temperatura (QUENTES + OLIVAS)",
         help: "(Demo) Imagine que você está comparando amostras ao lado do rosto. Escolha o que parece mais harmônico e vivo.",
-        layout: "cols2",
+        layout: "grid-faces",
         options: [
           { key: "A", label: "Quente (dourado/pêssego)", sub: "harmoniza e ilumina", swatch: { type: "block", bg: "linear-gradient(135deg,#ffbf69,#ff8e54,#fff1b8)" } },
           { key: "B", label: "Oliva (verde suave/acinzentado)", sub: "harmoniza sem rosar", swatch: { type: "block", bg: "linear-gradient(135deg,#525834,#908e17,#c9cf7a)" } }
@@ -3348,7 +3643,7 @@
         id: "q12",
         title: "Confirmação de temperatura (FRIOS + OLIVAS)",
         help: "(Demo) Pense em qual amostra acalma a pele e deixa o rosto mais elegante, sem amarelado.",
-        layout: "cols2",
+        layout: "grid-faces",
         options: [
           { key: "A", label: "Frio (rosado/azulado)", sub: "harmoniza e acalma", swatch: { type: "block", bg: "linear-gradient(135deg,#f2c6d1,#e6ddee,#ffffff)" } },
           { key: "B", label: "Oliva (verde suave/acinzentado)", sub: "harmoniza sem rosar", swatch: { type: "block", bg: "linear-gradient(135deg,#5a514b,#80766e,#c8b8aa)" } }
@@ -3723,7 +4018,10 @@
         // Scanner view (visual feedback)
         goTo("view-scanner");
         $("#scanImg").src = state.selfie.dataUrl;
-        await sleep(2500);
+
+        // Força um tempo mínimo de leitura biométrica (UX dramática)
+        // Aumentamos de 2500ms para 3000ms para o usuário apreciar o HUD
+        await sleep(3000);
 
         // Save analysis from Backend
         // state.analysis = data.final; // No longer receiving 'final' directly here
@@ -3851,32 +4149,39 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
       return maps[palette] || ["#EDF0F6", "#DDE3F0", "#C8D0E7", "#AAB6D9", "#8E9AC8", "#6F7EB5", "#5565A3", "#3D4D91"];
     }
 
-    /* ---------- Render Result ---------- */
+    /* ---------- Render Result (Cinematic & Orchestrated) ---------- */
     function renderResult(analysis) {
+      // 1. Prepare Data
+      // Update Texts
       $("#resultTitle").textContent = `COLORFY — ${analysis.final_palette.name}`;
       $("#resultSubtitle").textContent = analysis.report.sections.quick_summary;
+      $("#resultTitle").className = ""; // Reset anim class if any
 
-      // Palette grid
+      // Images
+      const userImg = state.selfie.dataUrl || "";
+      $("#resultImg").src = userImg;
+
+      // Palette Grid
       const grid = $("#paletteGrid");
       grid.innerHTML = "";
       analysis.report.sections.main_palette.forEach((item, i) => {
         const card = document.createElement("div");
-        card.className = "neu-card glass swatchCard stagger-item";
-        card.style.animationDelay = `${i * 60}ms`;
+        card.className = "neu-card glass swatchCard"; // Base class, animation added later
         const hex = item.hex || item;
-        const name = item.name || `Cor ${i + 1}`;
+        const name = item.name || `Tom ${i + 1}`;
+
         card.innerHTML = `
-        <div class="swatchDot" style="background:${hex}"></div>
-        <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center;">
-          <strong style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size: 0.95rem;">${name}</strong>
-        </div>`;
+          <div class="swatchDot" style="background:${hex}"></div>
+          <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center;">
+            <strong style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size: 0.95rem;">${name}</strong>
+          </div>`;
         grid.appendChild(card);
       });
 
       // Orbits
       renderOrbits(analysis.report.sections.main_palette);
 
-      // Report sections
+      // Populate Text Reports
       $("#techNote").textContent = analysis.report.sections.technical_note;
 
       const fl = $("#featureList");
@@ -3894,6 +4199,51 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
 
       // Audit
       $("#auditPre").textContent = JSON.stringify(analysis, null, 2);
+
+      // 2. ORCHESTRATION (The reveal)
+      // Hide everything initially
+      const resultWrap = $(".resultWrap");
+      const resultHeader = $(".resultHeader");
+      const orbitContainer = $(".orbit-container");
+      const reportGrid = $("#reportGrid");
+      const swatchCards = $$(".swatchCard", grid);
+
+      // Reset states
+      resultHeader.classList.add("reveal-hidden");
+      resultHeader.classList.remove("reveal-visible");
+
+      orbitContainer.classList.add("reveal-hidden");
+      orbitContainer.classList.remove("reveal-visible");
+
+      reportGrid.classList.add("reveal-hidden");
+      reportGrid.classList.remove("reveal-visible");
+
+      swatchCards.forEach(c => c.classList.remove("pop-in"));
+
+      // Sequence
+      // Step A: Header (Title)
+      requestAnimationFrame(() => {
+        resultHeader.classList.add("reveal-visible");
+      });
+
+      // Step B: Orbit/Photo (300ms delay)
+      setTimeout(() => {
+        orbitContainer.classList.add("reveal-visible");
+      }, 300);
+
+      // Step C: Swatch Cards (Cascading starting at 500ms)
+      setTimeout(() => {
+        swatchCards.forEach((c, i) => {
+          setTimeout(() => {
+            c.classList.add("pop-in");
+          }, i * 60); // 60ms stagger
+        });
+      }, 500);
+
+      // Step D: Report Text (1200ms delay - let them breathe)
+      setTimeout(() => {
+        reportGrid.classList.add("reveal-visible");
+      }, 1200);
     }
 
     function fillList(sel, arr) {
@@ -4070,31 +4420,31 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
     function resetAll() {
       location.reload();
     }
-  
 
-// -------- Auto-resume after Stripe redirect (PATCH) --------
-async function autoResumeFromSession() {
-  const params = new URLSearchParams(window.location.search);
-  const sessionIdFromUrl = params.get("session_id");
-  const sessionIdFromStorage = localStorage.getItem("colorfy_pending_session");
-  const sessionId = sessionIdFromUrl || sessionIdFromStorage;
-  if (!sessionId) return;
-  localStorage.setItem("colorfy_pending_session", sessionId);
-  try {
-    const res = await fetch(`/api/get-result?session_id=${encodeURIComponent(sessionId)}`);
-    if (res.status === 402) { if (typeof goTo === "function") goTo("view-payment-pending"); return; }
-    if (!res.ok) { console.warn("autoResume status:", res.status); if (typeof goTo === "function") goTo("view-landing"); return; }
-    const data = await res.json();
-    if (typeof renderResult === "function") renderResult(data.result);
-    if (typeof goTo === "function") goTo("view-result");
-  } catch (err) {
-    console.error("autoResume error:", err);
-    if (typeof goTo === "function") goTo("view-landing");
-  }
-}
-document.addEventListener("DOMContentLoaded", autoResumeFromSession);
-// -------- End auto-resume patch --------
-</script>
+
+    // -------- Auto-resume after Stripe redirect (PATCH) --------
+    async function autoResumeFromSession() {
+      const params = new URLSearchParams(window.location.search);
+      const sessionIdFromUrl = params.get("session_id");
+      const sessionIdFromStorage = localStorage.getItem("colorfy_pending_session");
+      const sessionId = sessionIdFromUrl || sessionIdFromStorage;
+      if (!sessionId) return;
+      localStorage.setItem("colorfy_pending_session", sessionId);
+      try {
+        const res = await fetch(`/api/get-result?session_id=${encodeURIComponent(sessionId)}`);
+        if (res.status === 402) { if (typeof goTo === "function") goTo("view-payment-pending"); return; }
+        if (!res.ok) { console.warn("autoResume status:", res.status); if (typeof goTo === "function") goTo("view-landing"); return; }
+        const data = await res.json();
+        if (typeof renderResult === "function") renderResult(data.result);
+        if (typeof goTo === "function") goTo("view-result");
+      } catch (err) {
+        console.error("autoResume error:", err);
+        if (typeof goTo === "function") goTo("view-landing");
+      }
+    }
+    document.addEventListener("DOMContentLoaded", autoResumeFromSession);
+    // -------- End auto-resume patch --------
+  </script>
 </body>
 
 </html>
