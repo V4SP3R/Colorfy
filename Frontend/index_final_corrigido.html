@@ -222,6 +222,130 @@
       }
     }
 
+    /* ---------- Result Page Premium UI ---------- */
+    .premium-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .premium-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+    }
+
+    .reveal-animation {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    .delay-100 {
+      animation-delay: 100ms;
+    }
+
+    .delay-200 {
+      animation-delay: 200ms;
+    }
+
+    .delay-300 {
+      animation-delay: 300ms;
+    }
+
+    .delay-400 {
+      animation-delay: 400ms;
+    }
+
+    .delay-500 {
+      animation-delay: 500ms;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .color-chip {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border: 2px solid white;
+      transition: transform 0.2s;
+    }
+
+    .color-chip:hover {
+      transform: scale(1.1);
+      z-index: 10;
+    }
+
+    .seasonal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .seasonal-card {
+      padding: 12px;
+      border-radius: 16px;
+      background: white;
+      text-align: center;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .seasonal-card.active {
+      border-color: var(--brand);
+      box-shadow: 0 8px 24px rgba(91, 124, 255, 0.2);
+      transform: scale(1.02);
+    }
+
+    /* Checkmark & List Styles */
+    .check-list li {
+      position: relative;
+      padding-left: 28px;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .check-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--ok);
+      font-weight: bold;
+    }
+
+    /* Makeup Icons (Basic SVG placeholders styling) */
+    .makeup-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--bg);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
     /* ---------- Layout ---------- */
     .app {
       min-height: 100%;
@@ -3994,50 +4118,253 @@
     // --- DATABASE DE ESTILO ---
     // --- NOVO DATASET PREMIUM (Fonte da Verdade) ---
     const SEASONAL_DATA = {
+      // 🌸 PRIMAVERA
+      "spring_light": {
+        title: "Primavera Clara (Light Spring)",
+        theme: "from-yellow-50 to-pink-50 border-yellow-200",
+        accent: "text-amber-500",
+        desc: "Quente, claro e delicado. Sua beleza brilha com cores iluminadas pelo sol.",
+        subtones: "Pêssego, Dourado suave.",
+        neutrals: [
+          { name: "Creme", hex: "#FFFDD0" }, { name: "Bege Dourado", hex: "#F5F5DC" },
+          { name: "Cinza Quente", hex: "#AFAFAF" }, { name: "Marrom Claro", hex: "#C4A484" }
+        ],
+        highlights: [
+          { name: "Pêssego", hex: "#FFDAB9" }, { name: "Coral Claro", hex: "#F08080" },
+          { name: "Amarelo Manteiga", hex: "#FFFACD" }, { name: "Verde Claro", hex: "#90EE90" },
+          { name: "Turquesa Suave", hex: "#AFEEEE" }
+        ],
+        makeup: { batom: "Coral rosado, Pêssego, Nude quente.", blush: "Pêssego ou Coral suave." },
+        hair: "Loiro dourado, Castanho claro quente, Ruivo morango.",
+        avoid: "Preto puro, cinzas frios, tons muito escuros e fechados.",
+        contrast_guide: "Baixo a médio. Evite contrastes pesados que ofusquem sua delicadeza."
+      },
+      "spring_warm": {
+        title: "Primavera Quente (True Spring)",
+        theme: "from-orange-50 to-yellow-50 border-orange-300",
+        accent: "text-orange-600",
+        desc: "Quente puro, vibrante e cheio de energia. Cores vivas são essenciais.",
+        subtones: "Dourado intenso, Mel.",
+        neutrals: [
+          { name: "Marrom Dourado", hex: "#966F33" }, { name: "Camel", hex: "#C19A6B" },
+          { name: "Creme Rico", hex: "#F3E5AB" }, { name: "Azul Marinho Quente", hex: "#000080" }
+        ],
+        highlights: [
+          { name: "Laranja", hex: "#FFA500" }, { name: "Tomate", hex: "#FF6347" },
+          { name: "Dourado", hex: "#FFD700" }, { name: "Verde Vivo", hex: "#32CD32" },
+          { name: "Coral Vivo", hex: "#FF7F50" }
+        ],
+        makeup: { batom: "Laranja, Coral vibrante, Vermelho tomate.", blush: "Coral ou Bronze." },
+        hair: "Ruivo acobreado, Loiro mel, Castanho dourado.",
+        avoid: "Tons frios azulados, rosados frios (fúcsia, bordô).",
+        contrast_guide: "Médio. Você segura bem cores com vivacidade."
+      },
+      "spring_bright": {
+        title: "Primavera Brilhante (Bright Spring)",
+        theme: "from-rose-50 to-yellow-50 border-rose-400",
+        accent: "text-rose-600",
+        desc: "Quente neutro, intenso e contrastante. Uma mistura vibrante de Primavera com influência de Inverno.",
+        subtones: "Neutro-quente, Brilhante.",
+        neutrals: [
+          { name: "Preto (com cor)", hex: "#2C2C2C" }, { name: "Cinza Chumbo", hex: "#333333" },
+          { name: "Taupe", hex: "#483C32" }, { name: "Marrom Escuro", hex: "#654321" }
+        ],
+        highlights: [
+          { name: "Coral Vibrante", hex: "#FF4040" }, { name: "Turquesa Forte", hex: "#00CED1" },
+          { name: "Verde Lima", hex: "#32CD32" }, { name: "Rosa Quente", hex: "#FF69B4" },
+          { name: "Amarelo Gema", hex: "#FFD700" }
+        ],
+        makeup: { batom: "Rosa vibrante, Coral intenso, Vermelho melancia.", blush: "Rosa quente." },
+        hair: "Castanho escuro, Preto natural, Loiro platinado (se quente).",
+        avoid: "Tons apagados, opacos, pastéis empoeirados.",
+        contrast_guide: "Alto. Use blocos de cor (color blocking) sem medo."
+      },
+
+      // ☀️ VERÃO
+      "summer_light": {
+        title: "Verão Claro (Light Summer)",
+        theme: "from-blue-50 to-pink-50 border-blue-200",
+        accent: "text-sky-600",
+        desc: "Frio, claro e etéreo. Cores suaves com frescor.",
+        subtones: "Rosado, Azulado suave.",
+        neutrals: [
+          { name: "Cinza Claro", hex: "#D3D3D3" }, { name: "Azul Acinzentado", hex: "#B0C4DE" },
+          { name: "Off-White", hex: "#F8F8FF" }, { name: "Areia Frio", hex: "#C2B280" }
+        ],
+        highlights: [
+          { name: "Rosa Bebê", hex: "#FFB6C1" }, { name: "Azul Céu", hex: "#87CEEB" },
+          { name: "Lilás", hex: "#C8A2C8" }, { name: "Menta Fria", hex: "#98FF98" },
+          { name: "Framboesa Suave", hex: "#E30B5C" }
+        ],
+        makeup: { batom: "Rosa claro, Malva suave.", blush: "Rosa frio." },
+        hair: "Loiro cinza claro, Loiro platinado perolado.",
+        avoid: "Laranja, amarelo forte, marrom quente, preto pesado.",
+        contrast_guide: "Baixo. Mantenha as combinações leves e fluidas."
+      },
+      "summer_soft": {
+        title: "Verão Suave (Soft Summer)",
+        theme: "from-slate-50 to-emerald-50 border-slate-300",
+        accent: "text-slate-600",
+        desc: "Frio neutralizado, suave e elegante. A estação mais complexa e sofisticada.",
+        subtones: "Neutro-frio, Opaco.",
+        neutrals: [
+          { name: "Cinza Médio", hex: "#808080" }, { name: "Taupe Rosado", hex: "#BC987E" },
+          { name: "Azul Marinho Suave", hex: "#4C516D" }, { name: "Cacau", hex: "#875F42" }
+        ],
+        highlights: [
+          { name: "Malva", hex: "#E0B0FF" }, { name: "Cinza Azulado", hex: "#6699CC" },
+          { name: "Verde Sálvia", hex: "#9DC183" }, { name: "Lavanda Empoeirada", hex: "#967BB6" },
+          { name: "Bordô Suave", hex: "#800020" }
+        ],
+        makeup: { batom: "Nude rosado, Malva, Ameixa suave.", blush: "Rosa antigo." },
+        hair: "Loiro cinza escuro (dirty blonde), Castanho claro cinza.",
+        avoid: "Cores neon, vibrantes demais, preto puro, laranja.",
+        contrast_guide: "Baixo a médio. O tom sobre tom (monocromático) fica incrível."
+      },
+      "summer_cool": {
+        title: "Verão Frio (Cool Summer)",
+        theme: "from-blue-50 to-indigo-50 border-blue-300",
+        accent: "text-indigo-600",
+        desc: "Frio puro, sereno e clássico. Evite qualquer calor na paleta.",
+        subtones: "Azulado, Rosado puro.",
+        neutrals: [
+          { name: "Azul Marinho", hex: "#000080" }, { name: "Carvão", hex: "#36454F" },
+          { name: "Branco Suave", hex: "#F5F5F5" }, { name: "Cinza Azulado", hex: "#778899" }
+        ],
+        highlights: [
+          { name: "Azul Royal Suave", hex: "#4169E1" }, { name: "Rosa Frio", hex: "#FF69B4" },
+          { name: "Violeta", hex: "#8A2BE2" }, { name: "Framboesa", hex: "#E30B5C" },
+          { name: "Verde Esmeralda Frio", hex: "#008000" }
+        ],
+        makeup: { batom: "Rosa chiclete, Pink suave, Rubi.", blush: "Rosa frio." },
+        hair: "Castanho cinza, Preto suave, Loiro platinado acinzentado.",
+        avoid: "Dourados, laranjas, terrosos quentes (tijolo, mostarda).",
+        contrast_guide: "Médio. Cores frias criam uma harmonia natural."
+      },
+
+      // 🍂 OUTONO
+      "autumn_soft": {
+        title: "Outono Suave (Soft Autumn)",
+        theme: "from-stone-50 to-orange-50 border-stone-300",
+        accent: "text-stone-600",
+        desc: "Quente neutralizado, suave e natural. Uma mistura rica de terra e luz difusa.",
+        subtones: "Neutro-quente, Oliva suave.",
+        neutrals: [
+          { name: "Camelo", hex: "#C19A6B" }, { name: "Caqui", hex: "#F0E68C" },
+          { name: "Marrom Café", hex: "#4B3621" }, { name: "Creme", hex: "#FFFDD0" }
+        ],
+        highlights: [
+          { name: "Oliva Claro", hex: "#808000" }, { name: "Terracota Suave", hex: "#E2725B" },
+          { name: "Pêssego Queimado", hex: "#FFCC99" }, { name: "Salmão", hex: "#FA8072" },
+          { name: "Verde Musgo", hex: "#8A9A5B" }
+        ],
+        makeup: { batom: "Nude pêssego, Terracota, Marrom rosado.", blush: "Pêssego bronze." },
+        hair: "Castanho dourado suave, Loiro mel, Acobreado sutíl.",
+        avoid: "Preto puro, cores frias vibrantes (pink, azul elétrico).",
+        contrast_guide: "Médio-baixo. Texturas naturais e cores foscas favorecem muito."
+      },
+      "autumn_warm": {
+        title: "Outono Quente (True Autumn)",
+        theme: "from-orange-100 to-amber-50 border-orange-400",
+        accent: "text-amber-700",
+        desc: "Quente puro, rico e terroso. A essência das folhas de outono.",
+        subtones: "Dourado profundo, Bronze.",
+        neutrals: [
+          { name: "Marrom Chocolate", hex: "#D2691E" }, { name: "Bege Quente", hex: "#F5F5DC" },
+          { name: "Verde Militar", hex: "#4B5320" }, { name: "Ferrugem", hex: "#B7410E" }
+        ],
+        highlights: [
+          { name: "Mostarda", hex: "#FFDB58" }, { name: "Laranja Queimado", hex: "#CC5500" },
+          { name: "Oliva Intenso", hex: "#556B2F" }, { name: "Vermelho Tomate Escuro", hex: "#BF616A" },
+          { name: "Bronze", hex: "#CD7F32" }
+        ],
+        makeup: { batom: "Tijolo, Cobre, Vermelho quente.", blush: "Terracota ou Bronze." },
+        hair: "Ruivo intenso, Castanho acobreado, Castanho dourado.",
+        avoid: "Tons frios azulados, rosa chiclete, cinza chumbo.",
+        contrast_guide: "Médio. Cores ricas e saturadas (mas terrosas) funcionam bem."
+      },
       "autumn_deep": {
         title: "Outono Profundo (Deep Autumn)",
         theme: "from-orange-50 to-stone-100 border-orange-200",
         accent: "text-orange-900",
-        desc: "Quente neutro, profundo, rico, contraste médio-alto.",
+        desc: "Quente neutro, profundo e nobre. Onde o calor encontra a escuridão.",
         subtones: "Oliva quente, Dourado, Quente puro.",
         neutrals: [
-          { name: "Marrom Chocolate", hex: "#381819" }, { name: "Caramelo Profundo", hex: "#8A5A2E" },
+          { name: "Chocolate Escuro", hex: "#381819" }, { name: "Caramelo Escuro", hex: "#8A5A2E" },
           { name: "Oliva Escuro", hex: "#3C4023" }, { name: "Preto Quente", hex: "#1E1613" }
         ],
         highlights: [
           { name: "Bordô", hex: "#5A1F1F" }, { name: "Tijolo", hex: "#9A3B2E" },
           { name: "Verde Bosque", hex: "#254025" }, { name: "Dourado Velho", hex: "#B08C3A" },
-          { name: "Ameixa", hex: "#4B2C3F" }, { name: "Oliva", hex: "#556B2F" }
+          { name: "Ameixa", hex: "#4B2C3F" }
         ],
-        makeup: { batom: "Vinho quente, Ameixa, Tijolo intenso.", blush: "Terracota quente." },
-        hair: "Castanho profundo quente, Chocolate com reflexos.",
-        avoid: "Pastéis frios, rosados frios, preto puro."
+        makeup: { batom: "Vinho quente, Ameixa, Tijolo intenso.", blush: "Terracota escuro." },
+        hair: "Castanho profundo quente, Chocolate com reflexos dourados.",
+        avoid: "Pastéis frios, rosados frios, cinzas claros, cores neon.",
+        contrast_guide: "Médio-alto. Use o claro/escuro a seu favor (profundidade)."
       },
+
+      // ❄️ INVERNO
       "winter_bright": {
         title: "Inverno Brilhante (Bright Winter)",
-        theme: "from-gray-50 to-white border-pink-500",
-        accent: "text-pink-600",
-        desc: "Frio, contraste alto e cores puras.",
-        subtones: "Frio puro, Azulado.",
-        neutrals: [{ name: "Preto", hex: "#000000" }, { name: "Branco Puro", hex: "#FFFFFF" }],
-        highlights: [{ name: "Azul Cobalto", hex: "#0047AB" }, { name: "Rosa Pink", hex: "#FF007F" }, { name: "Esmeralda", hex: "#50C878" }, { name: "Rubi", hex: "#E0115F" }],
-        makeup: { batom: "Vermelho Rubi, Pink.", blush: "Pink frio." },
-        hair: "Preto azulado, Castanho muito escuro.",
-        avoid: "Terrosos quentes, beges dourados."
+        theme: "from-fuchsia-50 to-cyan-50 border-fuchsia-400",
+        accent: "text-fuchsia-700",
+        desc: "Frio, vibrante e elétrico. Alto contraste e cores puras definem você.",
+        subtones: "Neutro-frio, Brilhante.",
+        neutrals: [
+          { name: "Preto Absoluto", hex: "#000000" }, { name: "Branco Puro", hex: "#FFFFFF" },
+          { name: "Cinza Gelo", hex: "#EFF0F1" }, { name: "Marinho Profundo", hex: "#000080" }
+        ],
+        highlights: [
+          { name: "Fúcsia (Pink)", hex: "#FF00FF" }, { name: "Azul Royal", hex: "#4169E1" },
+          { name: "Vermelho Cereja", hex: "#DE3163" }, { name: "Verde Esmeralda", hex: "#50C878" },
+          { name: "Amarelo Limão", hex: "#FAFA33" }
+        ],
+        makeup: { batom: "Pink vibrante, Vermelho puro, Rubi.", blush: "Rosa frio." },
+        hair: "Preto azulado, Castanho escuro, Grisalho prateado.",
+        avoid: "Terrosos quentes (bege, laranja, dourado), tons opacos e suaves.",
+        contrast_guide: "Alto. Preto e branco juntos ficam perfeitos em você."
+      },
+      "winter_cool": {
+        title: "Inverno Frio (True Winter)",
+        theme: "from-blue-100 to-slate-100 border-blue-500",
+        accent: "text-blue-800",
+        desc: "Frio puro, intenso e majestoso. A rainha das neves.",
+        subtones: "Azulado intenso.",
+        neutrals: [
+          { name: "Preto", hex: "#000000" }, { name: "Branco", hex: "#FFFFFF" },
+          { name: "Cinza Aço", hex: "#4682B4" }, { name: "Marinho", hex: "#000080" }
+        ],
+        highlights: [
+          { name: "Azul Cobalto", hex: "#0047AB" }, { name: "Roxo Real", hex: "#7851A9" },
+          { name: "Rosa Choque", hex: "#FC0FC0" }, { name: "Vinho Frio", hex: "#722F37" },
+          { name: "Verde Pinho", hex: "#01796F" }
+        ],
+        makeup: { batom: "Rosa frio, Roxo, Vinho.", blush: "Ameixa ou Rosa frio." },
+        hair: "Preto azeviche, Castanho escuro frio, Grisalho branco.",
+        avoid: "Dourado (use prata), laranja, marrom quente, tons amarelados.",
+        contrast_guide: "Médio-alto. Mantenha a pureza e frieza das cores."
       },
       "winter_deep": {
         title: "Inverno Profundo (Deep Winter)",
-        theme: "from-gray-100 to-slate-200 border-slate-600",
+        theme: "from-slate-100 to-gray-200 border-slate-500",
         accent: "text-slate-900",
-        desc: "Frio profundo, intenso, sofisticado.",
-        subtones: "Frio profundo, Neutro-frio.",
-        neutrals: [{ name: "Preto", hex: "#000000" }, { name: "Grafite", hex: "#36454F" }],
-        highlights: [{ name: "Vinho Frio", hex: "#722F37" }, { name: "Marinho", hex: "#000080" }, { name: "Verde Pinho", hex: "#01796F" }],
-        makeup: { batom: "Ameixa, Vinho.", blush: "Vinho." },
-        hair: "Preto, Castanho escuro frio.",
-        avoid: "Laranja, mostarda."
-      },
-      // ... (O código usará fallback inteligente para as outras estações se necessário)
+        desc: "Frio neutro, profundo e misterioso. Uma intensidade noturna.",
+        subtones: "Neutro-frio, Oliva escuro.",
+        neutrals: [
+          { name: "Preto", hex: "#000000" }, { name: "Grafite", hex: "#383838" },
+          { name: "Marrom Café Frio", hex: "#4B3621" }, { name: "Azul Noite", hex: "#191970" }
+        ],
+        highlights: [
+          { name: "Vinho Profundo", hex: "#59090C" }, { name: "Verde Floresta", hex: "#228B22" },
+          { name: "Ameixa", hex: "#673147" }, { name: "Azul Marinho", hex: "#000080" },
+          { name: "Vermelho Sangue", hex: "#8A0303" }
+        ],
+        makeup: { batom: "Vinho, Berinjela, Vermelho profundo.", blush: "Vinho ou Ameixa." },
+        hair: "Preto, Castanho muito escuro, Prata escuro.",
+        avoid: "Tons pastéis claros demais (te apagam), pêssego, terra claro.",
+        contrast_guide: "Alto. Combine cores escuras com detalhes claros e vibrantes."
+      }
     };
 
     // Adiciona as outras estações básicas para evitar erro de "undefined"
@@ -4052,8 +4379,76 @@
     }
 
     // --- FUNÇÃO DE RENDERIZAÇÃO (O CÉREBRO) ---
+    /* ---------- Helper Renderers ---------- */
+    function renderInventory(answers) {
+      // Derive attributes from answers (simulated logic for display)
+      const skinVal = answers.q11 === "A" ? { val: "Clara", temp: "Neutro-fria", chroma: "Suave" } :
+        answers.q11 === "B" ? { val: "Média", temp: "Neutra", chroma: "Médio" } :
+          answers.q11 === "C" ? { val: "Morena", temp: "Quente", chroma: "Intenso" } :
+            { val: "Profunda", temp: "Quente/Oliva", chroma: "Intenso" };
+
+      return `
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
+            <div class="glass-panel p-3 text-center flex flex-col items-center justify-center">
+                <span class="text-2xl mb-1">🧖‍♀️</span>
+                <span class="text-xs font-bold uppercase text-slate-400">Pele</span>
+                <span class="text-sm font-bold text-slate-700">${skinVal.val}</span>
+                <span class="text-[10px] text-slate-500">${skinVal.temp}</span>
+            </div>
+            <div class="glass-panel p-3 text-center flex flex-col items-center justify-center">
+                <span class="text-2xl mb-1">💇‍♀️</span>
+                <span class="text-xs font-bold uppercase text-slate-400">Cabelo</span>
+                <span class="text-sm font-bold text-slate-700">Contraste ${answers.q3 === "A" ? "Alto" : "Médio"}</span>
+            </div>
+            <div class="glass-panel p-3 text-center flex flex-col items-center justify-center">
+                <span class="text-2xl mb-1">👁️</span>
+                <span class="text-xs font-bold uppercase text-slate-400">Olhos</span>
+                <span class="text-sm font-bold text-slate-700">Brilho ${answers.q2 === "A" ? "Vivo" : "Suave"}</span>
+            </div>
+            <div class="glass-panel p-3 text-center flex flex-col items-center justify-center">
+                <span class="text-2xl mb-1">🤨</span>
+                <span class="text-xs font-bold uppercase text-slate-400">Sobrancelha</span>
+                <span class="text-sm font-bold text-slate-700">Definida</span>
+            </div>
+            <div class="glass-panel p-3 text-center col-span-2 md:col-span-1 flex flex-col items-center justify-center bg-white/50">
+                <span class="text-xs font-bold uppercase text-slate-400 mb-1">Resumo</span>
+                <span class="text-xs text-slate-600 leading-tight">Sua beleza pede harmonia e repetição de temperatura.</span>
+            </div>
+        </div>`;
+    }
+
+    function renderComparisonGrid(currentKey, seasonData) {
+      // Logic to show nearby seasons based on current
+      let related = [];
+      if (currentKey.includes("spring")) related = ["spring_bright", "spring_warm", "spring_light"];
+      else if (currentKey.includes("summer")) related = ["summer_light", "summer_cool", "summer_soft"];
+      else if (currentKey.includes("autumn")) related = ["autumn_soft", "autumn_warm", "autumn_deep"];
+      else related = ["winter_bright", "winter_cool", "winter_deep"];
+
+      return `
+        <div class="seasonal-grid mt-4">
+            ${related.map(k => {
+        const s = SEASONAL_DATA[k];
+        if (!s) return "";
+        const isCurrent = k === currentKey;
+        return `
+                <div class="seasonal-card ${isCurrent ? 'active ring-2 ring-offset-2 ring-indigo-500' : 'opacity-70 hover:opacity-100'}">
+                    <div class="text-xs font-bold uppercase mb-1 text-slate-400">${isCurrent ? 'Sua Paleta' : 'Variação'}</div>
+                    <div class="h-8 w-full rounded mb-2 bg-gradient-to-r ${s.theme}"></div>
+                    <h4 class="text-sm font-bold text-slate-700 leading-tight">${s.title.split('(')[0]}</h4>
+                </div>
+                `;
+      }).join('')}
+        </div>
+        <p class="text-xs text-slate-500 mt-3 text-center italic">
+            "Você foi classificada como ${seasonData.title.split('(')[0]} porque seu contraste e temperatura se alinham perfeitamente com os critérios desta estação."
+        </p>
+        `;
+    }
+
+    /* ---------- Main Render ---------- */
     function renderResult(analysis) {
-      // 1. TRADUTOR DE SEGURANÇA (Português -> Código)
+      // 1. TRADUTOR DE SEGURANÇA
       const map = {
         "Primavera Clara": "spring_light", "Primavera Quente": "spring_warm", "Primavera Brilhante": "spring_bright",
         "Verão Claro": "summer_light", "Verão Suave": "summer_soft", "Verão Frio": "summer_cool",
@@ -4065,91 +4460,256 @@
         "Inverno Frio Oliva": "winter_cool", "Inverno Profundo Oliva": "winter_deep"
       };
 
-      // Pega o nome vindo do cálculo (ex: "Outono Profundo")
       const seasonName = analysis.final_palette ? analysis.final_palette.name : "Outono Profundo";
-      // Traduz para chave (ex: "autumn_deep")
       const seasonKey = map[seasonName] || "autumn_deep";
-      // Carrega os dados visuais
       const data = getSeasonData(seasonKey);
 
-      // Recupera foto do usuário
+      const isOlive = seasonName.includes("Oliva");
+
       let userImg = state.selfie.dataUrl;
       if (!userImg) userImg = localStorage.getItem("colorfy_user_photo") || "https://ui-avatars.com/api/?name=Voce";
 
-      // Constrói o HTML
-      const html = `
-        <div class="relative w-full rounded-3xl bg-gradient-to-br ${data.theme} p-6 mb-6 shadow-lg animate-up">
-            <div class="flex flex-col md:flex-row items-center gap-6">
-                <img src="${userImg}" class="w-32 h-32 rounded-full border-4 border-white shadow-xl object-cover">
-                <div class="text-center md:text-left">
-                    <div class="inline-block px-3 py-1 bg-white/60 rounded-full text-xs font-bold uppercase mb-2 ${data.accent}">Resultado Oficial</div>
-                    <h2 class="text-3xl font-bold text-slate-800 mb-1">${data.title}</h2>
-                    <p class="text-slate-600 max-w-md">${data.desc}</p>
-                    <div class="mt-3 flex flex-wrap gap-2 justify-center md:justify-start">
-                        <span class="px-3 py-1 bg-white rounded text-xs font-bold text-slate-500">Subtom: ${data.subtones ? data.subtones.split(',')[0] : 'Natural'}</span>
+      // --- SECTION 1: HEADER & IDENTITY ---
+      const htmlHeader = `
+        <div class="relative w-full rounded-3xl bg-gradient-to-br ${data.theme} p-6 md:p-8 mb-8 shadow-xl animate-up overflow-hidden">
+            <div class="absolute top-0 right-0 p-8 opacity-10">
+                <i class="fa-solid fa-palette text-9xl"></i>
+            </div>
+            <div class="relative z-10 flex flex-col md:flex-row items-center gap-8">
+                <div class="relative group">
+                    <img src="${userImg}" class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-2xl object-cover group-hover:scale-105 transition duration-500">
+                    <div class="absolute bottom-0 right-0 bg-white text-xs font-bold px-2 py-1 rounded-full shadow border border-slate-100">
+                        ${isOlive ? '🫒 Oliva' : '✨ Oficial'}
+                    </div>
+                </div>
+                <div class="text-center md:text-left flex-1">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/60 backdrop-blur rounded-full text-xs font-bold uppercase mb-3 ${data.accent}">
+                        ${isOlive ? '<span class="w-2 h-2 rounded-full bg-green-600"></span> Subtom Oliva Detectado' : '<span class="w-2 h-2 rounded-full bg-indigo-600"></span> Análise Concluída'}
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight leading-tight">
+                        Sua Paleta: <br class="md:hidden"/>
+                        <span class="bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600">${data.title}</span>
+                    </h2>
+                    <p class="text-slate-700 font-medium max-w-lg text-lg leading-relaxed mb-4">${data.desc}</p>
+                    
+                    <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+                        <span class="px-3 py-1 bg-white/50 border border-white/40 rounded-lg text-xs font-bold text-slate-600 shadow-sm">
+                            <i class="fa-solid fa-temperature-half mr-1"></i> ${data.subtones.split(',')[0]}
+                        </span>
+                         <span class="px-3 py-1 bg-white/50 border border-white/40 rounded-lg text-xs font-bold text-slate-600 shadow-sm">
+                            <i class="fa-solid fa-circle-half-stroke mr-1"></i> Contraste Natural
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
+      `;
 
-        <div class="section-card animate-up delay-200" style="border-left: 6px solid #aaa;">
-            <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <span class="text-2xl">🎨</span> Sua Paleta Pessoal
+      // --- SECTION 2: INVENTORY ---
+      const htmlInventory = `
+        <div class="mb-10 animate-up delay-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 px-2 border-l-4 border-indigo-500">1. Inventário de Características</h3>
+            ${renderInventory(state.quiz.answers || {})}
+        </div>
+      `;
+
+      // --- SECTION 3: PALETTE ---
+      const htmlPalette = `
+        <div class="premium-card p-6 mb-10 animate-up delay-200">
+            <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2">
+                <span class="text-2xl">🎨</span> Paleta de Cores Principal
             </h3>
+            <p class="text-slate-500 text-sm mb-6">As cores que harmonizam perfeitamente com sua beleza natural.</p>
             
-            <p class="text-xs font-bold uppercase text-slate-400 mb-3">Neutros & Base</p>
-            <div class="flex flex-wrap gap-4 mb-8">
-                ${data.neutrals.map(c => `
-                    <div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition" onclick="alert('Cor copiada: ${c.hex}')">
-                        <div class="color-dot" style="background-color: ${c.hex}"></div>
-                        <span class="text-xs font-bold text-slate-600 w-20 text-center">${c.name}</span>
-                    </div>
-                `).join('')}
-            </div>
-
-            <p class="text-xs font-bold uppercase text-slate-400 mb-3">Cores de Destaque</p>
-            <div class="flex flex-wrap gap-4">
-                ${data.highlights.map(c => `
-                    <div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition">
-                        <div class="color-dot" style="background-color: ${c.hex}"></div>
-                        <span class="text-xs font-bold text-slate-600 w-20 text-center">${c.name}</span>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-
-        <div class="section-card animate-up delay-300">
-            <h3 class="text-xl font-bold text-slate-800 mb-4">💄 Guia de Estilo</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="p-4 bg-slate-50 rounded-xl">
-                    <h4 class="font-bold text-slate-700 mb-2">Maquiagem Ideal</h4>
-                    <ul class="text-sm text-slate-600 space-y-2">
-                        <li><strong>Batom:</strong> ${data.makeup.batom || "Tons da paleta"}</li>
-                        <li><strong>Blush:</strong> ${data.makeup.blush || "Suave e natural"}</li>
-                    </ul>
+            <div class="mb-8">
+                <p class="text-xs font-bold uppercase text-slate-400 mb-4 tracking-wider">Neutros Essenciais</p>
+                <div class="flex flex-wrap gap-4 md:gap-6">
+                    ${data.neutrals.map(c => `
+                        <div class="group flex flex-col items-center gap-3 cursor-pointer" onclick="navigator.clipboard.writeText('${c.hex}'); alert('Copiado: ${c.hex}')">
+                            <div class="color-chip shadow-lg group-hover:scale-110 transition duration-300" style="background-color: ${c.hex}"></div>
+                            <div class="text-center">
+                                <span class="block text-xs font-bold text-slate-700 w-20 leading-tight">${c.name}</span>
+                                <span class="block text-[10px] text-slate-400 font-mono opacity-0 group-hover:opacity-100 transition">${c.hex}</span>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
-                <div class="p-4 bg-slate-50 rounded-xl">
-                    <h4 class="font-bold text-slate-700 mb-2">Cabelo & Tons</h4>
-                    <p class="text-sm text-slate-600">${data.hair || "Mantenha o contraste natural."}</p>
+            </div>
+
+            <div>
+                <p class="text-xs font-bold uppercase text-slate-400 mb-4 tracking-wider">Cores de Destaque (Wow Factors)</p>
+                <div class="flex flex-wrap gap-4 md:gap-6">
+                    ${data.highlights.map(c => `
+                        <div class="group flex flex-col items-center gap-3 cursor-pointer" onclick="navigator.clipboard.writeText('${c.hex}'); alert('Copiado: ${c.hex}')">
+                            <div class="color-chip shadow-lg group-hover:scale-110 transition duration-300 ring-2 ring-white" style="background-color: ${c.hex}"></div>
+                            <div class="text-center">
+                                <span class="block text-xs font-bold text-slate-700 w-20 leading-tight">${c.name}</span>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         </div>
+      `;
 
-        <div class="section-card animate-up delay-400 border-red-100 bg-red-50/30">
-            <h3 class="text-lg font-bold text-red-800 mb-2">⚠️ Use com Moderação</h3>
-            <p class="text-sm text-red-700">${data.avoid || "Cores que apagam seu brilho natural."}</p>
+      // --- SECTION 4: CONTRAST ---
+      const htmlContrast = `
+        <div class="mb-10 animate-up delay-300">
+             <h3 class="text-lg font-bold text-slate-800 mb-4 px-2 border-l-4 border-indigo-500">4. Gestão de Contraste</h3>
+             <div class="premium-card p-6 bg-gradient-to-br from-white to-slate-50">
+                <p class="text-sm text-slate-600 mb-6 font-medium">
+                    <i class="fa-solid fa-circle-info text-indigo-500 mr-2"></i>
+                    ${data.contrast_guide || "Mantenha o equilíbrio natural entre suas cores."}
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-emerald-50/50 border border-emerald-100">
+                        <h4 class="font-bold text-emerald-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-check-circle"></i> Combinações Perfeitas</h4>
+                        <ul class="text-sm text-emerald-700 space-y-2">
+                             <li>• Neutro escuro + Cor vibrante</li>
+                             <li>• Tom sobre tom (Monocromático)</li>
+                             <li>• Estampas de baixo contraste</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 rounded-xl bg-amber-50/50 border border-amber-100">
+                        <h4 class="font-bold text-amber-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> Use com Moderação</h4>
+                        <ul class="text-sm text-amber-700 space-y-2">
+                             <li>• Preto puro próximo ao rosto</li>
+                             <li>• Cores neon isoladas</li>
+                             <li>• Contraste Branco x Preto extremo</li>
+                        </ul>
+                    </div>
+                </div>
+             </div>
         </div>
-        `;
+      `;
 
-      // Injeta no HTML
+      // --- SECTION 5: STYLE ---
+      const htmlStyle = `
+        <div class="mb-10 animate-up delay-400">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 px-2 border-l-4 border-pink-500">5. Estilo no Mundo Real</h3>
+             
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <!-- Makeup -->
+                 <div class="premium-card p-5">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-500"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                        <h4 class="font-bold text-slate-700">Maquiagem</h4>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase text-slate-400 block mb-1">Batom</span>
+                            <p class="text-sm text-slate-700 bg-slate-50 p-2 rounded border border-slate-100">${data.makeup.batom}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold uppercase text-slate-400 block mb-1">Blush</span>
+                            <p class="text-sm text-slate-700 bg-slate-50 p-2 rounded border border-slate-100">${data.makeup.blush}</p>
+                        </div>
+                    </div>
+                 </div>
+
+                 <!-- Hair -->
+                 <div class="premium-card p-5">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600"><i class="fa-solid fa-scissors"></i></div>
+                        <h4 class="font-bold text-slate-700">Cabelo & Acabamento</h4>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-4 leading-relaxed">${data.hair}</p>
+                    <div class="flex gap-2">
+                         <span class="px-2 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded">Brilho Natural</span>
+                         <span class="px-2 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded">Nuances</span>
+                    </div>
+                 </div>
+             </div>
+        </div>
+      `;
+
+      // --- SECTION 6: ADVANCED (Simplified for text fit) ---
+      const htmlAdvanced = `
+         <div class="section-card animate-up delay-500 bg-slate-800 text-white rounded-2xl p-6 mb-10 relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+                <i class="fa-solid fa-layer-group text-9xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-graduation-cap"></i> Técnicas Avançadas
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+                <div>
+                    <h5 class="font-bold text-indigo-300 mb-1 text-sm">Análogas</h5>
+                    <p class="text-xs text-slate-300">Combine cores vizinhas no círculo cromático para um visual sofisticado e suave.</p>
+                </div>
+                <div>
+                     <h5 class="font-bold text-rose-300 mb-1 text-sm">Complementares</h5>
+                    <p class="text-xs text-slate-300">Use cores opostas para alto impacto, mas mantenha a mesma profundidade.</p>
+                </div>
+                 <div>
+                     <h5 class="font-bold text-emerald-300 mb-1 text-sm">Teste do Tecido</h5>
+                    <p class="text-xs text-slate-300">aproxime o tecido do rosto: se as olheiras diminuírem, a cor é certa.</p>
+                </div>
+            </div>
+         </div>
+      `;
+
+      // --- SECTION 7: COMPARISON GRID ---
+      // (Using helper)
+      const htmlComparison = `
+        <div class="mb-10 animate-up delay-500">
+             <h3 class="text-lg font-bold text-slate-800 mb-4 px-2 border-l-4 border-slate-500">7. Comparação Sazonal</h3>
+             ${renderComparisonGrid(seasonKey, data)}
+        </div>
+       `;
+
+      // --- SECTION 8: NEXT STEPS ---
+      const htmlNextSteps = `
+        <div class="pb-12 animate-up delay-500">
+             <div class="premium-card p-6 md:p-8 bg-gradient-to-b from-white to-indigo-50/30 border-indigo-100">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 text-center">Resumo da Sua Estratégia</h3>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-100 text-center">
+                        <span class="block text-xs uppercase text-slate-400 font-bold mb-1">Temperatura</span>
+                        <span class="block font-bold text-indigo-600">${data.subtones.split(',')[0]}</span>
+                    </div>
+                     <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-100 text-center">
+                        <span class="block text-xs uppercase text-slate-400 font-bold mb-1">Valor</span>
+                        <span class="block font-bold text-indigo-600">${data.title.includes('Profundo') ? 'Escuro' : data.title.includes('Claro') ? 'Claro' : 'Médio'}</span>
+                    </div>
+                     <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-100 text-center">
+                        <span class="block text-xs uppercase text-slate-400 font-bold mb-1">Intensidade</span>
+                        <span class="block font-bold text-indigo-600">${data.title.includes('Brilhante') ? 'Alta' : data.title.includes('Suave') ? 'Baixa' : 'Média'}</span>
+                    </div>
+                     <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-100 text-center">
+                        <span class="block text-xs uppercase text-slate-400 font-bold mb-1">Estratégia</span>
+                        <span class="block font-bold text-indigo-600">Repetição</span>
+                    </div>
+                </div>
+
+                <button onclick="window.print()" class="w-full py-4 rounded-xl bg-slate-900 text-white font-bold text-lg shadow-lg hover:bg-slate-800 transition transform hover:-translate-y-1 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-download"></i> Baixar Relatório Completo
+                </button>
+                <button class="w-full mt-3 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition" onclick="location.reload()">
+                    Refazer Teste
+                </button>
+             </div>
+        </div>
+       `;
+
+      // Compose Final HTML
+      const fullHtml = htmlHeader + htmlInventory + htmlPalette + htmlContrast + htmlStyle + htmlAdvanced + htmlComparison + htmlNextSteps;
+
+      // Inject
       const container = document.getElementById("resultContainer");
       if (container) {
-        container.innerHTML = html;
-        // Mostra a tela
+        container.innerHTML = fullHtml;
+        // Show View
         const viewResult = document.getElementById("view-result");
         viewResult.classList.add("active");
         viewResult.style.display = "block";
-        viewResult.scrollIntoView({ behavior: 'smooth' });
+
+        // Trigger animations
+        setTimeout(() => {
+          viewResult.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
       } else {
         console.error("Erro Crítico: Elemento 'resultContainer' não encontrado no HTML.");
       }
