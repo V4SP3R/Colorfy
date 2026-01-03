@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>COLORFY — COLOR YOUR STYLE</title>
-  <meta name="theme-color" content="#edf0f6" />
+  <meta name="theme-color" content="#6366f1" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
@@ -21,9 +21,9 @@
       --shadowInset1: rgba(20, 30, 50, .15);
       --shadowInset2: rgba(255, 255, 255, .75);
 
-      --brand: #5b7cff;
-      --brand2: #ff4aa2;
-      --brand3: #7b4dff;
+      --brand: #6366f1;
+      --brand2: #ec4899;
+      --brand3: #4f46e5;
       --ok: #2ecb8b;
       --warn: #ffb020;
       --bad: #ff4d5f;
@@ -2216,7 +2216,16 @@
     .delay-500 {
       animation-delay: 500ms;
     }
-  </style>
+  
+/* === UX Mobile Polish (safe, no logic impact) === */
+:root{ --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom); }
+body{ padding-top: var(--safe-top); padding-bottom: var(--safe-bottom); }
+@media (max-width: 420px){
+  .container{ padding-left: 14px !important; padding-right: 14px !important; }
+  .card{ border-radius: 18px !important; }
+}
+
+</style>
 </head>
 
 <body>
@@ -2528,7 +2537,7 @@
 
       <section class="view-section" id="view-payment-pending">
         <div class="neu-card glass sectionPad centerStack">
-          <h3 style="margin:0; font-size:18px;">Pagamento ainda não confirmado</h3>
+          <h3 style="margin:0; font-size:18px;">Pagamento ainda não confirmado (processando).</h3>
           <p class="muted" id="pendingMsg" style="margin:10px 0 0; max-width:70ch;">
             Se você acabou de pagar, pode levar alguns segundos para confirmar. Clique em “Verificar novamente”.
           </p>
