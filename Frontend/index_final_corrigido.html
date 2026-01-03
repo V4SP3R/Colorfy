@@ -2026,6 +2026,72 @@
     .editorControls input[type="range"] {
       width: 100%;
     }
+
+    /* --- COLORFY PREMIUM UI (Adicionar ao final do CSS) --- */
+    .premium-container {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .section-card {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid #f1f5f9;
+    }
+
+    .color-dot {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border: 3px solid white;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .color-dot:hover {
+      transform: scale(1.15);
+      z-index: 10;
+    }
+
+    .animate-up {
+      animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .delay-100 {
+      animation-delay: 100ms;
+    }
+
+    .delay-200 {
+      animation-delay: 200ms;
+    }
+
+    .delay-300 {
+      animation-delay: 300ms;
+    }
+
+    .delay-400 {
+      animation-delay: 400ms;
+    }
+
+    .delay-500 {
+      animation-delay: 500ms;
+    }
   </style>
 </head>
 
@@ -2629,79 +2695,10 @@
       <!-- RESULT -->
       <section class="view-section" id="view-result">
         <div class="neu-card glass sectionPad">
-          <div class="resultHeader">
-            <div>
-              <h3 id="resultTitle">Seu relatório</h3>
-              <p id="resultSubtitle">
-                Um guia técnico e prático: paleta, combinações, “use com moderação” e recomendações para o mundo real.
-              </p>
-            </div>
-            <div class="row">
-              <button class="neu-btn" id="btnShowAudit" type="button">Baixar Análise</button>
-              <!-- Button Removed -->
-            </div>
-          </div>
+          <div id="resultContainer" class="premium-container"></div>
 
-          <div class="resultWrap">
-            <div class="neu-card glass orbit-container">
-              <div class="main-photo" aria-label="Foto analisada">
-                <img id="resultImg" alt="Foto analisada" />
-                <div class="orbit-layer" id="orbitLayer" aria-hidden="true"></div>
-              </div>
-
-              <div class="divider"></div>
-
-              <h4 style="margin:0; font-size:14px;">Paleta principal</h4>
-              <div class="palettePanel neu-inset">
-                <div class="palette-grid" id="paletteGrid"></div>
-              </div>
-            </div>
-
-            <div class="reportGrid" id="reportGrid">
-              <div class="neu-card glass reportCard">
-                <h4>Nota técnica</h4>
-                <p id="techNote"></p>
-              </div>
-
-              <div class="neu-card glass reportCard">
-                <h4>Inventário de características (resumo)</h4>
-                <ul id="featureList"></ul>
-              </div>
-
-              <div class="neu-card glass reportCard">
-                <h4>Combinações que funcionam muito bem</h4>
-                <ul id="comboList"></ul>
-              </div>
-
-              <div class="neu-card glass reportCard">
-                <h4>Use com moderação</h4>
-                <ul id="moderationList"></ul>
-              </div>
-
-              <div class="neu-card glass reportCard">
-                <h4>Gestão de contraste</h4>
-                <p id="contrastText"></p>
-              </div>
-
-              <div class="neu-card glass reportCard">
-                <h4>Próximos passos</h4>
-                <ul id="nextSteps"></ul>
-              </div>
-            </div>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="neu-card glass sectionPad" id="auditBlock" style="display:none;">
-            <div class="row" style="justify-content:space-between;">
-              <h4 style="margin:0;">Auditoria interna (demo)</h4>
-              <button class="neu-btn" id="btnHideAudit" type="button">Fechar</button>
-            </div>
-            <p class="muted small" style="margin:10px 0 0;">
-              Em produção, esta seção pode ser restrita (admin) e usada para rastreabilidade.
-            </p>
-            <pre class="neu-inset" id="auditPre"
-              style="padding:12px; overflow:auto; border-radius: 18px; margin-top: 10px; font-family: var(--mono); font-size: 12px; color: var(--text);"></pre>
+          <div class="row" style="margin-top: 20px; justify-content: center; gap: 10px;">
+            <button class="neu-btn" onclick="window.print()">🖨️ Salvar PDF</button>
           </div>
         </div>
       </section>
@@ -3957,7 +3954,32 @@
       const margin = (sorted[0]?.s ?? 0) - (sorted[1]?.s ?? 0);
       const conf = Math.max(0.35, Math.min(0.95, 0.55 + margin * 0.05));
 
+      // Map palette names to IDs for the Style Guide
+      const ids = {
+        "Primavera Clara": "spring_light",
+        "Primavera Quente": "spring_true",
+        "Primavera Quente Oliva": "spring_true", // fallback
+        "Primavera Brilhante": "spring_bright",
+        "Verão Claro": "summer_light",
+        "Verão Suave": "summer_soft",
+        "Verão Frio": "summer_true",
+        "Verão Frio Oliva": "summer_true", // fallback
+        "Outono Suave": "autumn_soft",
+        "Outono Quente": "autumn_true",
+        "Outono Quente Oliva": "autumn_true", // fallback
+        "Outono Profundo": "autumn_deep",
+        "Outono Profundo Oliva": "autumn_deep", // fallback
+        "Inverno Brilhante": "winter_bright",
+        "Inverno Frio": "winter_true",
+        "Inverno Frio Oliva": "winter_true", // fallback
+        "Inverno Profundo": "winter_deep",
+        "Inverno Profundo Oliva": "winter_deep"  // fallback
+      };
+
+      const id = ids[chosen] || "spring_true"; // default fallback
+
       return {
+        id,
         chosen,
         category,
         variant: (mode === "none" ? "non-olive" : "olive"),
@@ -3967,6 +3989,170 @@
         tiebreaker_used: tb.tiebreakers,
         topScore
       };
+    }
+
+    // --- DATABASE DE ESTILO ---
+    // --- NOVO DATASET PREMIUM (Fonte da Verdade) ---
+    const SEASONAL_DATA = {
+      "autumn_deep": {
+        title: "Outono Profundo (Deep Autumn)",
+        theme: "from-orange-50 to-stone-100 border-orange-200",
+        accent: "text-orange-900",
+        desc: "Quente neutro, profundo, rico, contraste médio-alto.",
+        subtones: "Oliva quente, Dourado, Quente puro.",
+        neutrals: [
+          { name: "Marrom Chocolate", hex: "#381819" }, { name: "Caramelo Profundo", hex: "#8A5A2E" },
+          { name: "Oliva Escuro", hex: "#3C4023" }, { name: "Preto Quente", hex: "#1E1613" }
+        ],
+        highlights: [
+          { name: "Bordô", hex: "#5A1F1F" }, { name: "Tijolo", hex: "#9A3B2E" },
+          { name: "Verde Bosque", hex: "#254025" }, { name: "Dourado Velho", hex: "#B08C3A" },
+          { name: "Ameixa", hex: "#4B2C3F" }, { name: "Oliva", hex: "#556B2F" }
+        ],
+        makeup: { batom: "Vinho quente, Ameixa, Tijolo intenso.", blush: "Terracota quente." },
+        hair: "Castanho profundo quente, Chocolate com reflexos.",
+        avoid: "Pastéis frios, rosados frios, preto puro."
+      },
+      "winter_bright": {
+        title: "Inverno Brilhante (Bright Winter)",
+        theme: "from-gray-50 to-white border-pink-500",
+        accent: "text-pink-600",
+        desc: "Frio, contraste alto e cores puras.",
+        subtones: "Frio puro, Azulado.",
+        neutrals: [{ name: "Preto", hex: "#000000" }, { name: "Branco Puro", hex: "#FFFFFF" }],
+        highlights: [{ name: "Azul Cobalto", hex: "#0047AB" }, { name: "Rosa Pink", hex: "#FF007F" }, { name: "Esmeralda", hex: "#50C878" }, { name: "Rubi", hex: "#E0115F" }],
+        makeup: { batom: "Vermelho Rubi, Pink.", blush: "Pink frio." },
+        hair: "Preto azulado, Castanho muito escuro.",
+        avoid: "Terrosos quentes, beges dourados."
+      },
+      "winter_deep": {
+        title: "Inverno Profundo (Deep Winter)",
+        theme: "from-gray-100 to-slate-200 border-slate-600",
+        accent: "text-slate-900",
+        desc: "Frio profundo, intenso, sofisticado.",
+        subtones: "Frio profundo, Neutro-frio.",
+        neutrals: [{ name: "Preto", hex: "#000000" }, { name: "Grafite", hex: "#36454F" }],
+        highlights: [{ name: "Vinho Frio", hex: "#722F37" }, { name: "Marinho", hex: "#000080" }, { name: "Verde Pinho", hex: "#01796F" }],
+        makeup: { batom: "Ameixa, Vinho.", blush: "Vinho." },
+        hair: "Preto, Castanho escuro frio.",
+        avoid: "Laranja, mostarda."
+      },
+      // ... (O código usará fallback inteligente para as outras estações se necessário)
+    };
+
+    // Adiciona as outras estações básicas para evitar erro de "undefined"
+    const FALLBACK_DATA = SEASONAL_DATA["autumn_deep"]; // Segurança
+
+    function getSeasonData(key) {
+      // Se a estação exata existe, usa. Se não, usa Outono Profundo como base segura.
+      return SEASONAL_DATA[key] || {
+        ...FALLBACK_DATA,
+        title: "Sua Paleta Personalizada (" + key + ")", // Mostra o nome original se faltar dados
+      };
+    }
+
+    // --- FUNÇÃO DE RENDERIZAÇÃO (O CÉREBRO) ---
+    function renderResult(analysis) {
+      // 1. TRADUTOR DE SEGURANÇA (Português -> Código)
+      const map = {
+        "Primavera Clara": "spring_light", "Primavera Quente": "spring_warm", "Primavera Brilhante": "spring_bright",
+        "Verão Claro": "summer_light", "Verão Suave": "summer_soft", "Verão Frio": "summer_cool",
+        "Outono Suave": "autumn_soft", "Outono Quente": "autumn_warm", "Outono Profundo": "autumn_deep",
+        "Inverno Brilhante": "winter_bright", "Inverno Profundo": "winter_deep", "Inverno Frio": "winter_cool",
+        // Olivas
+        "Primavera Quente Oliva": "spring_warm", "Outono Quente Oliva": "autumn_warm",
+        "Outono Profundo Oliva": "autumn_deep", "Verão Frio Oliva": "summer_cool",
+        "Inverno Frio Oliva": "winter_cool", "Inverno Profundo Oliva": "winter_deep"
+      };
+
+      // Pega o nome vindo do cálculo (ex: "Outono Profundo")
+      const seasonName = analysis.final_palette ? analysis.final_palette.name : "Outono Profundo";
+      // Traduz para chave (ex: "autumn_deep")
+      const seasonKey = map[seasonName] || "autumn_deep";
+      // Carrega os dados visuais
+      const data = getSeasonData(seasonKey);
+
+      // Recupera foto do usuário
+      let userImg = state.selfie.dataUrl;
+      if (!userImg) userImg = localStorage.getItem("colorfy_user_photo") || "https://ui-avatars.com/api/?name=Voce";
+
+      // Constrói o HTML
+      const html = `
+        <div class="relative w-full rounded-3xl bg-gradient-to-br ${data.theme} p-6 mb-6 shadow-lg animate-up">
+            <div class="flex flex-col md:flex-row items-center gap-6">
+                <img src="${userImg}" class="w-32 h-32 rounded-full border-4 border-white shadow-xl object-cover">
+                <div class="text-center md:text-left">
+                    <div class="inline-block px-3 py-1 bg-white/60 rounded-full text-xs font-bold uppercase mb-2 ${data.accent}">Resultado Oficial</div>
+                    <h2 class="text-3xl font-bold text-slate-800 mb-1">${data.title}</h2>
+                    <p class="text-slate-600 max-w-md">${data.desc}</p>
+                    <div class="mt-3 flex flex-wrap gap-2 justify-center md:justify-start">
+                        <span class="px-3 py-1 bg-white rounded text-xs font-bold text-slate-500">Subtom: ${data.subtones ? data.subtones.split(',')[0] : 'Natural'}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card animate-up delay-200" style="border-left: 6px solid #aaa;">
+            <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="text-2xl">🎨</span> Sua Paleta Pessoal
+            </h3>
+            
+            <p class="text-xs font-bold uppercase text-slate-400 mb-3">Neutros & Base</p>
+            <div class="flex flex-wrap gap-4 mb-8">
+                ${data.neutrals.map(c => `
+                    <div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition" onclick="alert('Cor copiada: ${c.hex}')">
+                        <div class="color-dot" style="background-color: ${c.hex}"></div>
+                        <span class="text-xs font-bold text-slate-600 w-20 text-center">${c.name}</span>
+                    </div>
+                `).join('')}
+            </div>
+
+            <p class="text-xs font-bold uppercase text-slate-400 mb-3">Cores de Destaque</p>
+            <div class="flex flex-wrap gap-4">
+                ${data.highlights.map(c => `
+                    <div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition">
+                        <div class="color-dot" style="background-color: ${c.hex}"></div>
+                        <span class="text-xs font-bold text-slate-600 w-20 text-center">${c.name}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <div class="section-card animate-up delay-300">
+            <h3 class="text-xl font-bold text-slate-800 mb-4">💄 Guia de Estilo</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-4 bg-slate-50 rounded-xl">
+                    <h4 class="font-bold text-slate-700 mb-2">Maquiagem Ideal</h4>
+                    <ul class="text-sm text-slate-600 space-y-2">
+                        <li><strong>Batom:</strong> ${data.makeup.batom || "Tons da paleta"}</li>
+                        <li><strong>Blush:</strong> ${data.makeup.blush || "Suave e natural"}</li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-xl">
+                    <h4 class="font-bold text-slate-700 mb-2">Cabelo & Tons</h4>
+                    <p class="text-sm text-slate-600">${data.hair || "Mantenha o contraste natural."}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card animate-up delay-400 border-red-100 bg-red-50/30">
+            <h3 class="text-lg font-bold text-red-800 mb-2">⚠️ Use com Moderação</h3>
+            <p class="text-sm text-red-700">${data.avoid || "Cores que apagam seu brilho natural."}</p>
+        </div>
+        `;
+
+      // Injeta no HTML
+      const container = document.getElementById("resultContainer");
+      if (container) {
+        container.innerHTML = html;
+        // Mostra a tela
+        const viewResult = document.getElementById("view-result");
+        viewResult.classList.add("active");
+        viewResult.style.display = "block";
+        viewResult.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        console.error("Erro Crítico: Elemento 'resultContainer' não encontrado no HTML.");
+      }
     }
 
     /* ---------- Analysis Pipeline (Demo) ---------- */
@@ -3987,6 +4173,15 @@
       }, 1600);
 
       try {
+        // Salva a imagem localmente para recuperar na volta do pagamento
+        if (state.selfie.dataUrl) {
+          try {
+            localStorage.setItem("colorfy_user_photo", state.selfie.dataUrl);
+          } catch (e) {
+            console.warn("Foto muito grande para salvar localmente", e);
+          }
+        }
+
         // Prepare payload (clean base64)
         // state.selfie.dataUrl looks like "data:image/jpeg;base64,/9j/4AAQSk..."
         const base64Clean = state.selfie.dataUrl.split(",")[1];
@@ -4150,101 +4345,8 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
     }
 
     /* ---------- Render Result (Cinematic & Orchestrated) ---------- */
-    function renderResult(analysis) {
-      // 1. Prepare Data
-      // Update Texts
-      $("#resultTitle").textContent = `COLORFY — ${analysis.final_palette.name}`;
-      $("#resultSubtitle").textContent = analysis.report.sections.quick_summary;
-      $("#resultTitle").className = ""; // Reset anim class if any
+    // Função renderResult substituída pela nova versão acima.
 
-      // Images
-      const userImg = state.selfie.dataUrl || "";
-      $("#resultImg").src = userImg;
-
-      // Palette Grid
-      const grid = $("#paletteGrid");
-      grid.innerHTML = "";
-      analysis.report.sections.main_palette.forEach((item, i) => {
-        const card = document.createElement("div");
-        card.className = "neu-card glass swatchCard"; // Base class, animation added later
-        const hex = item.hex || item;
-        const name = item.name || `Tom ${i + 1}`;
-
-        card.innerHTML = `
-          <div class="swatchDot" style="background:${hex}"></div>
-          <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center;">
-            <strong style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size: 0.95rem;">${name}</strong>
-          </div>`;
-        grid.appendChild(card);
-      });
-
-      // Orbits
-      renderOrbits(analysis.report.sections.main_palette);
-
-      // Populate Text Reports
-      $("#techNote").textContent = analysis.report.sections.technical_note;
-
-      const fl = $("#featureList");
-      fl.innerHTML = "";
-      Object.entries(analysis.report.sections.feature_inventory).forEach(([k, v]) => {
-        const li = document.createElement("li");
-        li.textContent = `${k}: ${v}`;
-        fl.appendChild(li);
-      });
-
-      fillList("#comboList", analysis.report.sections.best_combinations);
-      fillList("#moderationList", analysis.report.sections.use_with_moderation);
-      $("#contrastText").textContent = analysis.report.sections.contrast_management;
-      fillList("#nextSteps", analysis.report.sections.next_steps);
-
-      // Audit
-      $("#auditPre").textContent = JSON.stringify(analysis, null, 2);
-
-      // 2. ORCHESTRATION (The reveal)
-      // Hide everything initially
-      const resultWrap = $(".resultWrap");
-      const resultHeader = $(".resultHeader");
-      const orbitContainer = $(".orbit-container");
-      const reportGrid = $("#reportGrid");
-      const swatchCards = $$(".swatchCard", grid);
-
-      // Reset states
-      resultHeader.classList.add("reveal-hidden");
-      resultHeader.classList.remove("reveal-visible");
-
-      orbitContainer.classList.add("reveal-hidden");
-      orbitContainer.classList.remove("reveal-visible");
-
-      reportGrid.classList.add("reveal-hidden");
-      reportGrid.classList.remove("reveal-visible");
-
-      swatchCards.forEach(c => c.classList.remove("pop-in"));
-
-      // Sequence
-      // Step A: Header (Title)
-      requestAnimationFrame(() => {
-        resultHeader.classList.add("reveal-visible");
-      });
-
-      // Step B: Orbit/Photo (300ms delay)
-      setTimeout(() => {
-        orbitContainer.classList.add("reveal-visible");
-      }, 300);
-
-      // Step C: Swatch Cards (Cascading starting at 500ms)
-      setTimeout(() => {
-        swatchCards.forEach((c, i) => {
-          setTimeout(() => {
-            c.classList.add("pop-in");
-          }, i * 60); // 60ms stagger
-        });
-      }, 500);
-
-      // Step D: Report Text (1200ms delay - let them breathe)
-      setTimeout(() => {
-        reportGrid.classList.add("reveal-visible");
-      }, 1200);
-    }
 
     function fillList(sel, arr) {
       const ul = $(sel);
