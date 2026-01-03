@@ -5036,15 +5036,15 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
         const res = await fetch(`/api/get-result?session_id=${encodeURIComponent(sessionId)}`);
 
         if (res.status === 402) {
-          // Not paid yet
+// Not paid yet
           if (showPendingView) {
             $("#pendingMsg").textContent =
               "Ainda não confirmamos o pagamento para esta sessão. Se você acabou de pagar, aguarde alguns segundos e clique em “Verificar novamente”.";
             goTo("view-payment-pending");
             window.scrollTo(0, 0);
           }
-          return false;
-        }
+  return true;
+}
 
         if (!res.ok) {
           return false;
@@ -5093,29 +5093,7 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
     }
 
 
-    // -------- Auto-resume after Stripe redirect (PATCH) --------
-    async function autoResumeFromSession() {
-      const params = new URLSearchParams(window.location.search);
-      const sessionIdFromUrl = params.get("session_id");
-      const sessionIdFromStorage = localStorage.getItem("colorfy_pending_session");
-      const sessionId = sessionIdFromUrl || sessionIdFromStorage;
-      if (!sessionId) return;
-      localStorage.setItem("colorfy_pending_session", sessionId);
-      try {
-        const res = await fetch(`/api/get-result?session_id=${encodeURIComponent(sessionId)}`);
-        if (res.status === 402) { if (typeof goTo === "function") goTo("view-payment-pending"); return; }
-        if (!res.ok) { console.warn("autoResume status:", res.status); if (typeof goTo === "function") goTo("view-landing"); return; }
-        const data = await res.json();
-        if (typeof renderResult === "function") renderResult(data.result);
-        if (typeof goTo === "function") goTo("view-result");
-      } catch (err) {
-        console.error("autoResume error:", err);
-        if (typeof goTo === "function") goTo("view-landing");
-      }
-    }
-    document.addEventListener("DOMContentLoaded", autoResumeFromSession);
-    // -------- End auto-resume patch --------
-  </script>
+    </script>
 </body>
 
 </html>
