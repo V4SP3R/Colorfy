@@ -2216,16 +2216,29 @@
     .delay-500 {
       animation-delay: 500ms;
     }
-  
-/* === UX Mobile Polish (safe, no logic impact) === */
-:root{ --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom); }
-body{ padding-top: var(--safe-top); padding-bottom: var(--safe-bottom); }
-@media (max-width: 420px){
-  .container{ padding-left: 14px !important; padding-right: 14px !important; }
-  .card{ border-radius: 18px !important; }
-}
 
-</style>
+    /* === UX Mobile Polish (safe, no logic impact) === */
+    :root {
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
+
+    body {
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+    }
+
+    @media (max-width: 420px) {
+      .container {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+      }
+
+      .card {
+        border-radius: 18px !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -5020,44 +5033,54 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
 
     /* ---------- Initialization & Session Recovery ---------- */
 
+    // =========================================================
+    // LÓGICA DE RECUPERAÇÃO DE SESSÃO E INICIALIZAÇÃO BLINDADA
+    // =========================================================
+
     async function checkPaymentAndLoadResult(sessionId, { showPendingView = true } = {}) {
       if (!sessionId) return false;
 
-      // Keep a copy for other actions
+      // Salva no localStorage para persistência em caso de refresh
       state.session_id = sessionId;
       localStorage.setItem('colorfy_pending_session', sessionId);
 
-      // FORCE loading view immediately
-      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-      document.getElementById('view-loading').classList.add('active');
-      $("#loadingMsg").textContent = "Verificando pagamento...";
+      // Garante que a tela de loading esteja visível durante a verificação
+      const currentView = document.querySelector(".view-section.active")?.id;
+      if (currentView !== "view-result" && currentView !== "view-payment-pending") {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        document.getElementById('view-loading').classList.add('active');
+      }
 
       try {
         const res = await fetch(`/api/get-result?session_id=${encodeURIComponent(sessionId)}`);
 
+        // CASO 1: PAGAMENTO PENDENTE (402)
+        // O webhook ainda não processou. Mantemos o usuário na tela de espera.
         if (res.status === 402) {
-// Not paid yet
           if (showPendingView) {
-            $("#pendingMsg").textContent =
-              "Ainda não confirmamos o pagamento para esta sessão. Se você acabou de pagar, aguarde alguns segundos e clique em “Verificar novamente”.";
+            const pendingMsg = document.getElementById("pendingMsg");
+            if (pendingMsg) pendingMsg.textContent = "Ainda estamos confirmando seu pagamento. Aguarde alguns segundos e clique em verificar novamente.";
             goTo("view-payment-pending");
-            window.scrollTo(0, 0);
           }
-  return true;
-}
-
-        if (!res.ok) {
-          return false;
+          return true; // Retorna TRUE para dizer "tratamos isso, não vá para a home"
         }
 
+        // CASO 2: ERRO NA API (Diferente de 402)
+        if (!res.ok) {
+          console.warn("API retornou erro:", res.status);
+          return false; // Falha técnica
+        }
+
+        // CASO 3: SUCESSO (200)
         const data = await res.json();
         if (data.ok && data.paid && data.result) {
           state.analysis = data.result;
           state.user = data.result.user || state.user;
+
           renderResult(state.analysis);
           goTo("view-result");
 
-          // Clear pending session after success
+          // Limpa a sessão pendente pois já foi concluída com sucesso
           localStorage.removeItem('colorfy_pending_session');
           return true;
         }
@@ -5070,30 +5093,55 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
     }
 
     async function initApp() {
-      // 1) Check for pending session (URL or LocalStorage)
       const params = new URLSearchParams(window.location.search);
-      let sessionId = params.get('session_id') || localStorage.getItem('colorfy_pending_session');
+      const urlSessionId = params.get('session_id'); // ID vindo da URL (Stripe)
+      const localSessionId = localStorage.getItem('colorfy_pending_session'); // ID salvo (Refresh)
+
+      const sessionId = urlSessionId || localSessionId;
 
       if (sessionId) {
-        const ok = await checkPaymentAndLoadResult(sessionId, { showPendingView: true });
-        if (ok) return;
+        // Tenta carregar o resultado
+        const handled = await checkPaymentAndLoadResult(sessionId, { showPendingView: true });
+
+        // --- CORREÇÃO DO ERRO DE REDIRECIONAMENTO ---
+
+        // Se o usuário tem um ID na URL, significa que ele acabou de pagar.
+        // Se a API falhou (handled = false), NÃO devemos mandar ele para a home.
+        // Devemos mantê-lo na tela de loading/pendente para ele não perder o fluxo.
+        if (urlSessionId) {
+          if (!handled) {
+            // Se falhou, avisa na tela de loading e tenta de novo em 3s
+            const msgEl = document.getElementById("loadingMsg");
+            if (msgEl) {
+              msgEl.textContent = "Finalizando análise... aguarde um momento.";
+              msgEl.style.color = "var(--brand)";
+            }
+            // Retry automático simples
+            setTimeout(() => checkPaymentAndLoadResult(sessionId), 3000);
+          }
+          return; // <--- IMPEDE O REDIRECIONAMENTO PARA A HOME
+        }
+
+        // Se for apenas um refresh (localStorage) e deu certo, o código já foi para view-result.
+        // Se deu errado no refresh, aí sim permitimos cair para a home.
+        if (handled) return;
       }
 
-      // 2) Default start if NO session or check failed
-      const current = $(".view-section.active")?.id;
+      // Inicialização padrão (apenas se não houver sessão alguma)
+      const current = document.querySelector(".view-section.active")?.id;
       if (!current || current === "view-loading") {
         goTo("view-landing");
       }
     }
 
-    // Run initialization - waiting for load to ensure DOM is ready
+    // Inicializa quando a janela carregar
     window.addEventListener("load", initApp);
     function resetAll() {
       location.reload();
     }
 
 
-    </script>
+  </script>
 </body>
 
 </html>
