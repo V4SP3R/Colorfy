@@ -154,11 +154,11 @@
 
             <!-- CTA Principal -->
             <div class="space-y-3">
-                <a href="https://buy.stripe.com/test_dRmbJ31LOcBI7jB3vy1Jm00"
+                <button id="btnBuy" type="button"
                     class="block w-full gradient-bg text-white font-bold text-lg py-4 rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all duration-300">
                     QUERO ACESSO IMEDIATO
                     <i class="fa-solid fa-arrow-right ml-2"></i>
-                </a>
+                </button>
                 <p class="text-xs text-gray-400 flex items-center justify-center gap-1">
                     <i class="fa-solid fa-lock"></i> Compra 100% Segura e Instantânea
                 </p>
@@ -324,6 +324,49 @@
         </a>
     </div>
 
+    <script>
+        document.getElementById('btnBuy').addEventListener('click', async () => {
+            const btn = document.getElementById('btnBuy');
+            const originalText = btn.innerHTML;
+
+            // 1. Recuperar o session_id da URL
+            const params = new URLSearchParams(window.location.search);
+            const sessionId = params.get('session_id');
+
+            if (!sessionId) {
+                alert('Erro: Sessão de análise não encontrada. Por favor, refaça o teste.');
+                window.location.href = '/';
+                return;
+            }
+
+            // 2. Feedback visual de carregamento
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processando...';
+            btn.disabled = true;
+
+            try {
+                // 3. Chamar a API para criar o checkout dinâmico
+                const response = await fetch('/api/create-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.url) {
+                    // 4. Redirecionar para o Stripe
+                    window.location.href = data.url;
+                } else {
+                    throw new Error(data.error || 'Erro ao criar checkout');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Ocorreu um erro ao iniciar o pagamento. Tente novamente.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
 </body>
 
 </html>
