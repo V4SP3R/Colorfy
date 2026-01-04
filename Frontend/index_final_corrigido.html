@@ -4973,7 +4973,7 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
       setTimeout(() => window.print(), 80);
     }
 
-    $("#btnShowAudit").addEventListener("click", (ev) => {
+    $("#btnShowAudit")?.addEventListener("click", (ev) => {
       // Shift+click keeps the old "audit" behavior for debugging
       if (ev.shiftKey) {
         $("#auditBlock").style.display = "block";
@@ -4981,7 +4981,7 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
       }
       downloadResultPDF();
     });
-    $("#btnHideAudit").addEventListener("click", () => $("#auditBlock").style.display = "none");
+    $("#btnHideAudit")?.addEventListener("click", () => $("#auditBlock").style.display = "none");
 
     /* ---------- Checkout Logic (New) ---------- */
     /* ---------- Checkout Logic (New) ---------- */
