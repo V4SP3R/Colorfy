@@ -367,6 +367,52 @@
             }
         });
     </script>
+    <script>
+        document.getElementById('btnBuy').addEventListener('click', async () => {
+            const btn = document.getElementById('btnBuy');
+            const originalText = btn.innerHTML;
+
+            // 1. Pega o ID da sessão atual na URL
+            const params = new URLSearchParams(window.location.search);
+            const sessionId = params.get('session_id');
+
+            if (!sessionId) {
+                alert('Erro: Sessão não encontrada. Por favor, refaça a análise.');
+                window.location.href = '/';
+                return;
+            }
+
+            // 2. Trava o botão e mostra carregando
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processando...';
+            btn.disabled = true;
+
+            try {
+                // 3. Pede para o Backend criar o link da Stripe COM o ID da sessão
+                const response = await fetch('/api/create-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+
+                const data = await response.json();
+
+                if (data.url) {
+                    // 4. Redireciona para o pagamento correto
+                    window.location.href = data.url;
+                } else {
+                    console.error('Erro API:', data);
+                    alert('Erro ao criar pagamento. Tente novamente.');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Erro de conexão. Verifique sua internet.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
 </body>
 
 </html>
