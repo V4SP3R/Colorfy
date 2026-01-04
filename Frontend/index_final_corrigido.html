@@ -5098,6 +5098,7 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
       const localSessionId = localStorage.getItem('colorfy_pending_session'); // ID salvo (Refresh)
 
       const sessionId = urlSessionId || localSessionId;
+      console.log("DEBUG: InitApp. Search:", window.location.search, "UrlSession:", urlSessionId, "LocalSession:", localSessionId);
 
       if (sessionId) {
         // Tenta carregar o resultado
@@ -5109,6 +5110,7 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
         // Se a API falhou (handled = false), NÃO devemos mandar ele para a home.
         // Devemos mantê-lo na tela de loading/pendente para ele não perder o fluxo.
         if (urlSessionId) {
+          console.log("DEBUG: URL Session found. Preventing Home redirect.");
           if (!handled) {
             // Se falhou, avisa na tela de loading e tenta de novo em 3s
             const msgEl = document.getElementById("loadingMsg");
