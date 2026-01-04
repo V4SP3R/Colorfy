@@ -5037,14 +5037,18 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
     // LÓGICA DE RECUPERAÇÃO DE SESSÃO E INICIALIZAÇÃO BLINDADA
     // =========================================================
 
+    // =========================================================
+    // CORREÇÃO DEFINITIVA DO FLUXO DE PAGAMENTO (Auto-Retry)
+    // =========================================================
+
     async function checkPaymentAndLoadResult(sessionId, { showPendingView = true } = {}) {
       if (!sessionId) return false;
 
-      // Salva no localStorage para persistência em caso de refresh
+      // Salva sessão para persistência (caso o usuário atualize a página)
       state.session_id = sessionId;
       localStorage.setItem('colorfy_pending_session', sessionId);
 
-      // Garante que a tela de loading esteja visível durante a verificação
+      // Garante que a tela de loading esteja visível
       const currentView = document.querySelector(".view-section.active")?.id;
       if (currentView !== "view-result" && currentView !== "view-payment-pending") {
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -5055,20 +5059,20 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
         const res = await fetch(`/api/get-result?session_id=${encodeURIComponent(sessionId)}`);
 
         // CASO 1: PAGAMENTO PENDENTE (402)
-        // O webhook ainda não processou. Mantemos o usuário na tela de espera.
+        // O webhook ainda não processou. Retornamos TRUE para manter o usuário esperando.
         if (res.status === 402) {
           if (showPendingView) {
             const pendingMsg = document.getElementById("pendingMsg");
-            if (pendingMsg) pendingMsg.textContent = "Ainda estamos confirmando seu pagamento. Aguarde alguns segundos e clique em verificar novamente.";
+            if (pendingMsg) pendingMsg.textContent = "Pagamento em processamento. Aguarde...";
             goTo("view-payment-pending");
           }
-          return true; // Retorna TRUE para dizer "tratamos isso, não vá para a home"
+          return true; // IMPORTANTE: Retorna true para NÃO redirecionar para a home
         }
 
-        // CASO 2: ERRO NA API (Diferente de 402)
+        // CASO 2: ERRO TÉCNICO
         if (!res.ok) {
-          console.warn("API retornou erro:", res.status);
-          return false; // Falha técnica
+          console.warn("API retornou status:", res.status);
+          return false;
         }
 
         // CASO 3: SUCESSO (200)
@@ -5080,63 +5084,55 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
           renderResult(state.analysis);
           goTo("view-result");
 
-          // Limpa a sessão pendente pois já foi concluída com sucesso
           localStorage.removeItem('colorfy_pending_session');
           return true;
         }
 
         return false;
       } catch (err) {
-        console.error("Erro na verificação de pagamento:", err);
+        console.error("Erro na verificação:", err);
         return false;
       }
     }
 
     async function initApp() {
       const params = new URLSearchParams(window.location.search);
-      const urlSessionId = params.get('session_id'); // ID vindo da URL (Stripe)
-      const localSessionId = localStorage.getItem('colorfy_pending_session'); // ID salvo (Refresh)
+      const urlSessionId = params.get('session_id'); // ID vindo do Stripe
+      const localSessionId = localStorage.getItem('colorfy_pending_session');
 
       const sessionId = urlSessionId || localSessionId;
-      console.log("DEBUG: InitApp. Search:", window.location.search, "UrlSession:", urlSessionId, "LocalSession:", localSessionId);
 
       if (sessionId) {
-        // Tenta carregar o resultado
+        // Tenta verificar o pagamento
         const handled = await checkPaymentAndLoadResult(sessionId, { showPendingView: true });
 
-        // --- CORREÇÃO DO ERRO DE REDIRECIONAMENTO ---
-
-        // Se o usuário tem um ID na URL, significa que ele acabou de pagar.
-        // Se a API falhou (handled = false), NÃO devemos mandar ele para a home.
-        // Devemos mantê-lo na tela de loading/pendente para ele não perder o fluxo.
+        // --- A MÁGICA ACONTECE AQUI ---
+        // Se temos um ID na URL (acabou de voltar do Stripe), NUNCA vá para a home.
+        // Se a API falhou ou está pendente, tentamos de novo em 3 segundos.
         if (urlSessionId) {
-          console.log("DEBUG: URL Session found. Preventing Home redirect.");
-          if (!handled) {
-            // Se falhou, avisa na tela de loading e tenta de novo em 3s
+          if (!handled || document.getElementById('view-payment-pending').classList.contains('active')) {
+            // Atualiza mensagem de loading
             const msgEl = document.getElementById("loadingMsg");
-            if (msgEl) {
-              msgEl.textContent = "Finalizando análise... aguarde um momento.";
-              msgEl.style.color = "var(--brand)";
-            }
-            // Retry automático simples
-            setTimeout(() => checkPaymentAndLoadResult(sessionId), 3000);
+            if (msgEl) msgEl.textContent = "Confirmando pagamento... (Isso pode levar alguns segundos)";
+
+            // Tenta novamente em 3 segundos (Polling)
+            setTimeout(() => initApp(), 3000);
           }
-          return; // <--- IMPEDE O REDIRECIONAMENTO PARA A HOME
+          return; // <--- IMPEDE O REDIRECIONAMENTO (ERRO CORRIGIDO)
         }
 
-        // Se for apenas um refresh (localStorage) e deu certo, o código já foi para view-result.
-        // Se deu errado no refresh, aí sim permitimos cair para a home.
+        // Se for apenas refresh e deu certo, ok.
         if (handled) return;
       }
 
-      // Inicialização padrão (apenas se não houver sessão alguma)
+      // Inicialização padrão (só vai para Home se realmente não tiver sessão)
       const current = document.querySelector(".view-section.active")?.id;
       if (!current || current === "view-loading") {
         goTo("view-landing");
       }
     }
 
-    // Inicializa quando a janela carregar
+    // Inicializa o App
     window.addEventListener("load", initApp);
     function resetAll() {
       location.reload();
