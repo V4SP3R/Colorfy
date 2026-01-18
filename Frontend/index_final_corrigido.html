@@ -7,45 +7,62 @@
   <title>COLORFY — COLOR YOUR STYLE</title>
   <meta name="theme-color" content="#6366f1" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@100..900&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --bg: #edf0f6;
-      --card: #edf0f6;
-      --text: #1d2430;
+      /* Base Colors */
+      --bg: #F8F9FA;
+      /* Elegance White/Grey */
+      --card: #FFFFFF;
+      --text: #1A1A1A;
+      --text-secondary: #555555;
       --muted: #5a687c;
+
+      /* Brand Colors */
+      --primary-purple: #8A2BE2;
+      --primary-pink: #D946EF;
+      --accent-lilac: #F3E8FF;
+      --gradient-main: linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #EC4899 100%);
+
+      /* Shadows (Premium Glows) */
+      --premium-shadow: 0 20px 40px rgba(168, 85, 247, 0.12);
+      --glow-btn: 0 10px 25px rgba(217, 70, 239, 0.3);
       --shadow1: rgba(20, 30, 50, .12);
+      /* Keep for legacy fallback */
       --shadow2: rgba(255, 255, 255, .9);
+
+      /* Shape & Motion */
+      --radius: 28px;
+      --radiusSm: 18px;
+      --ease: cubic-bezier(0.23, 1, 0.32, 1);
+      --t: 400ms;
+
+      /* Legacy/Other Variables */
       --shadowInset1: rgba(20, 30, 50, .15);
       --shadowInset2: rgba(255, 255, 255, .75);
-
       --brand: #6366f1;
       --brand2: #ec4899;
       --brand3: #4f46e5;
       --ok: #2ecb8b;
       --warn: #ffb020;
       --bad: #ff4d5f;
-
-      --radius: 26px;
-      --radiusSm: 18px;
-
-      --ease: cubic-bezier(.2, .9, .2, 1);
-      --t: 360ms;
-
       --focus: 0 0 0 4px rgba(91, 124, 255, .18);
       --glass: rgba(237, 240, 246, .6);
       --glassBorder: rgba(255, 255, 255, .55);
-
-      --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Poppins", Arial, "Noto Sans", "Helvetica Neue", sans-serif;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-
+      --font: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+      /* Switched to Inter */
       --scale: 1;
       --contrast: 1;
       --sat: 1;
       --hue: 0deg;
       --blurGlass: 10px;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     /* A11y: reduced motion */
@@ -55,6 +72,127 @@
         transition: none !important;
         scroll-behavior: auto !important;
       }
+    }
+
+    /* ---------- Interaction System ---------- */
+
+    /* Parallax Layers */
+    .parallax-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .layer-0 {
+      /* Background Gradient */
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 15% 50%, rgba(138, 43, 226, 0.08), transparent 40%),
+        radial-gradient(circle at 85% 30%, rgba(217, 70, 239, 0.08), transparent 40%);
+      z-index: 0;
+    }
+
+    .layer-1 {
+      /* Mid Layer - Orbs */
+      position: absolute;
+      inset: -10%;
+      z-index: 1;
+      will-change: transform;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.6;
+    }
+
+    /* Text Reveal Mask */
+    .mask-reveal {
+      position: relative;
+      overflow: hidden;
+      display: block;
+      /* Ensure block for mask to work on lines */
+    }
+
+    .mask-reveal>span {
+      display: inline-block;
+      transform: translateY(100%);
+      opacity: 0;
+      animation: revealText 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    }
+
+    @keyframes revealText {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Magnetic Button Base */
+    .magnet-btn {
+      transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+      will-change: transform;
+    }
+
+    /* Liquid Ghost Button */
+    .btn-liquid {
+      position: relative;
+      background: transparent;
+      color: var(--primary-purple);
+      border: 1.5px solid var(--primary-purple);
+      border-radius: 99px;
+      font-weight: 700;
+      text-transform: uppercase;
+      overflow: hidden;
+      transition: color 0.4s;
+      cursor: pointer;
+      z-index: 1;
+    }
+
+    .btn-liquid::before {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      width: 150%;
+      height: 350%;
+      background: var(--primary-purple);
+      transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+      transform: translateX(-50%);
+      border-radius: 40%;
+      z-index: -1;
+    }
+
+    .btn-liquid:hover::before {
+      top: -40%;
+    }
+
+    .btn-liquid:hover {
+      color: white;
+      box-shadow: var(--glow-btn);
+      border-color: transparent;
+    }
+
+    /* Premium Card Standard (Neuroaesthetics) */
+    .premium-card-standard {
+      background: #FFFFFF;
+      border-radius: var(--radius);
+      padding: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: var(--premium-shadow);
+      transition: all 0.5s var(--ease);
+    }
+
+    .premium-card-standard:hover {
+      box-shadow: 0 40px 80px rgba(138, 43, 226, 0.18);
+      border-color: var(--accent-lilac);
+      transform: translateY(-4px);
     }
 
     html,
@@ -83,20 +221,21 @@
     .neu-card {
       background: var(--card);
       border-radius: var(--radius);
+      padding: 20px;
       box-shadow:
-        14px 14px 28px var(--shadow1),
-        -14px -14px 28px var(--shadow2);
-      border: 1px solid rgba(255, 255, 255, .45);
+        20px 20px 40px var(--shadow1),
+        -20px -20px 40px var(--shadow2);
+      border: 1px solid rgba(255, 255, 255, .15);
     }
 
     .neu-card.glass {
-      background: linear-gradient(135deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .18));
-      backdrop-filter: blur(var(--blurGlass));
-      -webkit-backdrop-filter: blur(var(--blurGlass));
-      border: 1px solid var(--glassBorder);
+      background: rgba(255, 255, 255, .7);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, .55);
       box-shadow:
-        18px 18px 40px rgba(20, 30, 50, .14),
-        -18px -18px 40px rgba(255, 255, 255, .75);
+        10px 10px 20px var(--shadow1),
+        -10px -10px 20px var(--shadow2);
     }
 
     .neu-inset {
@@ -367,6 +506,10 @@
       margin-bottom: 18px;
     }
 
+    header.topbar.centered {
+      justify-content: center;
+    }
+
     .brand {
       display: flex;
       align-items: center;
@@ -434,6 +577,15 @@
       margin-top: 2px;
       text-transform: uppercase;
       font-size: 11px;
+    }
+
+    .logo-img {
+      height: 75px;
+      width: 90px;
+      object-fit: contain;
+      display: block;
+      /* Optional: subtle shadow if needed, matching text style slightly */
+      /* filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); */
     }
 
     .shell {
@@ -575,20 +727,41 @@
     }
 
     .heroTitle p {
-      margin: 14px 0 0;
-      color: var(--muted);
-      font-weight: 700;
-      font-size: clamp(14px, 2vw, 16px);
-      line-height: 1.45;
-      max-width: 58ch;
+      margin: 20px 0 0;
+      color: var(--text);
+      /* Darker for better contrast/readability */
+      font-weight: 500;
+      font-size: clamp(15px, 2.5vw, 17px);
+      line-height: 1.6;
+      max-width: 54ch;
+      opacity: 0.85;
     }
 
     .ctaRow {
       display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 16px;
+      flex-wrap: nowrap;
       align-items: center;
-      margin-top: 18px;
+      margin-top: 28px;
+    }
+
+    /* Pulse Animation for Primary CTA */
+    @keyframes pulse-glow {
+      0% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+      }
+    }
+
+    .pulse-btn {
+      animation: pulse-glow 2s infinite;
     }
 
     .ctaRow .neu-btn.primary {
@@ -599,12 +772,21 @@
     }
 
     .socialProof {
-      flex: 0 0 320px;
+      flex: 1 1 320px;
       min-width: min(320px, 100%);
       padding: 16px;
       border-radius: var(--radius);
       position: relative;
       overflow: hidden;
+      /* Ensure it aligns with right edge */
+      margin-left: auto;
+    }
+
+    @media (max-width: 900px) {
+      .socialProof {
+        flex: 1 1 100%;
+        margin-left: 0;
+      }
     }
 
     .socialProof .big {
@@ -616,8 +798,19 @@
 
     .socialProof .big strong {
       display: block;
-      font-size: 18px;
-      margin-top: 4px;
+      font-size: 16px;
+      margin-top: 6px;
+      line-height: 1.3;
+      color: var(--text);
+    }
+
+    .socialProof .proof-desc {
+      display: block;
+      font-weight: 500;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+      line-height: 1.5;
     }
 
     .avatars {
@@ -663,6 +856,40 @@
       transform: scale(1.02);
     }
 
+    /* Avatar Reveal & Tooltip */
+    .avatars:hover .avatar {
+      margin-left: 2px;
+      /* Spread effect */
+      transform: scale(1.1);
+      z-index: 10;
+    }
+
+    .avatar[data-tooltip]::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px) scale(0.8);
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s var(--ease);
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .avatar:hover::before {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-14px) scale(1);
+    }
+
+    /* Pulse Stars */
     .stars {
       display: flex;
       gap: 4px;
@@ -676,8 +903,42 @@
       background: conic-gradient(from 0deg, #ffd37a, #ffb020, #ffd37a);
       clip-path: polygon(50% 0%, 62% 32%, 98% 38%, 72% 58%, 80% 92%, 50% 74%, 20% 92%, 28% 58%, 2% 38%, 38% 32%);
       filter: drop-shadow(0 6px 10px rgba(255, 176, 32, .18));
-      animation: twinkle 2.8s var(--ease) infinite;
+      animation: pulseStar 2s var(--ease) infinite;
+      cursor: pointer;
+      transition: transform 0.2s;
     }
+
+    .star:hover {
+      transform: scale(1.3) rotate(15deg);
+    }
+
+    .star:active {
+      transform: scale(0.9);
+    }
+
+    @keyframes pulseStar {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.15);
+        opacity: 0.8;
+      }
+    }
+
+    .socialProof .quote {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 750;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+
 
     .star:nth-child(2) {
       animation-delay: .2s;
@@ -734,11 +995,34 @@
       }
     }
 
+    /* Flow Card Interactions */
     .flowCard {
       padding: 16px;
       border-radius: var(--radius);
       position: relative;
       overflow: hidden;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.6s var(--ease), transform 0.6s var(--ease), border-color 0.4s, box-shadow 0.4s;
+    }
+
+    .flowCard.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .flowCard.focused {
+      border-color: var(--primary-purple);
+      box-shadow: 0 12px 30px rgba(138, 43, 226, 0.15);
+      transform: scale(1.02);
+      z-index: 2;
+      opacity: 1;
+    }
+
+    .flowCard.blurred {
+      opacity: 0.6;
+      transform: scale(0.98);
+      filter: grayscale(0.4);
     }
 
     .flowCard .icon {
@@ -753,15 +1037,32 @@
       box-shadow:
         12px 12px 22px rgba(20, 30, 50, .14),
         -12px -12px 22px rgba(255, 255, 255, .72);
-      animation: floaty 3.8s var(--ease) infinite;
     }
 
-    .flowCard:nth-child(2) .icon {
-      animation-delay: .35s;
+    /* Icon Animations */
+    .icon-upload {
+      animation: floaty 3s ease-in-out infinite;
     }
 
-    .flowCard:nth-child(3) .icon {
-      animation-delay: .7s;
+    .icon-quiz {
+      animation: icon-circle 4s linear infinite;
+    }
+
+    .icon-report {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .icon-report::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -50%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+      transform: skewX(-20deg);
+      animation: icon-shimmer 3s infinite;
     }
 
     @keyframes floaty {
@@ -772,14 +1073,39 @@
       }
 
       50% {
-        transform: translateY(-3px);
+        transform: translateY(-4px);
+      }
+    }
+
+    @keyframes icon-circle {
+      0% {
+        transform: rotate(0deg) translateX(2px) rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg) translateX(2px) rotate(-360deg);
+      }
+    }
+
+    @keyframes icon-shimmer {
+      0% {
+        left: -100%;
+      }
+
+      20% {
+        left: 200%;
+      }
+
+      100% {
+        left: 200%;
       }
     }
 
     .flowCard h3 {
       margin: 0;
-      font-size: 14px;
-      letter-spacing: .2px;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: .3px;
     }
 
     .flowCard p {
@@ -1238,8 +1564,8 @@
     }
 
     .swatch {
-      width: 44px;
-      height: 44px;
+      width: 64px;
+      height: 64px;
       border-radius: 16px;
       background: linear-gradient(135deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .18));
       border: 1px solid rgba(255, 255, 255, .5);
@@ -2151,6 +2477,85 @@
       width: 100%;
     }
 
+    /* --- USP Card (Olive Skin) --- */
+    .card-oliva-premium {
+      position: relative;
+      background: #FFFFFF;
+      border-radius: 28px;
+      padding: 32px;
+      overflow: hidden;
+      transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      /* Fallback */
+    }
+
+    .card-oliva-premium::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(transparent,
+          var(--primary-purple),
+          var(--primary-pink),
+          transparent 30%);
+      animation: rotate-border 4s linear infinite;
+      z-index: 0;
+      opacity: 0.6;
+      /* Slight transparency so it's not too harsh */
+    }
+
+    .card-oliva-premium::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      /* Border thickness */
+      background: white;
+      border-radius: 26px;
+      z-index: 1;
+    }
+
+    .card-oliva-premium .card-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .card-oliva-premium:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 30px 60px rgba(138, 43, 226, 0.15);
+    }
+
+    .card-oliva-premium:hover .icon {
+      transform: rotate(15deg) scale(1.1);
+    }
+
+    @keyframes rotate-border {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .metallic-text {
+      background: linear-gradient(90deg, #333 0%, #888 20%, #333 40%, #333 100%);
+      background-size: 200% auto;
+      color: #333;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shineMetal 4s linear infinite;
+    }
+
+    @keyframes shineMetal {
+      to {
+        background-position: 200% center;
+      }
+    }
+
     /* --- COLORFY PREMIUM UI (Adicionar ao final do CSS) --- */
     .premium-container {
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -2238,14 +2643,56 @@
         border-radius: 18px !important;
       }
     }
+
+    /* --- Q10 Poster Layout (Full Image Fix) --- */
+    .optionsGrid.poster {
+      gap: 16px;
+    }
+
+    .optionsGrid.poster .opt {
+      flex-direction: column;
+      text-align: center;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 14px;
+      height: auto;
+      gap: 14px;
+    }
+
+    .optionsGrid.poster .swatch {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1080/229;
+      /* Specific ratio provided by user */
+      border-radius: 12px;
+      background-size: cover !important;
+      /* Ensure full fill */
+      background-repeat: no-repeat !important;
+      background-position: center !important;
+      margin: 0;
+      background-color: transparent;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .optionsGrid.poster .txt {
+      width: 100%;
+    }
   </style>
 </head>
 
 <body>
+  <div class="parallax-wrapper">
+    <div class="layer-0"></div>
+    <div class="layer-1">
+      <div class="orb" style="top: 15%; left: 15%; width: 300px; height: 300px; background: var(--primary-purple);">
+      </div>
+      <div class="orb" style="top: 60%; left: 75%; width: 400px; height: 400px; background: var(--primary-pink);"></div>
+    </div>
+  </div>
   <main class="app" id="app">
     <header class="topbar">
-      <div class="brand">
-        <div class="logo">Colorfy</div>
+      <div class="brand" id="topbarBrand">
+        <img src="assets/Logo corrigida.png" alt="Colorfy" class="logo-img">
       </div>
 
       <div class="row">
@@ -2267,39 +2714,48 @@
         <div class="neu-card glass hero">
           <div class="heroTop">
             <div class="heroTitle">
-              <h2><span class="grad">COLORFY</span></h2>
-              <p>
-                Uma análise cromática guiada por IA, com linguagem de consultoria premium:
-                paleta, contraste, profundidade e recomendações práticas para roupa, maquiagem, cabelo e acessórios.
+              <h2 style="font-variation-settings: 'wght' 900;"><span class="grad">COLORFY</span></h2>
+              <p class="mask-reveal" style="margin-top: 24px;">
+                <span style="font-variation-settings: 'wght' 700;">Uma análise cromática guiada por IA,</span>
+                <span style="font-variation-settings: 'wght' 300; opacity: 0.9;">com linguagem de consultoria premium:
+                  paleta, contraste, profundidade e recomendações práticas para roupa, maquiagem, cabelo e
+                  acessórios.</span>
               </p>
               <div class="ctaRow">
-                <button class="neu-btn primary" id="btnStart" type="button">Iniciar análise</button>
-                <button class="neu-btn" id="btnHow" type="button">Como funciona</button>
+                <button class="neu-btn primary pulse-btn magnet-btn" id="btnStart" type="button"
+                  style="padding: 18px 42px; font-size: 16px; box-shadow: var(--premium-shadow);">INICIAR
+                  ANÁLISE</button>
+                <button class="btn-liquid" id="btnHow" type="button" style="margin-left: 8px;">Como
+                  funciona</button>
               </div>
-              <p class="muted small" style="margin-top:12px">
-                Dica: resultados melhores com selfie em luz natural, sem filtros, rosto centralizado e nítido.
+              <p
+                style="margin-top: 24px; font-size: 13px; color: var(--muted); opacity: 0.8; max-width: 400px; line-height: 1.5;">
+                <strong>Dica:</strong> resultados melhores com selfie em luz natural, sem filtros, rosto centralizado e
+                nítido.
               </p>
             </div>
 
             <aside class="neu-card glass socialProof">
               <p class="big">
-                <span class="muted">Prova social</span>
-                <strong>Testado e aprovado por + de 20.000 Mulheres</strong>
+                <span class="muted">Sobre a Colorfy</span>
+                <strong>Resultados reais, precisão real.</strong>
+                <span class="proof-desc">Mais de 120 mulheres passaram por testes presenciais de colorimetria, com
+                  diagnósticos que bateram exatamente com os nossos resultados.</span>
               </p>
               <div class="avatars" aria-label="Usuárias satisfeitas">
-                <div class="avatar"><img class="avatarImg"
+                <div class="avatar" data-tooltip="Ana"><img class="avatarImg"
                     src="data:image/jpeg;base64,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"
                     alt="Usuária 1" /></div>
-                <div class="avatar"><img class="avatarImg"
+                <div class="avatar" data-tooltip="Beatriz"><img class="avatarImg"
                     src="data:image/jpeg;base64,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"
                     alt="Usuária 2" /></div>
-                <div class="avatar"><img class="avatarImg"
+                <div class="avatar" data-tooltip="Carla"><img class="avatarImg"
                     src="data:image/jpeg;base64,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"
                     alt="Usuária 3" /></div>
-                <div class="avatar"><img class="avatarImg"
+                <div class="avatar" data-tooltip="Diana"><img class="avatarImg"
                     src="data:image/jpeg;base64,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"
                     alt="Usuária 4" /></div>
-                <div class="avatar"><img class="avatarImg"
+                <div class="avatar" data-tooltip="Elena"><img class="avatarImg"
                     src="data:image/jpeg;base64,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"
                     alt="Usuária 5" /></div>
               </div>
@@ -2310,544 +2766,589 @@
                 <div class="star" aria-hidden="true"></div>
                 <div class="star" aria-hidden="true"></div>
               </div>
-              <p class="quote">“Relatório muito mais completo do que eu imaginava. Eu finalmente entendi por que algumas
-                cores me apagavam.”</p>
+              <p class="quote">
+                <strong style="display:block; margin-bottom:4px; color:var(--text); font-size:14px;">Ana Beatriz - Belo
+                  Horizonte</strong>
+                “Relatório muito mais completo do que eu imaginava. Eu finalmente entendi por que algumas cores me
+                apagavam.”
+              </p>
             </aside>
+          </div>
+
+          <!-- Feature Highlight: Olive Skin -->
+          <!-- Feature Highlight: Olive Skin -->
+          <div class="card-oliva-premium animate-up delay-200" style="margin-top: 32px;">
+            <div class="card-content" style="display: flex; align-items: flex-start; gap: 16px;">
+              <div
+                style="flex-shrink: 0; width: 40px; height: 40px; border-radius: 12px; background: rgba(123, 77, 255, 0.1); display: flex; align-items: center; justify-content: center; color: #6366f1;">
+                <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 18px;"></i>
+              </div>
+              <div>
+                <p style="font-size: 15px; font-weight: 500; color: #475569; margin: 0; line-height: 1.6;">
+                  <span style="color: #6366f1; font-weight: 700;">Colorfy</span> é um dos poucos softwares de
+                  colorimetria
+                  que parte do pressuposto de que a <strong class="metallic-text" style="font-weight: 900;">pele oliva
+                    existe</strong> — e precisa ser identificada antes de lhe classificar em uma paleta.
+                </p>
+              </div>
+            </div>
           </div>
 
           <div class="divider" aria-hidden="true"></div>
 
           <div class="flowGrid" id="howBlock" style="scroll-margin-top: 120px;">
-            <div class="neu-card glass flowCard">
-              <div class="icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 3v10" stroke="rgba(91,124,255,1)" stroke-width="2" stroke-linecap="round" />
-                  <path d="M8 7l4-4 4 4" stroke="rgba(255,74,162,1)" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                  <path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" stroke="rgba(123,77,255,1)" stroke-width="2"
-                    stroke-linecap="round" />
-                </svg>
+            <div class="neu-card glass flowCard" style="transition-delay: 0ms;">
+              <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 8px;">
+                <div class="icon icon-upload" aria-hidden="true" style="margin-bottom: 0;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 3v10" stroke="rgba(91,124,255,1)" stroke-width="2" stroke-linecap="round" />
+                    <path d="M8 7l4-4 4 4" stroke="rgba(255,74,162,1)" stroke-width="2" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                    <path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" stroke="rgba(123,77,255,1)" stroke-width="2"
+                      stroke-linecap="round" />
+                  </svg>
+                </div>
+                <h3>Upload</h3>
               </div>
-              <h3>Upload</h3>
               <p>Envie uma selfie em luz natural, nítida e sem cortes. A IA valida a qualidade antes de analisar.</p>
             </div>
 
-            <div class="neu-card glass flowCard">
-              <div class="icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                  <path d="M10.5 4.5a6 6 0 1 0 0 12a6 6 0 0 0 0-12Z" stroke="rgba(91,124,255,1)" stroke-width="2" />
-                  <path d="M15.5 15.5L20 20" stroke="rgba(255,74,162,1)" stroke-width="2" stroke-linecap="round" />
-                  <path d="M8.3 9.7c.6-1.2 1.9-2 3.4-2" stroke="rgba(123,77,255,1)" stroke-width="2"
-                    stroke-linecap="round" />
-                </svg>
+            <div class="neu-card glass flowCard" style="transition-delay: 150ms;">
+              <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 8px;">
+                <div class="icon icon-quiz" aria-hidden="true" style="margin-bottom: 0;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M10.5 4.5a6 6 0 1 0 0 12a6 6 0 0 0 0-12Z" stroke="rgba(91,124,255,1)" stroke-width="2" />
+                    <path d="M15.5 15.5L20 20" stroke="rgba(255,74,162,1)" stroke-width="2" stroke-linecap="round" />
+                    <path d="M8.3 9.7c.6-1.2 1.9-2 3.4-2" stroke="rgba(123,77,255,1)" stroke-width="2"
+                      stroke-linecap="round" />
+                  </svg>
+                </div>
+                <h3>Quiz</h3>
               </div>
-              <h3>Quiz</h3>
               <p>Perguntas técnicas com imagens realistas (olhos, esclera, cabelo, veias, molduras). Sem poluição
                 visual.</p>
             </div>
 
-            <div class="neu-card glass flowCard">
-              <div class="icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                  <path d="M7 3h7l3 3v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" stroke="rgba(91,124,255,1)"
-                    stroke-width="2" />
-                  <path d="M14 3v4h4" stroke="rgba(255,74,162,1)" stroke-width="2" />
-                  <path d="M8 12h8M8 16h6" stroke="rgba(123,77,255,1)" stroke-width="2" stroke-linecap="round" />
-                </svg>
+            <div class="neu-card glass flowCard" style="transition-delay: 300ms;">
+              <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 8px;">
+                <div class="icon icon-report" aria-hidden="true" style="margin-bottom: 0;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M7 3h7l3 3v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" stroke="rgba(91,124,255,1)"
+                      stroke-width="2" />
+                    <path d="M14 3v4h4" stroke="rgba(255,74,162,1)" stroke-width="2" />
+                    <path d="M8 12h8M8 16h6" stroke="rgba(123,77,255,1)" stroke-width="2" stroke-linecap="round" />
+                  </svg>
+                </div>
+                <h3>Relatório</h3>
               </div>
-              <h3>Relatório</h3>
               <p>Paleta final, combinações, “use com moderação”, gestão de contraste e aplicação prática no mundo real.
               </p>
             </div>
           </div>
+        </div>
 
-          <div class="divider" aria-hidden="true"></div>
+        <div class="divider" aria-hidden="true"></div>
 
-          <div class="row">
-            <!-- Footer Removed -->
+        <div class="row">
+          <!-- Footer Removed -->
+        </div>
+    </div>
+    </section>
+
+    <!-- REGISTER -->
+    <section class="view-section" id="view-register">
+      <div class="neu-card glass sectionPad">
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <h3 style="margin:0; font-size:20px;">Prepare sua análise</h3>
+            <p class="muted" style="margin:8px 0 0; max-width:70ch;">
+              Esses dados servem para assinar o relatório e ajustar recomendações (sem exageros). Leva menos de 20
+              segundos.
+            </p>
+          </div>
+          <div class="pillRow">
+            <span class="pill">Profissional</span>
+            <span class="pill">Sem misticismo</span>
+            <span class="pill">Visagismo</span>
           </div>
         </div>
-      </section>
 
-      <!-- REGISTER -->
-      <section class="view-section" id="view-register">
-        <div class="neu-card glass sectionPad">
-          <div class="row" style="justify-content:space-between;">
-            <div>
-              <h3 style="margin:0; font-size:20px;">Prepare sua análise</h3>
-              <p class="muted" style="margin:8px 0 0; max-width:70ch;">
-                Esses dados servem para assinar o relatório e ajustar recomendações (sem exageros). Leva menos de 20
-                segundos.
-              </p>
-            </div>
-            <div class="pillRow">
-              <span class="pill">Profissional</span>
-              <span class="pill">Sem misticismo</span>
-              <span class="pill">Visagismo</span>
-            </div>
+        <div class="divider"></div>
+
+        <div class="grid2">
+          <div class="field">
+            <label for="name">Nome</label>
+            <input class="neu-input" id="name" type="text" placeholder="Seu nome" autocomplete="name" />
+            <div class="error" id="errName">Ops, precisamos do seu nome para personalizar a análise.</div>
           </div>
 
-          <div class="divider"></div>
-
-          <div class="grid2">
-            <div class="field">
-              <label for="name">Nome</label>
-              <input class="neu-input" id="name" type="text" placeholder="Seu nome" autocomplete="name" />
-              <div class="error" id="errName">Ops, precisamos do seu nome para personalizar a análise.</div>
-            </div>
-
-            <div class="field">
-              <label for="email">Email</label>
-              <input class="neu-input" id="email" type="email" placeholder="voce@exemplo.com" autocomplete="email" />
-              <div class="error" id="errEmail">Inclua um email válido para salvar e recuperar seu relatório.</div>
-            </div>
-
-            <div class="field">
-              <label for="phone">Telefone</label>
-              <input class="neu-input" id="phone" type="tel" placeholder="(00) 00000-0000" autocomplete="tel" />
-            </div>
-
-            <div class="field">
-              <label for="goal">Objetivo principal</label>
-              <select class="neu-input" id="goal" aria-label="Objetivo principal">
-                <option value="">Selecione…</option>
-                <option>Roupas do dia a dia</option>
-                <option>Maquiagem</option>
-                <option>Cabelo / Barba</option>
-                <option>Presença digital (fotos/redes)</option>
-                <option>Consultoria / trabalho</option>
-              </select>
-              <div class="error" id="errGoal">Escolha um objetivo — ajuda a deixar as recomendações mais úteis.</div>
-            </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input class="neu-input" id="email" type="email" placeholder="voce@exemplo.com" autocomplete="email" />
+            <div class="error" id="errEmail">Inclua um email válido para salvar e recuperar seu relatório.</div>
           </div>
 
-          <div class="row" style="justify-content:space-between; margin-top: 6px;">
-            <button class="neu-btn" type="button" data-nav="back">Voltar</button>
-            <button class="neu-btn primary" id="btnToUpload" type="button">Prosseguir</button>
+          <div class="field">
+            <label for="phone">Telefone</label>
+            <input class="neu-input" id="phone" type="tel" placeholder="(00) 00000-0000" autocomplete="tel" />
+          </div>
+
+          <div class="field">
+            <label for="goal">Objetivo principal</label>
+            <select class="neu-input" id="goal" aria-label="Objetivo principal">
+              <option value="">Selecione…</option>
+              <option>Roupas do dia a dia</option>
+              <option>Maquiagem</option>
+              <option>Cabelo / Barba</option>
+              <option>Presença digital (fotos/redes)</option>
+              <option>Consultoria / trabalho</option>
+            </select>
+            <div class="error" id="errGoal">Escolha um objetivo — ajuda a deixar as recomendações mais úteis.</div>
           </div>
         </div>
-      </section>
 
-      <!-- UPLOAD -->
-      <section class="view-section" id="view-upload">
-        <div class="neu-card glass sectionPad">
-          <div class="row" style="justify-content:space-between;">
-            <div>
-              <h3 style="margin:0; font-size:20px;">Envie sua selfie para análise</h3>
-              <p class="muted" style="margin:8px 0 0; max-width:85ch;">
-                Carregue uma foto de rosto sob luz natural, sem maquiagem e sem filtros para precisão máxima.
-                Retire <strong>brincos, piercings, óculos</strong>. Mantenha o <strong>cabelo afastado do
-                  rosto</strong>.
-                Use uma imagem <strong>nítida e de boa qualidade</strong>, com o rosto centralizado e <strong>sem
-                  cortes</strong>.
-              </p>
-            </div>
-            <div class="pillRow">
-              <span class="pill">Luz natural</span>
-              <span class="pill">Sem filtros</span>
-              <span class="pill">Rosto central</span>
-            </div>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="upload-zone neu-card glass" id="uploadZone" role="button" tabindex="0"
-            aria-label="Área de upload">
-            <div class="inner neu-inset" id="uploadInner">
-              <div class="hint">
-                <h3>Arraste e solte sua foto aqui</h3>
-                <p>
-                  Ou clique para selecionar. A moldura ajuda a enquadrar o rosto sem cortes — pense em “foto de
-                  documento”, mas natural.
-                </p>
-                <div style="margin-top: 10px">
-                  <span class="badge">
-                    <span aria-hidden="true">⬆</span> Upload seguro
-                  </span>
-                </div>
-              </div>
-              <div class="frameGuide" aria-hidden="true">
-                <div class="oval"></div>
-              </div>
-              <input id="fileInput" type="file" accept="image/*" />
-            </div>
-          </div>
-
-          <div class="previewWrap">
-            <div class="neu-card glass previewCard" id="previewCard" style="display:none;">
-              <div class="previewFrame" aria-label="Prévia da selfie">
-                <div class="ovalEditor" id="ovalEditor" style="--ovalW:78%;--ovalH:92%;">
-                  <img id="previewImg" alt="Prévia da selfie enviada" />
-                </div>
-              </div>
-              <div class="editorControls" id="editorControls" style="display:none;">
-                <label class="muted small" style="min-width:44px;">Zoom</label>
-                <input id="zoomRange" type="range" min="1" max="1.8" step="0.01" value="1" />
-              </div>
-              <p class="muted small" style="margin:10px 2px 0;">
-                Enquadramento automático sem cortes (ajuste: rosto centralizado).
-              </p>
-            </div>
-
-            <div class="neu-card glass qualityList">
-              <h4>Checklist rápido (para precisão máxima)</h4>
-              <ul class="bullets">
-                <li><span class="dot"></span><span>Rosto inteiro visível (testa e queixo sem cortar).</span></li>
-                <li><span class="dot"></span><span>Luz natural lateral suave (evite luz “estourada”).</span></li>
-                <li><span class="dot"></span><span>Sem maquiagem pesada, sem filtro, sem modo “beauty”.</span></li>
-                <li><span class="dot"></span><span>Retire óculos, brincos grandes e piercings chamativos.</span></li>
-                <li><span class="dot"></span><span>Cabelo fora do rosto, sobrancelhas visíveis.</span></li>
-              </ul>
-              <div class="error" id="errPhoto" style="display:block; margin-top:12px;">
-                Envie uma imagem para continuarmos.
-              </div>
-            </div>
-          </div>
-
-          <div class="row" style="justify-content:space-between; margin-top: 14px;">
-            <button class="neu-btn" type="button" data-nav="back">Voltar</button>
-            <button class="neu-btn primary" id="btnToQuiz" type="button" disabled
-              style="opacity:.6; cursor:not-allowed;">Continuar</button>
-          </div>
+        <div class="row" style="justify-content:space-between; margin-top: 14px;">
+          <button class="neu-btn" type="button" data-nav="back">Voltar</button>
+          <button class="neu-btn primary" id="btnToVideo" type="button">Continuar</button>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- QUIZ -->
-      <section class="view-section" id="view-quiz">
-        <div class="neu-card glass quizCard">
-          <div class="qTop">
-            <div>
-              <h3 class="qTitle" id="qTitle">Pergunta</h3>
-              <p class="qHelp" id="qHelp">
-                Observe com calma. Suas respostas refinam a classificação e ajudam a resolver empates com critérios
-                técnicos.
-              </p>
-            </div>
-            <div class="qMeta" id="qMeta">Pergunta 1</div>
-          </div>
-
-          <div id="qOptions" class="optionsGrid"></div>
-
-          <div class="hintInline" id="qHint">Escolha uma opção para avançarmos.</div>
-
-          <div class="quizNav">
-            <button class="neu-btn" id="btnPrevQ" type="button">Voltar</button>
-            <button class="neu-btn primary" id="btnNextQ" type="button">Próxima</button>
-          </div>
+    <!-- VIDEO -->
+    <section class="view-section" id="view-video">
+      <div class="neu-card glass sectionPad centerStack">
+        <h3 style="margin:0 0 16px;">Assista antes de continuar</h3>
+        <div style="width:100%; border-radius:18px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.15);">
+          <video controls style="width:100%; display:block;" id="introVideo">
+            <source src="assets/Colorfy video 1.mp4" type="video/mp4">
+            Seu navegador não suporta vídeos.
+          </video>
         </div>
-      </section>
-
-      <!-- LOADING -->
-      <section class="view-section" id="view-loading">
-        <div class="neu-card glass sectionPad centerStack">
-          <div class="spinner" aria-hidden="true"></div>
-          <h3 style="margin:0; font-size:18px;">Processando sua análise cromática…</h3>
-          <p class="muted" id="loadingMsg" style="margin:10px 0 0; max-width:70ch;">
-            Cruzando suas respostas com leitura visual de contraste, valor e profundidade.
-          </p>
+        <div class="row" style="justify-content:flex-end; margin-top: 20px; width:100%;">
+          <button class="neu-btn primary" id="btnAfterVideo" type="button">Continuar</button>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="view-section" id="view-payment-pending">
-        <div class="neu-card glass sectionPad centerStack">
-          <h3 style="margin:0; font-size:18px;">Pagamento ainda não confirmado (processando).</h3>
-          <p class="muted" id="pendingMsg" style="margin:10px 0 0; max-width:70ch;">
-            Se você acabou de pagar, pode levar alguns segundos para confirmar. Clique em “Verificar novamente”.
-          </p>
-
-          <div class="row" style="margin-top:14px;">
-            <button class="neu-btn primary" id="btnRetryPayment" type="button">Verificar novamente</button>
-            <button class="neu-btn" id="btnBackToCheckout" type="button">Voltar ao checkout</button>
+    <!-- UPLOAD -->
+    <section class="view-section" id="view-upload">
+      <div class="neu-card glass sectionPad">
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <h3 style="margin:0; font-size:20px;">Envie sua selfie para análise</h3>
+            <p class="muted" style="margin:8px 0 0; max-width:85ch;">
+              Carregue uma foto de rosto sob luz natural, sem maquiagem e sem filtros para precisão máxima.
+              Retire <strong>brincos, piercings, óculos</strong>. Mantenha o <strong>cabelo afastado do
+                rosto</strong>.
+              Use uma imagem <strong>nítida e de boa qualidade</strong>, com o rosto centralizado e <strong>sem
+                cortes</strong>.
+            </p>
           </div>
-
-          <p class="muted small" style="margin:12px 0 0;">
-            Dica: se você pagou em outra aba, volte para esta página e tente novamente.
-          </p>
-        </div>
-      </section>
-
-      <!-- SCANNER -->
-      <section class="view-section" id="view-scanner">
-        <div class="neu-card glass sectionPad centerStack">
-          <h3 style="margin:0; font-size:18px;">Leitura facial (scanner)</h3>
-          <p class="muted" style="margin:10px 0 0; max-width:70ch;">
-            Lendo áreas de luz e sombra, contraste entre pele/cabelo/olhos e sinais de subtom para validação fina.
-          </p>
-          <div class="scanFrame" id="scanFrame">
-            <img id="scanImg" alt="Selfie para leitura facial" />
-            <div class="scanLine" aria-hidden="true"></div>
-          </div>
-          <div class="row" style="justify-content:center; margin-top: 12px;">
-            <span class="pill">Precisão depende da foto</span>
+          <div class="pillRow">
+            <span class="pill">Luz natural</span>
             <span class="pill">Sem filtros</span>
-            <span class="pill">Boa luz</span>
+            <span class="pill">Rosto central</span>
           </div>
         </div>
-      </section>
 
-      <!-- CHECKOUT (Injected) -->
-      <section class="view-section" id="view-checkout" style="text-align:left;">
-        <script>
-          tailwind.config = {
-            theme: {
-              extend: {
-                fontFamily: {
-                  sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                },
-                colors: {
-                  brand: {
-                    primary: '#6366f1',
-                    secondary: '#ec4899',
-                    dark: '#0f172a',
-                  }
+        <div class="divider"></div>
+
+        <div class="upload-zone neu-card glass" id="uploadZone" role="button" tabindex="0" aria-label="Área de upload">
+          <div class="inner neu-inset" id="uploadInner">
+            <div class="hint">
+              <h3>Arraste e solte sua foto aqui</h3>
+              <p>
+                Ou clique para selecionar. A moldura ajuda a enquadrar o rosto sem cortes — pense em “foto de
+                documento”, mas natural.
+              </p>
+              <div style="margin-top: 10px">
+                <span class="badge">
+                  <span aria-hidden="true">⬆</span> Upload seguro
+                </span>
+              </div>
+            </div>
+            <div class="frameGuide" aria-hidden="true">
+              <div class="oval"></div>
+            </div>
+            <input id="fileInput" type="file" accept="image/*" />
+          </div>
+        </div>
+
+        <div class="previewWrap">
+          <div class="neu-card glass previewCard" id="previewCard" style="display:none;">
+            <div class="previewFrame" aria-label="Prévia da selfie">
+              <div class="ovalEditor" id="ovalEditor" style="--ovalW:78%;--ovalH:92%;">
+                <img id="previewImg" alt="Prévia da selfie enviada" />
+              </div>
+            </div>
+            <div class="editorControls" id="editorControls" style="display:none;">
+              <label class="muted small" style="min-width:44px;">Zoom</label>
+              <input id="zoomRange" type="range" min="1" max="1.8" step="0.01" value="1" />
+            </div>
+            <p class="muted small" style="margin:10px 2px 0;">
+              Enquadramento automático sem cortes (ajuste: rosto centralizado).
+            </p>
+          </div>
+
+          <div class="neu-card glass qualityList">
+            <h4>Checklist rápido (para precisão máxima)</h4>
+            <ul class="bullets">
+              <li><span class="dot"></span><span>Rosto inteiro visível (testa e queixo sem cortar).</span></li>
+              <li><span class="dot"></span><span>Luz natural lateral suave (evite luz “estourada”).</span></li>
+              <li><span class="dot"></span><span>Sem maquiagem pesada, sem filtro, sem modo “beauty”.</span></li>
+              <li><span class="dot"></span><span>Retire óculos, brincos grandes e piercings chamativos.</span></li>
+              <li><span class="dot"></span><span>Cabelo fora do rosto, sobrancelhas visíveis.</span></li>
+            </ul>
+            <div class="error" id="errPhoto" style="display:block; margin-top:12px;">
+              Envie uma imagem para continuarmos.
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="justify-content:space-between; margin-top: 14px;">
+          <button class="neu-btn" type="button" data-nav="back">Voltar</button>
+          <button class="neu-btn primary" id="btnToQuiz" type="button" disabled
+            style="opacity:.6; cursor:not-allowed;">Continuar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section class="view-section" id="view-quiz">
+      <div class="neu-card glass quizCard">
+        <div class="qTop">
+          <div>
+            <h3 class="qTitle" id="qTitle">Pergunta</h3>
+            <p class="qHelp" id="qHelp">
+              Observe com calma. Suas respostas refinam a classificação e ajudam a resolver empates com critérios
+              técnicos.
+            </p>
+          </div>
+          <div class="qMeta" id="qMeta">Pergunta 1</div>
+        </div>
+
+        <div id="qOptions" class="optionsGrid"></div>
+
+        <div class="hintInline" id="qHint">Escolha uma opção para avançarmos.</div>
+
+        <div class="quizNav">
+          <button class="neu-btn" id="btnPrevQ" type="button">Voltar</button>
+          <button class="neu-btn primary" id="btnNextQ" type="button">Próxima</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOADING -->
+    <section class="view-section" id="view-loading">
+      <div class="neu-card glass sectionPad centerStack">
+        <div class="spinner" aria-hidden="true"></div>
+        <h3 style="margin:0; font-size:18px;">Processando sua análise cromática…</h3>
+        <p class="muted" id="loadingMsg" style="margin:10px 0 0; max-width:70ch;">
+          Cruzando suas respostas com leitura visual de contraste, valor e profundidade.
+        </p>
+      </div>
+    </section>
+
+    <section class="view-section" id="view-payment-pending">
+      <div class="neu-card glass sectionPad centerStack">
+        <h3 style="margin:0; font-size:18px;">Pagamento ainda não confirmado (processando).</h3>
+        <p class="muted" id="pendingMsg" style="margin:10px 0 0; max-width:70ch;">
+          Se você acabou de pagar, pode levar alguns segundos para confirmar. Clique em “Verificar novamente”.
+        </p>
+
+        <div class="row" style="margin-top:14px;">
+          <button class="neu-btn primary" id="btnRetryPayment" type="button">Verificar novamente</button>
+          <button class="neu-btn" id="btnBackToCheckout" type="button">Voltar ao checkout</button>
+        </div>
+
+        <p class="muted small" style="margin:12px 0 0;">
+          Dica: se você pagou em outra aba, volte para esta página e tente novamente.
+        </p>
+      </div>
+    </section>
+
+    <!-- SCANNER -->
+    <section class="view-section" id="view-scanner">
+      <div class="neu-card glass sectionPad centerStack">
+        <h3 style="margin:0; font-size:18px;">Leitura facial (scanner)</h3>
+        <p class="muted" style="margin:10px 0 0; max-width:70ch;">
+          Lendo áreas de luz e sombra, contraste entre pele/cabelo/olhos e sinais de subtom para validação fina.
+        </p>
+        <div class="scanFrame" id="scanFrame">
+          <img id="scanImg" alt="Selfie para leitura facial" />
+          <div class="scanLine" aria-hidden="true"></div>
+        </div>
+        <div class="row" style="justify-content:center; margin-top: 12px;">
+          <span class="pill">Precisão depende da foto</span>
+          <span class="pill">Sem filtros</span>
+          <span class="pill">Boa luz</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHECKOUT (Injected) -->
+    <section class="view-section" id="view-checkout" style="text-align:left;">
+      <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+              },
+              colors: {
+                brand: {
+                  primary: '#6366f1',
+                  secondary: '#ec4899',
+                  dark: '#0f172a',
                 }
               }
             }
           }
-        </script>
-        <style>
-          .gradient-text {
-            background: linear-gradient(to right, #6366f1, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-          }
+        }
+      </script>
+      <style>
+        .gradient-text {
+          background: linear-gradient(to right, #6366f1, #ec4899);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
 
-          .gradient-bg {
-            background: linear-gradient(to right, #6366f1, #ec4899);
-          }
+        .gradient-bg {
+          background: linear-gradient(to right, #6366f1, #ec4899);
+        }
 
-          .mockup-shadow {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-          }
+        .mockup-shadow {
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
 
-          /* Reset some styles for this section to avoid conflicts */
-          #view-checkout h1,
-          #view-checkout h2,
-          #view-checkout h3,
-          #view-checkout p {
-            margin: initial;
-          }
+        /* Reset some styles for this section to avoid conflicts */
+        #view-checkout h1,
+        #view-checkout h2,
+        #view-checkout h3,
+        #view-checkout p {
+          margin: initial;
+        }
 
 
-          /* ---------- Result micro-interactions (UX polish) ---------- */
-          @keyframes fadeUp {
-            from {
-              opacity: 0;
-              transform: translateY(10px);
-              filter: blur(2px);
-            }
-
-            to {
-              opacity: 1;
-              transform: translateY(0);
-              filter: blur(0);
-            }
-          }
-
-          .stagger-item {
+        /* ---------- Result micro-interactions (UX polish) ---------- */
+        @keyframes fadeUp {
+          from {
             opacity: 0;
-            animation: fadeUp 520ms ease forwards;
-            will-change: transform, opacity, filter;
+            transform: translateY(10px);
+            filter: blur(2px);
           }
 
-          .swatchCard {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            transition: transform 220ms ease, box-shadow 220ms ease;
+          to {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+          }
+        }
+
+        .stagger-item {
+          opacity: 0;
+          animation: fadeUp 520ms ease forwards;
+          will-change: transform, opacity, filter;
+        }
+
+        .swatchCard {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+          transition: transform 220ms ease, box-shadow 220ms ease;
+        }
+
+        .swatchCard:hover {
+          transform: translateY(-3px) scale(1.01);
+        }
+
+        .swatchDot {
+          width: 44px;
+          height: 44px;
+          border-radius: 14px;
+          box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+          transition: transform 220ms ease;
+          flex: 0 0 auto;
+        }
+
+        .swatchCard:hover .swatchDot {
+          transform: scale(1.06);
+        }
+
+        /* ---------- Print (Download as PDF) ---------- */
+        @media print {
+
+          /* Show only the result view */
+          .view-section {
+            display: none !important;
           }
 
-          .swatchCard:hover {
-            transform: translateY(-3px) scale(1.01);
+          #view-result {
+            display: block !important;
           }
 
-          .swatchDot {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
-            transition: transform 220ms ease;
-            flex: 0 0 auto;
+          #auditBlock {
+            display: none !important;
           }
 
-          .swatchCard:hover .swatchDot {
-            transform: scale(1.06);
+          /* Hide interactive controls */
+          button,
+          .neu-btn,
+          nav,
+          .floating,
+          .toast {
+            display: none !important;
           }
 
-          /* ---------- Print (Download as PDF) ---------- */
-          @media print {
-
-            /* Show only the result view */
-            .view-section {
-              display: none !important;
-            }
-
-            #view-result {
-              display: block !important;
-            }
-
-            #auditBlock {
-              display: none !important;
-            }
-
-            /* Hide interactive controls */
-            button,
-            .neu-btn,
-            nav,
-            .floating,
-            .toast {
-              display: none !important;
-            }
-
-            html,
-            body {
-              background: #fff !important;
-              color: #111 !important;
-            }
-
-            /* Remove heavy effects for crisp PDF */
-            .glass,
-            .neu-card,
-            .neu-inset {
-              box-shadow: none !important;
-              background: #fff !important;
-              border: 1px solid #e5e7eb !important;
-            }
-
-            /* Prevent awkward breaks */
-            .swatchCard,
-            .resultWrap,
-            .sectionPad {
-              break-inside: avoid;
-              page-break-inside: avoid;
-            }
+          html,
+          body {
+            background: #fff !important;
+            color: #111 !important;
           }
-        </style>
 
-        <div
-          class="relative w-full max-w-md mx-auto bg-white min-h-[80vh] shadow-2xl overflow-hidden rounded-3xl font-sans text-slate-800">
+          /* Remove heavy effects for crisp PDF */
+          .glass,
+          .neu-card,
+          .neu-inset {
+            box-shadow: none !important;
+            background: #fff !important;
+            border: 1px solid #e5e7eb !important;
+          }
 
-          <!-- Navbar -->
-          <nav class="absolute top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-100">
-            <div class="px-4 h-16 flex items-center justify-between">
-              <div class="text-2xl font-extrabold tracking-tight">
-                <span class="gradient-text">Colorfy</span>
-              </div>
-              <!-- CTA Button Simulating Payment -->
-              <button id="btnCheckoutTop" type="button"
-                class="bg-black text-white px-4 py-2 rounded-full text-xs font-bold hover:scale-105 transition-transform">
-                VER RELATÓRIO
-              </button>
+          /* Prevent awkward breaks */
+          .swatchCard,
+          .resultWrap,
+          .sectionPad {
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
+        }
+      </style>
+
+      <div
+        class="relative w-full max-w-md mx-auto bg-white min-h-[80vh] shadow-2xl overflow-hidden rounded-3xl font-sans text-slate-800">
+
+        <!-- Navbar -->
+        <nav class="absolute top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-100">
+          <div class="px-4 h-16 flex items-center justify-between">
+            <div class="text-2xl font-extrabold tracking-tight">
+              <span class="gradient-text">Colorfy</span>
             </div>
-          </nav>
-
-          <!-- Main Content -->
-          <div class="pt-20 pb-24">
-            <!-- Hero Section -->
-            <section class="px-5 py-8 text-center relative overflow-hidden">
-              <div
-                class="inline-flex items-center gap-1 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full mb-6">
-                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span class="text-xs font-semibold text-indigo-600 uppercase tracking-wide">Análise Concluída</span>
-              </div>
-              <h1 class="text-3xl md:text-4xl font-extrabold leading-tight mb-4 text-slate-900">
-                Relatório completo com sua <span class="gradient-text">paleta personalizada</span> pronto para acesso!
-              </h1>
-              <p class="text-gray-500 text-lg mb-8 leading-relaxed">
-                Descubra sua melhor versão com nossa análise profissional de colorimetria.
-              </p>
-
-              <!-- CTA Principal -->
-              <div class="space-y-3">
-                <button id="btnCheckoutHero" type="button"
-                  class="block w-full gradient-bg text-white font-bold text-lg py-4 rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all duration-300">
-                  QUERO ACESSO IMEDIATO
-                  <i class="fa-solid fa-arrow-right ml-2"></i>
-                </button>
-                <p class="text-xs text-gray-400 flex items-center justify-center gap-1">
-                  <i class="fa-solid fa-lock"></i> Compra 100% Segura e Instantânea
-                </p>
-              </div>
-            </section>
-
-            <!-- Features Grid -->
-            <section class="px-5 py-10 bg-gray-50">
-              <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold mb-2">Veja o que você vai receber</h2>
-              </div>
-              <!-- Cards -->
-              <div class="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm mb-4 flex items-start gap-4">
-                <div
-                  class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl shrink-0">
-                  <i class="fa-solid fa-eye"></i>
-                </div>
-                <div>
-                  <h3 class="font-bold text-lg text-slate-800">Análise da Colorimetria</h3>
-                  <p class="text-sm text-gray-500 mt-1">Descubra sua estação e as características da sua pele.</p>
-                </div>
-              </div>
-              <div class="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm mb-4 flex items-start gap-4">
-                <div
-                  class="w-12 h-12 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center text-xl shrink-0">
-                  <i class="fa-solid fa-palette"></i>
-                </div>
-                <div>
-                  <h3 class="font-bold text-lg text-slate-800">Cores que te valorizam</h3>
-                  <p class="text-sm text-gray-500 mt-1">Saiba exatamente quais tons realçam sua beleza natural.</p>
-                </div>
-              </div>
-            </section>
-
-            <!-- Offer/Price Section -->
-            <section class="px-5 pb-8 pt-8">
-              <div class="bg-slate-900 rounded-3xl p-8 text-center text-white relative overflow-hidden">
-                <div
-                  class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-full blur-3xl opacity-20 -mr-10 -mt-10">
-                </div>
-                <div
-                  class="absolute bottom-0 left-0 w-32 h-32 bg-pink-500 rounded-full blur-3xl opacity-20 -ml-10 -mb-10">
-                </div>
-
-                <h3 class="text-xl font-medium text-gray-300 mb-2">Oferta Especial Limitada</h3>
-                <div class="flex items-center justify-center gap-3 mb-6">
-                  <span class="text-gray-500 line-through text-lg">R$ 197,00</span>
-                  <span class="text-4xl font-extrabold text-white">R$ 67,00</span>
-                </div>
-
-                <button id="btnCheckoutOffer" type="button"
-                  class="block w-full bg-white text-slate-900 font-bold text-lg py-4 rounded-xl hover:bg-gray-100 transition-colors">
-                  PEGAR OFERTA AGORA
-                </button>
-              </div>
-              <div class="text-center mt-4">
-                <a href="https://buy.stripe.com/test_dRmbJ31LOcBI7jB3vy1Jm00" target="_blank"
-                  class="text-sm text-gray-400 underline hover:text-gray-600">Link original de pagamento (Stripe)</a>
-              </div>
-            </section>
-
-          </div>
-
-          <!-- Sticky Bottom CTA for Mobile -->
-          <div
-            class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40 md:hidden">
-            <button id="btnCheckoutBottom" type="button"
-              class="block w-full gradient-bg text-white text-center font-bold py-3.5 rounded-xl shadow-lg animate-pulse">
-              QUERO COMEÇAR AGORA
+            <!-- CTA Button Simulating Payment -->
+            <button id="btnCheckoutTop" type="button"
+              class="bg-black text-white px-4 py-2 rounded-full text-xs font-bold hover:scale-105 transition-transform">
+              VER RELATÓRIO
             </button>
           </div>
-        </div>
-      </section>
+        </nav>
 
-      <!-- RESULT -->
-      <section class="view-section" id="view-result">
-        <div class="neu-card glass sectionPad">
-          <div id="resultContainer" class="premium-container"></div>
+        <!-- Main Content -->
+        <div class="pt-20 pb-24">
+          <!-- Hero Section -->
+          <section class="px-5 py-8 text-center relative overflow-hidden">
+            <div
+              class="inline-flex items-center gap-1 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full mb-6">
+              <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              <span class="text-xs font-semibold text-indigo-600 uppercase tracking-wide">Análise Concluída</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-extrabold leading-tight mb-4 text-slate-900">
+              Relatório completo com sua <span class="gradient-text">paleta personalizada</span> pronto para acesso!
+            </h1>
+            <p class="text-gray-500 text-lg mb-8 leading-relaxed">
+              Descubra sua melhor versão com nossa análise profissional de colorimetria.
+            </p>
 
-          <div class="row" style="margin-top: 20px; justify-content: center; gap: 10px;">
-            <button class="neu-btn" onclick="window.print()">🖨️ Salvar PDF</button>
-          </div>
+            <!-- CTA Principal -->
+            <div class="space-y-3">
+              <button id="btnCheckoutHero" type="button"
+                class="block w-full gradient-bg text-white font-bold text-lg py-4 rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all duration-300">
+                QUERO ACESSO IMEDIATO
+                <i class="fa-solid fa-arrow-right ml-2"></i>
+              </button>
+              <p class="text-xs text-gray-400 flex items-center justify-center gap-1">
+                <i class="fa-solid fa-lock"></i> Compra 100% Segura e Instantânea
+              </p>
+            </div>
+          </section>
+
+          <!-- Features Grid -->
+          <section class="px-5 py-10 bg-gray-50">
+            <div class="text-center mb-8">
+              <h2 class="text-2xl font-bold mb-2">Veja o que você vai receber</h2>
+            </div>
+            <!-- Cards -->
+            <div class="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm mb-4 flex items-start gap-4">
+              <div
+                class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl shrink-0">
+                <i class="fa-solid fa-eye"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg text-slate-800">Análise da Colorimetria</h3>
+                <p class="text-sm text-gray-500 mt-1">Descubra sua estação e as características da sua pele.</p>
+              </div>
+            </div>
+            <div class="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm mb-4 flex items-start gap-4">
+              <div
+                class="w-12 h-12 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center text-xl shrink-0">
+                <i class="fa-solid fa-palette"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg text-slate-800">Cores que te valorizam</h3>
+                <p class="text-sm text-gray-500 mt-1">Saiba exatamente quais tons realçam sua beleza natural.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Offer/Price Section -->
+          <section class="px-5 pb-8 pt-8">
+            <div class="bg-slate-900 rounded-3xl p-8 text-center text-white relative overflow-hidden">
+              <div
+                class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-full blur-3xl opacity-20 -mr-10 -mt-10">
+              </div>
+              <div
+                class="absolute bottom-0 left-0 w-32 h-32 bg-pink-500 rounded-full blur-3xl opacity-20 -ml-10 -mb-10">
+              </div>
+
+              <h3 class="text-xl font-medium text-gray-300 mb-2">Oferta Especial Limitada</h3>
+              <div class="flex items-center justify-center gap-3 mb-6">
+                <span class="text-gray-500 line-through text-lg">R$ 197,00</span>
+                <span class="text-4xl font-extrabold text-white">R$ 67,00</span>
+              </div>
+
+              <button id="btnCheckoutOffer" type="button"
+                class="block w-full bg-white text-slate-900 font-bold text-lg py-4 rounded-xl hover:bg-gray-100 transition-colors">
+                PEGAR OFERTA AGORA
+              </button>
+            </div>
+            <div class="text-center mt-4">
+              <a href="https://buy.stripe.com/test_dRmbJ31LOcBI7jB3vy1Jm00" target="_blank"
+                class="text-sm text-gray-400 underline hover:text-gray-600">Link original de pagamento (Stripe)</a>
+            </div>
+          </section>
+
         </div>
-      </section>
+
+        <!-- Sticky Bottom CTA for Mobile -->
+        <div
+          class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40 md:hidden">
+          <button id="btnCheckoutBottom" type="button"
+            class="block w-full gradient-bg text-white text-center font-bold py-3.5 rounded-xl shadow-lg animate-pulse">
+            QUERO COMEÇAR AGORA
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULT -->
+    <section class="view-section" id="view-result">
+      <div class="neu-card glass sectionPad">
+        <div id="resultContainer" class="premium-container"></div>
+
+        <div class="row" style="margin-top: 20px; justify-content: center; gap: 10px;">
+          <button class="neu-btn" onclick="window.print()">🖨️ Salvar PDF</button>
+        </div>
+      </div>
+    </section>
     </div>
   </main>
 
@@ -2866,7 +3367,7 @@
     const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
 
     /* ---------- SPA ---------- */
-    const views = ["view-landing", "view-register", "view-upload", "view-quiz", "view-loading", "view-scanner", "view-checkout", "view-result"];
+    const views = ["view-landing", "view-register", "view-video", "view-upload", "view-quiz", "view-loading", "view-scanner", "view-checkout", "view-result"];
     let currentView = "view-landing";
     let viewStack = ["view-landing"];
 
@@ -2876,14 +3377,31 @@
       const next = document.getElementById(id);
       if (!next) return;
 
-      // Special handling for Checkout view: hide main header/progress
+      const header = document.querySelector("header.topbar");
+      const progress = document.querySelector(".progressWrap");
+
       if (id === "view-checkout") {
-        document.querySelector("header.topbar").style.display = "none";
-        document.querySelector(".progressWrap").style.display = "none";
+        if (header) header.style.display = "none";
+        if (progress) progress.style.display = "none";
       } else {
-        // Restore if leaving checkout (or general navigation)
-        document.querySelector("header.topbar").style.display = "";
-        document.querySelector(".progressWrap").style.display = "";
+        if (header) header.style.display = "";
+        if (progress) progress.style.display = "";
+      }
+
+      // Handle Logo Visibility (Hide topbar logo on Landing, show elsewhere) - Removing specific landing hide logic as requested to restore
+      const topBrand = document.getElementById("topbarBrand");
+      if (topBrand) {
+        topBrand.style.opacity = "1";
+        topBrand.style.visibility = "visible";
+      }
+
+      // Handle Header Alignment: Center on Landing, Left (Space-between) on others
+      if (header) {
+        if (id === "view-landing") {
+          header.classList.add("centered");
+        } else {
+          header.classList.remove("centered");
+        }
       }
 
       // Force cleanup of all sections to prevent overlaps
@@ -2951,13 +3469,14 @@
       const idx = Math.max(0, views.indexOf(currentView));
       // 6 steps visible (register->result), landing is 0
       const map = {
-        "view-landing": { p: 0, label: "Etapa 0 de 6" },
-        "view-register": { p: 10, label: "Etapa 1 de 6" },
-        "view-upload": { p: 22, label: "Etapa 2 de 6" },
-        "view-quiz": { p: 55, label: "Etapa 3 de 6" },
-        "view-loading": { p: 78, label: "Etapa 4 de 6" },
-        "view-scanner": { p: 88, label: "Etapa 5 de 6" },
-        "view-checkout": { p: 95, label: "Etapa 6 de 6" },
+        "view-landing": { p: 0, label: "Etapa 0 de 7" },
+        "view-register": { p: 10, label: "Etapa 1 de 7" },
+        "view-video": { p: 20, label: "Etapa 2 de 7" },
+        "view-upload": { p: 30, label: "Etapa 3 de 7" },
+        "view-quiz": { p: 50, label: "Etapa 4 de 7" },
+        "view-loading": { p: 75, label: "Etapa 5 de 7" },
+        "view-scanner": { p: 85, label: "Etapa 6 de 7" },
+        "view-checkout": { p: 95, label: "Etapa 7 de 7" },
         "view-result": { p: 100, label: "Resultados" }
       };
       const m = map[currentView] || { p: Math.round((idx / (views.length - 1)) * 100), label: `Etapa ${idx} de ${views.length - 1}` };
@@ -2985,7 +3504,7 @@
 
 
     /* ---------- Register validation ---------- */
-    $("#btnToUpload").addEventListener("click", () => {
+    $("#btnToVideo").addEventListener("click", () => {
       const name = $("#name").value.trim();
       const email = $("#email").value.trim();
       const phone = $("#phone").value.trim();
@@ -3000,6 +3519,14 @@
       if (!name || !okEmail || !goal) return;
 
       state.user = { name, email, phone, goal };
+      goTo("view-video");
+    });
+
+    /* ---------- Video Step ---------- */
+    $("#btnAfterVideo")?.addEventListener("click", () => {
+      // Pause video if playing
+      const vid = document.getElementById("introVideo");
+      if (vid) vid.pause();
       goTo("view-upload");
     });
 
@@ -3280,11 +3807,7 @@
         help: "Observe a cor em luz natural.",
         layout: "cols3",
         options: [
-          { key: "A", label: "Castanho escuro / preto", sub: "Profundo", swatch: { type: "eye", bg: "linear-gradient(135deg,#2b1a16,#000000)" } },
-          { key: "B", label: "Castanho médio / claro / mel", sub: "Amendoado", swatch: { type: "eye", bg: "linear-gradient(135deg,#8b5a3b,#c28a55)" } },
-          { key: "C", label: "Avelã / oliva", sub: "Mistura verde-castanho", swatch: { type: "eye", bg: "linear-gradient(135deg,#6b5e20,#8f7e38)" } },
-          { key: "D", label: "Verdes", sub: "Verde claro ou médio", swatch: { type: "eye", bg: "linear-gradient(135deg,#3d6b3d,#6b8f6b)" } },
-          { key: "E", label: "Azuis / Cinzas", sub: "Frio", swatch: { type: "eye", bg: "linear-gradient(135deg,#4a6cff,#cbbcff)" } }
+          { key: "A", label: "Castanho escuro / preto", sub: "Profundo", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20A.jpg') center/cover no-repeat" } }, { key: "B", label: "Castanho médio / claro / mel", sub: "Amendoado", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20B.jpg') center/cover no-repeat" } }, { key: "C", label: "Avelã / oliva", sub: "Mistura verde-castanho", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20C.jpg') center/cover no-repeat" } }, { key: "D", label: "Verdes", sub: "Verde claro ou médio", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20D.jpg') center/cover no-repeat" } }, { key: "E", label: "Azuis / Cinzas", sub: "Frio", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20E.jpg') center/cover no-repeat" } }
         ]
       },
       {
@@ -3293,8 +3816,7 @@
         help: "Ajuda a identificar contraste e temperatura.",
         layout: "cols2",
         options: [
-          { key: "A", label: "É BRANCA MUITO CLARA, ILUMINADA", sub: "", swatch: { type: "block", bg: "#ffffff" } },
-          { key: "B", label: "É MAIS SUAVE, COMO UM OFFWHITE OU MARFIM CLARO", sub: "", swatch: { type: "block", bg: "#fefae0" } }
+          { key: "A", label: "É BRANCA MUITO CLARA, ILUMINADA", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%202%20-%20A.jpg') center/cover no-repeat" } }, { key: "B", label: "É MAIS SUAVE, COMO UM OFFWHITE OU MARFIM CLARO", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%202%20-%20B.jpg') center/cover no-repeat" } }
         ]
       },
       {
@@ -3303,8 +3825,7 @@
         help: "Contraste vs Suavidade.",
         layout: "cols2",
         options: [
-          { key: "A", label: "A borda da minha íris parece uma maquiagem esfumada", sub: "Degradê suave", swatch: { type: "icon", svg: `<svg viewBox="0 0 64 64" width="46" height="46"><circle cx="32" cy="32" r="20" fill="url(#gradSoft)"/><defs><radialGradient id="gradSoft"><stop offset="60%" stop-color="#8b5a3b"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></radialGradient></defs></svg>` } },
-          { key: "B", label: "A borda da íris é tão bem delimitada, que parece desenhada à caneta", sub: "Contraste alto", swatch: { type: "icon", svg: `<svg viewBox="0 0 64 64" width="46" height="46"><circle cx="32" cy="32" r="18" fill="#3b251a" stroke="#000" stroke-width="2"/></svg>` } }
+          { key: "A", label: "A borda da minha íris parece uma maquiagem esfumada", sub: "Degradê suave", swatch: { bg: "url('assets/Quest%C3%A3o%203%20-%20A.jpg') center/cover no-repeat" } }, { key: "B", label: "A borda da íris é tão bem delimitada, que parece desenhada à caneta", sub: "Contraste alto", swatch: { bg: "url('assets/Quest%C3%A3o%203%20-%20B.jpg') center/cover no-repeat" } }
         ]
       },
       {
@@ -3313,14 +3834,7 @@
         help: "Considere a cor que nasce na raiz.",
         layout: "cols2",
         options: [
-          { key: "a", label: "Preto azulado (vívido)", sub: "", swatch: { type: "block", bg: "#090909" } },
-          { key: "b", label: "Castanho escuro", sub: "", swatch: { type: "block", bg: "#302018" } },
-          { key: "c", label: "Castanho médio", sub: "", swatch: { type: "block", bg: "#5c4033" } },
-          { key: "d", label: "Castanho claro / mel", sub: "", swatch: { type: "block", bg: "#9c7c58" } },
-          { key: "e", label: "Loiro escuro acinzentado", sub: "", swatch: { type: "block", bg: "#80756a" } },
-          { key: "f", label: "Loiro médio / claro", sub: "", swatch: { type: "block", bg: "#e6cba5" } },
-          { key: "g", label: "Ruivo claro alaranjado", sub: "", swatch: { type: "block", bg: "#ff955c" } },
-          { key: "h", label: "Ruivo médio", sub: "", swatch: { type: "block", bg: "#a54522" } }
+          { key: "a", label: "Preto azulado (vívido)", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%204%20-%20A.jpg') center/cover no-repeat" } }, { key: "b", label: "Castanho escuro", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%204%20-%20B.jpg') center/cover no-repeat" } }, { key: "c", label: "Castanho médio", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%204%20-%20C.jpg') center/cover no-repeat" } }, { key: "d", label: "Castanho claro / mel", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%204%20-%20D.jpg') center/cover no-repeat" } }, { key: "e", label: "Loiro escuro acinzentado", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%204%20-%20E.jpg') center/cover no-repeat" } }, { key: "f", label: "Loiro médio / claro", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%204%20-%20F.jpg') center/cover no-repeat" } }, { key: "g", label: "Ruivo claro alaranjado", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%204%20-%20G.jpg') center/cover no-repeat" } }, { key: "h", label: "Ruivo médio", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%204%20-%20H.jpg') center/cover no-repeat" } }
         ]
       },
       {
@@ -3329,9 +3843,7 @@
         help: "Marcador clássico de subtom.",
         layout: "cols3",
         options: [
-          { key: "A", label: "Azul ou roxo", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg, #6b7aec, #9b59b6)" } },
-          { key: "B", label: "Esverdeada", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg, #2ecc71, #27ae60)" } },
-          { key: "C", label: "Não consigo ver as veias claramente", sub: "Difícil distinguir", swatch: { type: "block", bg: "#bdc3c7" } }
+          { key: "A", label: "Azul ou roxo", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%205%20-%20A.jpg') center/cover no-repeat" } }, { key: "B", label: "Esverdeada", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%205%20-%20B.jpg') center/cover no-repeat" } }, { key: "C", label: "Não consigo ver as veias claramente", sub: "Difícil distinguir", swatch: { type: "block", bg: "#bdc3c7" } }
         ]
       },
       {
@@ -3340,10 +3852,7 @@
         help: "",
         layout: "cols2",
         options: [
-          { key: "A", label: "Não tenho sardas.", sub: "", swatch: { type: "block", bg: "#ecf0f1" } },
-          { key: "B", label: "Sim. Elas são claras, em um tom de dourado.", sub: "", swatch: { type: "block", bg: "#f1c40f" } },
-          { key: "C", label: "Sim. Elas são na cor caramelo.", sub: "", swatch: { type: "block", bg: "#d35400" } },
-          { key: "D", label: "Sim. Elas têm um tom de marrom acinzentado.", sub: "", swatch: { type: "block", bg: "#7f8c8d" } }
+          { key: "A", label: "Não tenho sardas.", sub: "", swatch: { type: "block", bg: "#ecf0f1" } }, { key: "B", label: "Sim. Elas são claras, em um tom de dourado.", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%206%20-%20B.jpg') center/cover no-repeat" } }, { key: "C", label: "Sim. Elas são na cor caramelo.", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%206%20-%20C.jpg') center/cover no-repeat" } }, { key: "D", label: "Sim. Elas têm um tom de marrom acinzentado.", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%206%20-%20D.jpg') center/cover no-repeat" } }
         ]
       },
       {
@@ -3352,10 +3861,7 @@
         help: "Reação vascular.",
         layout: "cols2",
         options: [
-          { key: "A", label: "Sim, facilmente", sub: "Fica rosada rápido", swatch: { type: "block", bg: "#ff9ff3" } },
-          { key: "B", label: "Às vezes, só com esforço extremo", sub: "", swatch: { type: "block", bg: "#feca57" } },
-          { key: "C", label: "Raramente / nunca", sub: "", swatch: { type: "block", bg: "#1dd1a1" } },
-          { key: "D", label: "Minha pele escurece ou fica arroxeada", sub: "", swatch: { type: "block", bg: "#5f27cd" } }
+          { key: "A", label: "Sim, facilmente", sub: "Fica rosada rápido", swatch: { type: "block", bg: "#ff9ff3" } }, { key: "B", label: "Às vezes, só com esforço extremo", sub: "", swatch: { type: "block", bg: "#feca57" } }, { key: "C", label: "Raramente / nunca", sub: "", swatch: { type: "block", bg: "#1dd1a1" } }, { key: "D", label: "Minha pele escurece ou fica arroxeada", sub: "", swatch: { type: "block", bg: "#5f27cd" } }
         ]
       },
       {
@@ -3364,11 +3870,7 @@
         help: "",
         layout: "cols2",
         options: [
-          { key: "A", label: "Só tenho olheiras quando cansada.", sub: "", swatch: { type: "block", bg: "#ecf0f1" } },
-          { key: "B", label: "Sim, mas são uma sombra por causa do formato natural.", sub: "", swatch: { type: "block", bg: "#bdc3c7" } },
-          { key: "C", label: "Sim, são castanhas ou caramelo.", sub: "", swatch: { type: "block", bg: "#af6b42" } },
-          { key: "D", label: "Sim, são levemente azuladas ou ameixa.", sub: "", swatch: { type: "block", bg: "#6c5ce7" } },
-          { key: "E", label: "Sim, são esverdeadas ou acinzentadas.", sub: "", swatch: { type: "block", bg: "#7f8c8d" } }
+          { key: "A", label: "Só tenho olheiras quando cansada.", sub: "", swatch: { bg: "#ecf0f1" } }, { key: "B", label: "Sim, mas são uma sombra por causa do formato natural.", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%208%20-%20B.jpg') center/cover no-repeat" } }, { key: "C", label: "Sim, são castanhas ou caramelo.", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%208%20-%20C.jpg') center/cover no-repeat" } }, { key: "D", label: "Sim, são levemente azuladas ou ameixa.", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%208%20-%20D.jpg') center/cover no-repeat" } }, { key: "E", label: "Sim, são esverdeadas ou acinzentadas.", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%208%20-%20E.jpg') center/cover no-repeat" } }
         ]
       },
       {
@@ -3377,23 +3879,16 @@
         help: "",
         layout: "cols2",
         options: [
-          { key: "A", label: "Queima rapidamente e não bronzeia", sub: "", swatch: { type: "block", bg: "#ff7675" } },
-          { key: "B", label: "Queima, mas depois fica bronzeada", sub: "", swatch: { type: "block", bg: "#fab1a0" } },
-          { key: "C", label: "Queima, mas depois escurece sem bronzear", sub: "", swatch: { type: "block", bg: "#636e72" } },
-          { key: "D", label: "Bronzeia rapidamente e raramente fica vermelha", sub: "", swatch: { type: "block", bg: "#e17055" } },
-          { key: "E", label: "Fica vermelha e com um ou dois dias volta ao normal", sub: "", swatch: { type: "block", bg: "#ff9f43" } }
+          { key: "A", label: "Queima rapidamente e não bronzeia", sub: "", swatch: { type: "block", bg: "#ff7675" } }, { key: "B", label: "Queima, mas depois fica bronzeada", sub: "", swatch: { type: "block", bg: "#fab1a0" } }, { key: "C", label: "Queima, mas depois escurece sem bronzear", sub: "", swatch: { type: "block", bg: "#636e72" } }, { key: "D", label: "Bronzeia rapidamente e raramente fica vermelha", sub: "", swatch: { type: "block", bg: "#e17055" } }, { key: "E", label: "Fica vermelha e com um ou dois dias volta ao normal", sub: "", swatch: { type: "block", bg: "#ff9f43" } }
         ]
       },
       {
         id: "q10",
         title: "“Minha pele não é rosada nem dourada; é um tom que não sei explicar bem.”",
         help: "Identificador de Oliva.",
-        layout: "cols2",
+        layout: "poster",
         options: [
-          { key: "A", label: "Minha pele é levemente rosada.", sub: "Falso", swatch: { type: "block", bg: "#fd79a8" } },
-          { key: "B", label: "Minha pele é dourada.", sub: "Falso", swatch: { type: "block", bg: "#ffeaa7" } },
-          { key: "C", label: "Fico esverdeado sem sol.", sub: "Verdadeiro", swatch: { type: "block", bg: "#55efc4" } },
-          { key: "D", label: "Bronzeio acinzentado.", sub: "Verdadeiro", swatch: { type: "block", bg: "#b2bec3" } }
+          { key: "A", label: "Minha pele é clara", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%2010%20-%20A.jpg') center/cover no-repeat" } }, { key: "B", label: "Minha pele é média.", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%2010%20-%20B.jpg') center/cover no-repeat" } }, { key: "C", label: "Minha pele é morena", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%2010%20-%20C.jpg') center/cover no-repeat" } }, { key: "D", label: "Minha pele é profunda", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%2010%20-%20D.jpg') center/cover no-repeat" } }
         ]
       },
       {
@@ -3402,11 +3897,7 @@
         help: "Já ocorreu de algumas ficarem alaranjadas e outras, acinzentadas?",
         layout: "cols2",
         options: [
-          { key: "A", label: "Sim! Bases rosadas ficam cinzas, quentes ficam laranjas.", sub: "Aspecto estranho", swatch: { type: "block", bg: "#dfe6e9" } },
-          { key: "B", label: "Nunca percebi isso.", sub: "Neutro", swatch: { type: "block", bg: "#ecf0f1" } },
-          { key: "C", label: "Não. Sei que bases frias (rosadas) me representam.", sub: "Frio", swatch: { type: "block", bg: "#fab1a0" } },
-          { key: "D", label: "Não. Sei que bases quentes (douradas) me representam.", sub: "Quente", swatch: { type: "block", bg: "#fdcb6e" } },
-          { key: "E", label: "Não. Sei que bases neutras me representam.", sub: "Neutro", swatch: { type: "block", bg: "#ffeaa7" } }
+          { key: "A", label: "Sim! Bases rosadas ficam cinzas, quentes ficam laranjas.", sub: "Aspecto estranho", swatch: { type: "block", bg: "#dfe6e9" } }, { key: "B", label: "Nunca percebi isso.", sub: "Neutro", swatch: { type: "block", bg: "#ecf0f1" } }, { key: "C", label: "Não. Sei que bases frias (rosadas) me representam.", sub: "Frio", swatch: { type: "block", bg: "#fab1a0" } }, { key: "D", label: "Não. Sei que bases quentes (douradas) me representam.", sub: "Quente", swatch: { type: "block", bg: "#fdcb6e" } }, { key: "E", label: "Não. Sei que bases neutras me representam.", sub: "Neutro", swatch: { type: "block", bg: "#ffeaa7" } }
         ]
       }
     ];
@@ -3479,6 +3970,7 @@
       el.className = "optionsGrid";
       if (cls === "cols3") el.classList.add("cols3");
       if (cls === "cols4") el.classList.add("cols4");
+      if (cls === "poster") el.classList.add("poster");
     }
 
 
@@ -5137,6 +5629,109 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
     function resetAll() {
       location.reload();
     }
+
+    /* ---------- Extreme Interaction System (Scripts) ---------- */
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Parallax Background
+      const parallaxOrbs = document.querySelectorAll(".layer-1");
+
+      document.addEventListener("mousemove", (e) => {
+        if (!parallaxOrbs.length) return;
+        const x = (e.clientX / window.innerWidth) - 0.5;
+        const y = (e.clientY / window.innerHeight) - 0.5;
+
+        // Move Layer 1 (Orbs) slower
+        parallaxOrbs.forEach(el => {
+          el.style.transform = `translate(${x * 30}px, ${y * 30}px)`;
+        });
+      });
+
+      // 2. Magnetic Buttons
+      const magnets = document.querySelectorAll(".magnet-btn");
+      magnets.forEach(btn => {
+        btn.addEventListener("mousemove", (e) => {
+          const rect = btn.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+
+          btn.style.transform = `translate(${x * 0.4}px, ${y * 0.4}px) scale(1.05)`;
+        });
+
+        btn.addEventListener("mouseleave", () => {
+          btn.style.transform = "translate(0, 0) scale(1)";
+        });
+      });
+
+      // 3. Liquid Button (Follow Cursor Internal)
+      const liquids = document.querySelectorAll(".btn-liquid");
+      liquids.forEach(btn => {
+        btn.addEventListener("mousemove", (e) => {
+          const rect = btn.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          // Move the pseudo-element 'blob' via CSS variables if we update CSS
+          // For now, based on provided CSS, it's a simple hover fill. 
+          // To make it follow x/y, we'd need to update the CSS to use var(--x), var(--y).
+          // Enhancing CSS on the fly for liquid effect:
+          const blob = btn.querySelector('.liquid-blob'); // If we had one
+          // Current CSS implementation in step 451 uses ::before with top/left transition.
+          // Let's make it smarter:
+          btn.style.setProperty('--x', x + 'px');
+          btn.style.setProperty('--y', y + 'px');
+        });
+      });
+      // 4. Scroll Reveal (Intersection Observer)
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.flowCard').forEach(el => observer.observe(el));
+
+      // 5. Active Focus (Steps)
+      window.addEventListener('scroll', () => {
+        const cards = document.querySelectorAll('.flowCard');
+        if (!cards.length) return;
+
+        const center = window.innerHeight / 2;
+        let closest = null;
+        let minDiff = Infinity;
+
+        cards.forEach(card => {
+          const rect = card.getBoundingClientRect();
+          const cardCenter = rect.top + rect.height / 2;
+          const diff = Math.abs(center - cardCenter);
+
+          if (diff < minDiff) {
+            minDiff = diff;
+            closest = card;
+          }
+        });
+
+        cards.forEach(card => {
+          if (card === closest && minDiff < 300) { // Only focus if reasonably close to center
+            card.classList.add('focused');
+            card.classList.remove('blurred');
+          } else {
+            card.classList.remove('focused');
+            card.classList.add('blurred');
+          }
+        });
+      }, { passive: true });
+
+      // 6. Haptic Feedback (Mobile)
+      const interactives = document.querySelectorAll('button, a, .flowCard, .card-oliva-premium, .seasonal-card, .star');
+      interactives.forEach(el => {
+        el.addEventListener('pointerdown', () => { // pointerdown is faster than click
+          if (navigator.vibrate) navigator.vibrate(15);
+        });
+      });
+    });
 
 
   </script>
