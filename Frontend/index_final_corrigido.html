@@ -2677,6 +2677,48 @@
     .optionsGrid.poster .txt {
       width: 100%;
     }
+
+    /* --- MOBILE UPLOAD FIX (ETAPA 3) --- */
+    @media (max-width: 640px) {
+      .upload-zone .inner {
+        flex-direction: column;
+        /* Hint top, Frame bottom */
+        align-items: center;
+        text-align: center;
+        gap: 24px;
+        padding: 24px 16px;
+        /* Ensure padding doesn't eat too much width */
+      }
+
+      .upload-zone .hint {
+        min-width: 0;
+        width: 100%;
+        text-align: center;
+      }
+
+      .upload-zone .badge {
+        margin: 0 auto;
+        /* Center badge */
+      }
+
+      /* Adjust section padding for mobile to prevent cut-off */
+      .app {
+        padding-left: 16px;
+        padding-right: 16px;
+        overflow-x: hidden;
+        /* Prevent horizontal scroll */
+      }
+
+      /* Ensure text doesn't touch edges */
+      .heroTitle h2 {
+        font-size: 32px;
+        /* Smaller title on mobile */
+      }
+
+      .mask-reveal {
+        max-width: 100%;
+      }
+    }
   </style>
 </head>
 
