@@ -14,18 +14,18 @@
   <style>
     :root {
       /* Base Colors */
-      --bg: #F8F9FA;
+      --bg: #ece9e1;
       /* Elegance White/Grey */
       --card: #FFFFFF;
-      --text: #1A1A1A;
+      --text: #1612d3;
       --text-secondary: #555555;
       --muted: #5a687c;
 
       /* Brand Colors */
-      --primary-purple: #8A2BE2;
-      --primary-pink: #D946EF;
+      --primary-purple: #782ce7;
+      --primary-pink: #0ab6ce;
       --accent-lilac: #F3E8FF;
-      --gradient-main: linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #EC4899 100%);
+      --gradient-main: linear-gradient(135deg, #782ce7 0%, #0ab6ce 100%);
 
       /* Shadows (Premium Glows) */
       --premium-shadow: 0 20px 40px rgba(168, 85, 247, 0.12);
@@ -43,8 +43,8 @@
       /* Legacy/Other Variables */
       --shadowInset1: rgba(20, 30, 50, .15);
       --shadowInset2: rgba(255, 255, 255, .75);
-      --brand: #6366f1;
-      --brand2: #ec4899;
+      --brand: #782ce7;
+      --brand2: #0ab6ce;
       --brand3: #4f46e5;
       --ok: #2ecb8b;
       --warn: #ffb020;
@@ -517,8 +517,8 @@
     }
 
     .logo {
-      font-family: "Outfit", var(--font);
-      font-weight: 900;
+      font-family: "Times New Roman MT Condensed", "Times New Roman", serif;
+      font-weight: 700;
       font-size: 28px;
       letter-spacing: -0.5px;
       background: linear-gradient(135deg, #5b7cff, #ff4aa2);
@@ -716,6 +716,8 @@
       font-size: clamp(34px, 5vw, 56px);
       line-height: 1.02;
       letter-spacing: -1.2px;
+      font-family: "Times New Roman MT Condensed", "Times New Roman", serif;
+      font-weight: 700;
     }
 
     .heroTitle h2 .grad {
@@ -2756,7 +2758,7 @@
         <div class="neu-card glass hero">
           <div class="heroTop">
             <div class="heroTitle">
-              <h2 style="font-variation-settings: 'wght' 900;"><span class="grad">COLORFY</span></h2>
+              <h2><span class="grad">COLORFY</span></h2>
               <p class="mask-reveal" style="margin-top: 24px;">
                 <span style="font-variation-settings: 'wght' 700;">Uma análise cromática guiada por IA,</span>
                 <span style="font-variation-settings: 'wght' 300; opacity: 0.9;">com linguagem de consultoria premium:
@@ -3036,7 +3038,7 @@
             <h4>Checklist rápido (para precisão máxima)</h4>
             <ul class="bullets">
               <li><span class="dot"></span><span>Rosto inteiro visível (testa e queixo sem cortar).</span></li>
-              <li><span class="dot"></span><span>Luz natural lateral suave (evite luz “estourada”).</span></li>
+              <li><span class="dot"></span><span>Luz natural frontal suave (evite luz “estourada”).</span></li>
               <li><span class="dot"></span><span>Sem maquiagem pesada, sem filtro, sem modo “beauty”.</span></li>
               <li><span class="dot"></span><span>Retire óculos, brincos grandes e piercings chamativos.</span></li>
               <li><span class="dot"></span><span>Cabelo fora do rosto, sobrancelhas visíveis.</span></li>
@@ -3849,13 +3851,13 @@
         help: "Observe a cor em luz natural.",
         layout: "cols3",
         options: [
-          { key: "A", label: "Castanho escuro / preto", sub: "Profundo", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20A.jpg') center/cover no-repeat" } }, { key: "B", label: "Castanho médio / claro / mel", sub: "Amendoado", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20B.jpg') center/cover no-repeat" } }, { key: "C", label: "Avelã / oliva", sub: "Mistura verde-castanho", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20C.jpg') center/cover no-repeat" } }, { key: "D", label: "Verdes", sub: "Verde claro ou médio", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20D.jpg') center/cover no-repeat" } }, { key: "E", label: "Azuis / Cinzas", sub: "Frio", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20E.jpg') center/cover no-repeat" } }
+          { key: "A", label: "Castanhos escuros / preto", sub: "Profundo", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20A.jpg') center/cover no-repeat" } }, { key: "B", label: "Castanhos médios / claros / mel", sub: "Amendoado", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20B.jpg') center/cover no-repeat" } }, { key: "C", label: "Avelã / oliva", sub: "Mistura verde-castanho", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20C.jpg') center/cover no-repeat" } }, { key: "D", label: "Verdes", sub: "Verde claro ou médio", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20D.jpg') center/cover no-repeat" } }, { key: "E", label: "Azuis / Cinzas", sub: "Frio", swatch: { bg: "url('assets/Quest%C3%A3o%201%20-%20E.jpg') center/cover no-repeat" } }
         ]
       },
       {
         id: "q2",
         title: "OBSERVE A COR DA ESCLERA DOS SEUS OLHOS (O BRANCO DO OLHO).",
-        help: "Ajuda a identificar contraste e temperatura.",
+        help: "Ajuda a identificar o contraste.",
         layout: "cols2",
         options: [
           { key: "A", label: "É BRANCA MUITO CLARA, ILUMINADA", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%202%20-%20A.jpg') center/cover no-repeat" } }, { key: "B", label: "É MAIS SUAVE, COMO UM OFFWHITE OU MARFIM CLARO", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%202%20-%20B.jpg') center/cover no-repeat" } }
@@ -3917,20 +3919,27 @@
       },
       {
         id: "q9",
-        title: "Quando vc pega sol, SEM protetor solar, como sua pele reage?",
-        help: "",
+        title: "Quando sua pele bronzeia, qual opção melhor descreve o tom que ela adquire?",
+        help: "Pense em como sua pele fica após exposição ao sol, mesmo que você use protetor normalmente.",
         layout: "cols2",
         options: [
-          { key: "A", label: "Queima rapidamente e não bronzeia", sub: "", swatch: { type: "block", bg: "#ff7675" } }, { key: "B", label: "Queima, mas depois fica bronzeada", sub: "", swatch: { type: "block", bg: "#fab1a0" } }, { key: "C", label: "Queima, mas depois escurece sem bronzear", sub: "", swatch: { type: "block", bg: "#636e72" } }, { key: "D", label: "Bronzeia rapidamente e raramente fica vermelha", sub: "", swatch: { type: "block", bg: "#e17055" } }, { key: "E", label: "Fica vermelha e com um ou dois dias volta ao normal", sub: "", swatch: { type: "block", bg: "#ff9f43" } }
+          { key: "A", label: "Nunca consegui bronzear. Sempre fico rosa.", sub: "", swatch: { type: "block", bg: "#ffb6c1" } },
+          { key: "B", label: "Um tom opaco: mostarda escuro ou terracota", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg, #d4a574, #c87533)" } },
+          { key: "C", label: "Um tom levemente acinzentado ou sombreado, semelhante à argila", sub: "", swatch: { type: "block", bg: "#9fa8a3" } },
+          { key: "D", label: "Um tom dourado luminoso: folha seca de outono ou caramelo", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg, #daa520, #cd853f)" } },
+          { key: "E", label: "Fica vermelha e com um ou dois dias volta ao normal", sub: "", swatch: { type: "block", bg: "#ff6b6b" } }
         ]
       },
       {
-        id: "q10",
-        title: "“Minha pele não é rosada nem dourada; é um tom que não sei explicar bem.”",
-        help: "Identificador de Oliva.",
-        layout: "poster",
+        id: "q12",
+        title: "QUAL TOM DE PELE MAIS SE ASSEMELHA AO SEU?",
+        help: "Selecione o tom que mais se aproxima da sua pele em condições normais (sem bronzeado intenso).",
+        layout: "cols2",
         options: [
-          { key: "A", label: "Minha pele é clara", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%2010%20-%20A.jpg') center/cover no-repeat" } }, { key: "B", label: "Minha pele é média.", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%2010%20-%20B.jpg') center/cover no-repeat" } }, { key: "C", label: "Minha pele é morena", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%2010%20-%20C.jpg') center/cover no-repeat" } }, { key: "D", label: "Minha pele é profunda", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%2010%20-%20D.jpg') center/cover no-repeat" } }
+          { key: "A", label: "CLARA", sub: "", swatch: { type: "block", bg: "#f5d5c8" } },
+          { key: "B", label: "MÉDIA", sub: "", swatch: { type: "block", bg: "#d4a68a" } },
+          { key: "C", label: "MORENA", sub: "", swatch: { type: "block", bg: "#9d6b53" } },
+          { key: "D", label: "PROFUNDA", sub: "", swatch: { type: "block", bg: "#6b4836" } }
         ]
       },
       {
@@ -3941,7 +3950,17 @@
         options: [
           { key: "A", label: "Sim! Bases rosadas ficam cinzas, quentes ficam laranjas.", sub: "Aspecto estranho", swatch: { type: "block", bg: "#dfe6e9" } }, { key: "B", label: "Nunca percebi isso.", sub: "Neutro", swatch: { type: "block", bg: "#ecf0f1" } }, { key: "C", label: "Não. Sei que bases frias (rosadas) me representam.", sub: "Frio", swatch: { type: "block", bg: "#fab1a0" } }, { key: "D", label: "Não. Sei que bases quentes (douradas) me representam.", sub: "Quente", swatch: { type: "block", bg: "#fdcb6e" } }, { key: "E", label: "Não. Sei que bases neutras me representam.", sub: "Neutro", swatch: { type: "block", bg: "#ffeaa7" } }
         ]
+      },
+      {
+        id: "q10",
+        title: "“Minha pele não é rosada nem dourada; é um tom que não sei explicar bem.”",
+        help: "Identificador de Oliva.",
+        layout: "poster",
+        options: [
+          { key: "A", label: "Minha pele é clara", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%2010%20-%20A.jpg') center/cover no-repeat" } }, { key: "B", label: "Minha pele é média.", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%2010%20-%20B.jpg') center/cover no-repeat" } }, { key: "C", label: "Minha pele é morena", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%2010%20-%20C.jpg') center/cover no-repeat" } }, { key: "D", label: "Minha pele é profunda", sub: "", swatch: { bg: "url('assets/Quest%C3%A3o%2010%20-%20D.jpg') center/cover no-repeat" } }
+        ]
       }
+
     ];
 
     // --- Frame Data for Dynamic Q13 ---
@@ -4200,7 +4219,7 @@
         btn.setAttribute("aria-label", publicLabel);
 
         const sw = document.createElement("div");
-        const wantsFace = Boolean(state?.selfie?.dataUrl) && (q.id === "q12" || q.id === "frame");
+        const wantsFace = Boolean(state?.selfie?.dataUrl) && (q.id === "frame");
         sw.className = "swatch" + (opt.swatch?.type === "eye" ? " eye" : "") + (wantsFace ? " faceSwatch" : "");
         sw.style.background = opt.swatch?.bg || "linear-gradient(135deg,#fff,#edf0f6)";
 
@@ -4268,15 +4287,7 @@
         return;
       }
 
-      // Dynamic injection points
-      // After answering Q10, decide whether Q12 should be warm or cool version
-      if (q.id === "q10") {
-        const pre = computePreTemperature();
-        const idxQ12 = state.quiz.flow.findIndex(x => x.id === "q12");
-        if (idxQ12 !== -1) {
-          state.quiz.flow[idxQ12] = pre === "cool" ? getQ12Cool() : getQ12Warm();
-        }
-      }
+      // Q12 is now fixed (skin tone) - no dynamic injection needed
 
       // After answering Q12, choose which frame test applies (spring/summer/autumn/winter)
       if (q.id === "q12") {
@@ -4299,38 +4310,8 @@
       }
     });
 
-    function getQ12Warm() {
-      return {
-        id: "q12",
-        title: "Confirmação de temperatura (QUENTES + OLIVAS)",
-        help: "(Demo) Imagine que você está comparando amostras ao lado do rosto. Escolha o que parece mais harmônico e vivo.",
-        layout: "grid-faces",
-        options: [
-          { key: "A", label: "Quente (dourado/pêssego)", sub: "harmoniza e ilumina", swatch: { type: "block", bg: "linear-gradient(135deg,#ffbf69,#ff8e54,#fff1b8)" } },
-          { key: "B", label: "Oliva (verde suave/acinzentado)", sub: "harmoniza sem rosar", swatch: { type: "block", bg: "linear-gradient(135deg,#525834,#908e17,#c9cf7a)" } }
-        ],
-        score: (ans, s) => {
-          if (ans === "A") { groupWarm.forEach(p => s[p] += 1); }
-          if (ans === "B") { s["Oliva Quente"] += 2; s["Oliva Frio"] += 1; }
-        }
-      };
-    }
-    function getQ12Cool() {
-      return {
-        id: "q12",
-        title: "Confirmação de temperatura (FRIOS + OLIVAS)",
-        help: "(Demo) Pense em qual amostra acalma a pele e deixa o rosto mais elegante, sem amarelado.",
-        layout: "grid-faces",
-        options: [
-          { key: "A", label: "Frio (rosado/azulado)", sub: "harmoniza e acalma", swatch: { type: "block", bg: "linear-gradient(135deg,#f2c6d1,#e6ddee,#ffffff)" } },
-          { key: "B", label: "Oliva (verde suave/acinzentado)", sub: "harmoniza sem rosar", swatch: { type: "block", bg: "linear-gradient(135deg,#5a514b,#80766e,#c8b8aa)" } }
-        ],
-        score: (ans, s) => {
-          if (ans === "A") { groupCool.forEach(p => s[p] += 1); }
-          if (ans === "B") { s["Oliva Quente"] += 1; s["Oliva Frio"] += 2; }
-        }
-      };
-    }
+    // getQ12Warm removed - Q12 is now fixed
+    // getQ12Cool removed - Q12 is now fixed
 
     function getFrameForGroup(group) {
       if (group === "spring") return {
