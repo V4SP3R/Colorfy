@@ -62,10 +62,31 @@ export function computeFinalResult({ quizAnswers, vision }) {
   if (q8 === "E") { s["Oliva Frio"] += 3; s["Oliva Quente"] += 3; }
 
   const q9 = quizAnswers["q9"];
-  if (q9 === "A") { allWinters.forEach(k => s[k] += 2); allSummers.forEach(k => s[k] += 2); }
-  if (q9 === "B") { s["Oliva Quente"] += 2; s["Oliva Frio"] += 2; }
-  if (q9 === "C") { s["Oliva Frio"] += 3; }
-  if (q9 === "D") { s["Oliva Quente"] += 3; }
+  if (q9 === "A") { 
+    // ✅ CORRIGIDO: Nunca consegui bronzear. Sempre fico rosa. (1pt conforme PDF)
+    allWinters.forEach(k => s[k] += 1); 
+    allSummers.forEach(k => s[k] += 1); 
+  }
+  if (q9 === "B") { 
+    // ✅ CORRIGIDO: Tom opaco (mostarda/terracota) → apenas Oliva Quente
+    s["Oliva Quente"] += 2; 
+  }
+  if (q9 === "C") { 
+    // Tom acinzentado (argila) → Oliva Frio
+    s["Oliva Frio"] += 3; 
+  }
+  if (q9 === "D") { 
+    // ✅ CORRIGIDO: Tom dourado luminoso (outono/caramelo) → Primaveras e Outonos
+    s["Primavera Quente"] += 3;
+    s["Primavera Clara"] += 3;
+    s["Primavera Brilhante"] += 3;
+    allAutumns.forEach(k => s[k] += 3);
+  }
+  if (q9 === "E") { 
+    // ✅ NOVO: Fica vermelha e normaliza em 1-2 dias
+    allSummers.forEach(k => s[k] += 1);
+    s["Inverno Brilhante"] += 1; // "Inverno Claro" = "Inverno Brilhante"
+  }
 
   const q10 = quizAnswers["q10"];
   if (q10 === "A") { allWinters.forEach(k => s[k] += 3); allSummers.forEach(k => s[k] += 3); }
@@ -81,25 +102,26 @@ export function computeFinalResult({ quizAnswers, vision }) {
 
   // --- 3. PREMISSAS DE LÓGICA (USER RULES) ---
   const q12 = quizAnswers["q12"];
-  const frame = quizAnswers["frame"];
 
+  // Premissa 1: Esclera branca + cabelo escuro (+ pele clara/média)
   if (q2 === "A" && (q4 === "a" || q4 === "b")) {
     s["Inverno Brilhante"] += 3;
     s["Inverno Profundo"] += 3;
-    const ans12 = frame || q12;
-    if (ans12 === "A" || ans12 === "B") {
+    // Se pele clara ou média, reforça Invernos
+    if (q12 === "A" || q12 === "B") {
       s["Inverno Brilhante"] += 4;
       s["Inverno Profundo"] += 4;
     }
   }
 
+  // Premissa 2: Olhos verdes + cabelo ruivo claro + sardas douradas
   if (q1 === "D" && q4 === "g" && q6 === "B") {
     s["Primavera Brilhante"] += 3;
     s["Primavera Quente"] += 3;
   }
 
-  const ans12 = frame || q12;
-  if (q2 === "B" && (q4 === "d" || q4 === "e" || q4 === "f") && (ans12 === "C" || ans12 === "D")) {
+  // Premissa 3: Esclera suave + cabelo claro + pele morena/profunda
+  if (q2 === "B" && (q4 === "d" || q4 === "e" || q4 === "f") && (q12 === "C" || q12 === "D")) {
     s["Verão Suave"] += 3;
     s["Primavera Clara"] += 3;
     s["Outono Suave"] += 3;
@@ -113,10 +135,24 @@ export function computeFinalResult({ quizAnswers, vision }) {
     isOliva = true;
     const candidates = ["Inverno Frio Oliva", "Verão Frio Oliva", "Inverno Profundo Oliva", "Inverno Frio", "Verão Frio", "Verão Suave", "Inverno Profundo"];
     finalSeason = pickWinner(s, candidates);
+    
+    // Aplicar desempate se necessário
+    const topScore = s[finalSeason] || 0;
+    const tied = candidates.filter(c => (s[c] || 0) === topScore);
+    if (tied.length > 1) {
+      finalSeason = resolveTie(tied, quizAnswers);
+    }
   } else if (s["Oliva Quente"] >= 13) {
     isOliva = true;
     const candidates = ["Outono Quente Oliva", "Primavera Quente Oliva", "Outono Profundo Oliva", "Primavera Quente", "Outono Suave", "Outono Profundo", "Outono Quente"];
     finalSeason = pickWinner(s, candidates);
+    
+    // Aplicar desempate se necessário
+    const topScore = s[finalSeason] || 0;
+    const tied = candidates.filter(c => (s[c] || 0) === topScore);
+    if (tied.length > 1) {
+      finalSeason = resolveTie(tied, quizAnswers);
+    }
   } else {
     const gates = {
       "Primavera Clara": 7, "Primavera Quente": 11, "Primavera Brilhante": 3,
@@ -198,12 +234,61 @@ function pickWinner(scores, candidates) {
 }
 
 function resolveTie(ties, qa) {
-  const isSharp = (qa["q2"] === "A" || qa["q3"] === "B");
-  const sharpSeasons = ties.filter(t => t.includes("Brilhante") || t.includes("Profundo") || t.includes("Frio"));
-  const softSeasons = ties.filter(t => t.includes("Suave") || t.includes("Claro"));
+  // Critério 1: Esclera + Recorte da Íris
+  const hasBrightSclera = (qa["q2"] === "A");  // Branca muito clara
+  const hasSharpIris = (qa["q3"] === "B");     // Recorte nítido
+  
+  if (hasBrightSclera && hasSharpIris) {
+    // Favorece: Brilhantes e Profundos
+    const preferred = ties.filter(c => 
+      c.includes("Brilhante") || c.includes("Profundo")
+    );
+    if (preferred.length > 0) return preferred[0];
+  }
+  
+  if (qa["q2"] === "B" && qa["q3"] === "A") {
+    // Esclera off-white + transição suave → Favorece Suaves e Claros
+    const preferred = ties.filter(c => 
+      c.includes("Suave") || c.includes("Clara") || c.includes("Claro")
+    );
+    if (preferred.length > 0) return preferred[0];
+  }
 
-  if (isSharp && sharpSeasons.length > 0) return sharpSeasons[0];
-  if (!isSharp && softSeasons.length > 0) return softSeasons[0];
+  // Critério 2: Reação de Rubor
+  if (qa["q7"] === "A") {
+    // Rubor rápido/rosado → Primaveras Claras / Verões
+    const preferred = ties.filter(c => 
+      c.includes("Primavera Clara") || c.includes("Verão")
+    );
+    if (preferred.length > 0) return preferred[0];
+  }
+  
+  if (qa["q7"] === "C") {
+    // Escurece/bronzeia → Outonos
+    const preferred = ties.filter(c => c.includes("Outono"));
+    if (preferred.length > 0) return preferred[0];
+  }
+
+  // Critério 3: Olheiras + Sardas
+  if (qa["q8"] === "C" || qa["q6"] === "C") {
+    // Olheiras/sardas castanhas ou caramelo → Outonos
+    const preferred = ties.filter(c => c.includes("Outono"));
+    if (preferred.length > 0) return preferred[0];
+  }
+  
+  if (qa["q8"] === "D") {
+    // Olheiras azuladas → Primaveras
+    const preferred = ties.filter(c => c.includes("Primavera"));
+    if (preferred.length > 0) return preferred[0];
+  }
+  
+  if (qa["q8"] === "E" || qa["q6"] === "D") {
+    // Olheiras/sardas acinzentadas → Profundas
+    const preferred = ties.filter(c => c.includes("Profundo"));
+    if (preferred.length > 0) return preferred[0];
+  }
+
+  // Fallback: mantém primeira opção
   return ties[0];
 }
 
