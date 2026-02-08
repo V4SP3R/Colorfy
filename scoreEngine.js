@@ -62,31 +62,11 @@ export function computeFinalResult({ quizAnswers, vision }) {
   if (q8 === "E") { s["Oliva Frio"] += 3; s["Oliva Quente"] += 3; }
 
   const q9 = quizAnswers["q9"];
-  if (q9 === "A") { 
-    // ✅ CORRIGIDO: Nunca consegui bronzear. Sempre fico rosa. (1pt conforme PDF)
-    allWinters.forEach(k => s[k] += 1); 
-    allSummers.forEach(k => s[k] += 1); 
-  }
-  if (q9 === "B") { 
-    // ✅ CORRIGIDO: Tom opaco (mostarda/terracota) → apenas Oliva Quente
-    s["Oliva Quente"] += 2; 
-  }
-  if (q9 === "C") { 
-    // Tom acinzentado (argila) → Oliva Frio
-    s["Oliva Frio"] += 3; 
-  }
-  if (q9 === "D") { 
-    // ✅ CORRIGIDO: Tom dourado luminoso (outono/caramelo) → Primaveras e Outonos
-    s["Primavera Quente"] += 3;
-    s["Primavera Clara"] += 3;
-    s["Primavera Brilhante"] += 3;
-    allAutumns.forEach(k => s[k] += 3);
-  }
-  if (q9 === "E") { 
-    // ✅ NOVO: Fica vermelha e normaliza em 1-2 dias
-    allSummers.forEach(k => s[k] += 1);
-    s["Inverno Brilhante"] += 1; // "Inverno Claro" = "Inverno Brilhante"
-  }
+  if (q9 === "A") { allWinters.forEach(k => s[k] += 2); allSummers.forEach(k => s[k] += 2); }
+  if (q9 === "B") { s["Oliva Quente"] += 2; s["Oliva Frio"] += 2; }
+  if (q9 === "C") { s["Oliva Frio"] += 3; }
+  if (q9 === "D") { s["Oliva Quente"] += 3; }
+  if (q9 === "E") { allSummers.forEach(k => s[k] += 1); s["Inverno Brilhante"] += 1; }
 
   const q10 = quizAnswers["q10"];
   if (q10 === "A") { allWinters.forEach(k => s[k] += 3); allSummers.forEach(k => s[k] += 3); }
@@ -100,54 +80,99 @@ export function computeFinalResult({ quizAnswers, vision }) {
   if (q11 === "D") { s["Primavera Quente"] += 4; s["Primavera Clara"] += 4; s["Primavera Brilhante"] += 4; allAutumns.forEach(k => s[k] += 4); }
   if (q11 === "E") { allSummers.forEach(k => s[k] += 4); allAutumns.forEach(k => s[k] += 4); }
 
-  // --- 3. PREMISSAS DE LÓGICA (USER RULES) ---
-  const q12 = quizAnswers["q12"];
+  // --- 4. LÓGICA DE FRAME (MOLDURA) - FALLBACK DETERMINÍSTICO ---
+  let fGroup = quizAnswers.frameGroup;
 
-  // Premissa 1: Esclera branca + cabelo escuro (+ pele clara/média)
+  // Se não veio do frontend, derivamos deterministicamente (Cópia exata do Frontend)
+  if (!fGroup) {
+    fGroup = predictSeasonGroupBackend(quizAnswers);
+  }
+
+  // Pontuação do Frame (Q13)
+  const frameAns = quizAnswers["frame"];
+  if (frameAns) {
+    if (fGroup === "spring") {
+      if (frameAns === "A") s["Primavera Clara"] += 3;
+      if (frameAns === "B") s["Primavera Quente"] += 3;
+      if (frameAns === "C") s["Primavera Brilhante"] += 3;
+    } else if (fGroup === "summer") {
+      if (frameAns === "A") s["Verão Claro"] += 3;
+      if (frameAns === "B") s["Verão Suave"] += 3;
+      if (frameAns === "C") s["Verão Frio"] += 3;
+    } else if (fGroup === "autumn") {
+      if (frameAns === "A") s["Outono Suave"] += 3;
+      if (frameAns === "B") s["Outono Quente"] += 3;
+      if (frameAns === "C") s["Outono Profundo"] += 3;
+      if (frameAns === "D") s["Oliva Quente"] += 3;
+    } else { // winter
+      if (frameAns === "A") s["Inverno Brilhante"] += 3;
+      if (frameAns === "B") s["Inverno Frio"] += 3;
+      if (frameAns === "C") s["Inverno Profundo"] += 3;
+      if (frameAns === "D") {
+        s["Inverno Profundo Oliva"] += 3;
+      }
+    }
+  }
+
+  // --- 5. PREMISSAS DE LÓGICA ESTRITA (USER RULES) ---
+
+  // Premissa 1: Esclera branca (Q2=A) + cabelo escuro (Q4=a ou b) -> Inverno Brilhante e Profundo ganham +3.
+  // Regra extra: Se Q12 (pele) for A ou B, ganham +4. (NÃO USAR FRAME)
+  const q12 = quizAnswers["q12"];
   if (q2 === "A" && (q4 === "a" || q4 === "b")) {
     s["Inverno Brilhante"] += 3;
     s["Inverno Profundo"] += 3;
-    // Se pele clara ou média, reforça Invernos
+
     if (q12 === "A" || q12 === "B") {
       s["Inverno Brilhante"] += 4;
       s["Inverno Profundo"] += 4;
     }
   }
 
-  // Premissa 2: Olhos verdes + cabelo ruivo claro + sardas douradas
+  // Premissa 2: Olhos verdes (Q1=D) + cabelo ruivo claro (Q4=g) + sardas (Q6=B) -> Primavera Brilhante e Quente ganham +3.
   if (q1 === "D" && q4 === "g" && q6 === "B") {
     s["Primavera Brilhante"] += 3;
     s["Primavera Quente"] += 3;
   }
 
-  // Premissa 3: Esclera suave + cabelo claro + pele morena/profunda
+  // Premissa 3: Esclera suave (Q2=B) + cabelo claro/médio (Q4=d/e/f) + Q12 morena/profunda (C/D)
+  // CONDICIONAL EXATA: (q2 === "B") AND (q4 === "d" OR "e" OR "f") AND (q12 === "C" OR "D")
   if (q2 === "B" && (q4 === "d" || q4 === "e" || q4 === "f") && (q12 === "C" || q12 === "D")) {
     s["Verão Suave"] += 3;
     s["Primavera Clara"] += 3;
     s["Outono Suave"] += 3;
   }
 
-  // --- 4. GATING & WINNER ---
+
+  // --- 6. GATING & WINNER SELECTION ---
   let isOliva = false;
   let finalSeason = null;
 
+  // Gate Oliva Frio
   if (s["Oliva Frio"] >= 13) {
     isOliva = true;
-    const candidates = ["Inverno Frio Oliva", "Verão Frio Oliva", "Inverno Profundo Oliva", "Inverno Frio", "Verão Frio", "Verão Suave", "Inverno Profundo"];
+    // LISTA ESTRITA: Verão Frio, Verão Suave, Inverno Frio, Inverno Profundo, Inverno Profundo Oliva
+    const candidates = [
+      "Verão Frio", "Verão Suave", "Inverno Frio", "Inverno Profundo", "Inverno Profundo Oliva"
+    ];
     finalSeason = pickWinner(s, candidates);
-    
-    // Aplicar desempate se necessário
+
+    // Desempate
     const topScore = s[finalSeason] || 0;
     const tied = candidates.filter(c => (s[c] || 0) === topScore);
     if (tied.length > 1) {
       finalSeason = resolveTie(tied, quizAnswers);
     }
-  } else if (s["Oliva Quente"] >= 13) {
+  }
+  // Gate Oliva Quente
+  else if (s["Oliva Quente"] >= 13) {
     isOliva = true;
-    const candidates = ["Outono Quente Oliva", "Primavera Quente Oliva", "Outono Profundo Oliva", "Primavera Quente", "Outono Suave", "Outono Profundo", "Outono Quente"];
+    // LISTA ESTRITA: Primavera Quente, Outono Suave, Outono Quente, Outono Profundo
+    const candidates = [
+      "Primavera Quente", "Outono Suave", "Outono Quente", "Outono Profundo"
+    ];
     finalSeason = pickWinner(s, candidates);
-    
-    // Aplicar desempate se necessário
+
     const topScore = s[finalSeason] || 0;
     const tied = candidates.filter(c => (s[c] || 0) === topScore);
     if (tied.length > 1) {
@@ -234,61 +259,12 @@ function pickWinner(scores, candidates) {
 }
 
 function resolveTie(ties, qa) {
-  // Critério 1: Esclera + Recorte da Íris
-  const hasBrightSclera = (qa["q2"] === "A");  // Branca muito clara
-  const hasSharpIris = (qa["q3"] === "B");     // Recorte nítido
-  
-  if (hasBrightSclera && hasSharpIris) {
-    // Favorece: Brilhantes e Profundos
-    const preferred = ties.filter(c => 
-      c.includes("Brilhante") || c.includes("Profundo")
-    );
-    if (preferred.length > 0) return preferred[0];
-  }
-  
-  if (qa["q2"] === "B" && qa["q3"] === "A") {
-    // Esclera off-white + transição suave → Favorece Suaves e Claros
-    const preferred = ties.filter(c => 
-      c.includes("Suave") || c.includes("Clara") || c.includes("Claro")
-    );
-    if (preferred.length > 0) return preferred[0];
-  }
+  const isSharp = (qa["q2"] === "A" || qa["q3"] === "B");
+  const sharpSeasons = ties.filter(t => t.includes("Brilhante") || t.includes("Profundo") || t.includes("Frio"));
+  const softSeasons = ties.filter(t => t.includes("Suave") || t.includes("Claro"));
 
-  // Critério 2: Reação de Rubor
-  if (qa["q7"] === "A") {
-    // Rubor rápido/rosado → Primaveras Claras / Verões
-    const preferred = ties.filter(c => 
-      c.includes("Primavera Clara") || c.includes("Verão")
-    );
-    if (preferred.length > 0) return preferred[0];
-  }
-  
-  if (qa["q7"] === "C") {
-    // Escurece/bronzeia → Outonos
-    const preferred = ties.filter(c => c.includes("Outono"));
-    if (preferred.length > 0) return preferred[0];
-  }
-
-  // Critério 3: Olheiras + Sardas
-  if (qa["q8"] === "C" || qa["q6"] === "C") {
-    // Olheiras/sardas castanhas ou caramelo → Outonos
-    const preferred = ties.filter(c => c.includes("Outono"));
-    if (preferred.length > 0) return preferred[0];
-  }
-  
-  if (qa["q8"] === "D") {
-    // Olheiras azuladas → Primaveras
-    const preferred = ties.filter(c => c.includes("Primavera"));
-    if (preferred.length > 0) return preferred[0];
-  }
-  
-  if (qa["q8"] === "E" || qa["q6"] === "D") {
-    // Olheiras/sardas acinzentadas → Profundas
-    const preferred = ties.filter(c => c.includes("Profundo"));
-    if (preferred.length > 0) return preferred[0];
-  }
-
-  // Fallback: mantém primeira opção
+  if (isSharp && sharpSeasons.length > 0) return sharpSeasons[0];
+  if (!isSharp && softSeasons.length > 0) return softSeasons[0];
   return ties[0];
 }
 
@@ -438,3 +414,69 @@ const SEASON_DATA = {
     colors: [{ name: "Rosa Bebê", hex: "#F4C2C2" }, { name: "Céu", hex: "#87CEEB" }, { name: "Amarelo Bebê", hex: "#FDFD96" }, { name: "Verde Água", hex: "#7FFFD4" }, { name: "Lilás", hex: "#C8A2C8" }, { name: "Prata", hex: "#C0C0C0" }, { name: "Framboesa Clara", hex: "#E30B5C" }, { name: "Branco Suave", hex: "#F5F5F5" }]
   }
 };
+
+// --- HELPER: Deterministic Season Group Prediction (Exact Backend Copy) ---
+function predictSeasonGroupBackend(ans) {
+  // Simplified scoring to determine just the season family (Standard vs Dynamic Frame)
+  const s = {};
+  const PALETTES = [
+    "Primavera Clara", "Primavera Quente", "Primavera Quente Oliva", "Primavera Brilhante",
+    "Outono Suave", "Outono Quente", "Outono Quente Oliva", "Outono Profundo", "Outono Profundo Oliva",
+    "Verão Claro", "Verão Suave", "Verão Frio", "Verão Frio Oliva",
+    "Inverno Brilhante", "Inverno Frio", "Inverno Frio Oliva", "Inverno Profundo", "Inverno Profundo Oliva",
+    "Oliva Quente", "Oliva Frio"
+  ];
+  PALETTES.forEach(p => s[p] = 0);
+
+  // Helper to add points
+  const add = (p, v) => { if (s[p] !== undefined) s[p] += v; };
+  const addList = (list, v) => list.forEach(p => add(p, v));
+
+  const allAutumns = ["Outono Suave", "Outono Quente", "Outono Profundo", "Outono Quente Oliva", "Outono Profundo Oliva"];
+  const allSummers = ["Verão Claro", "Verão Suave", "Verão Frio", "Verão Frio Oliva"];
+  const allWinters = ["Inverno Brilhante", "Inverno Frio", "Inverno Profundo", "Inverno Frio Oliva", "Inverno Profundo Oliva"];
+
+  if (ans.q1 === "A") { add("Inverno Profundo", 2); add("Outono Profundo", 2); }
+  if (ans.q1 === "B") { add("Primavera Quente", 1); add("Outono Quente", 1); add("Oliva Quente", 1); }
+  if (ans.q1 === "C") { addList(allAutumns, 1); add("Primavera Quente", 1); }
+  if (ans.q1 === "D") { add("Primavera Quente", 1); addList(allSummers, 1); } // Green eyes -> diverse
+  if (ans.q1 === "E") { addList(allSummers, 1); addList(allWinters, 1); }
+
+  // Q4 Hair is strong indicator
+  if (ans.q4 === "a") { add("Inverno Profundo", 3); add("Inverno Brilhante", 2); }
+  if (ans.q4 === "b") { add("Inverno Profundo", 2); add("Outono Profundo", 2); }
+  if (ans.q4 === "c") { add("Outono Quente", 1); add("Primavera Quente", 1); }
+  if (ans.q4 === "d") { add("Primavera Quente", 2); add("Outono Suave", 1); }
+  if (ans.q4 === "e") { add("Verão Suave", 2); add("Verão Frio", 1); }
+  if (ans.q4 === "f") { add("Primavera Clara", 2); add("Verão Claro", 2); }
+  if (ans.q4 === "g") { add("Primavera Quente", 3); }
+  if (ans.q4 === "h") { add("Outono Quente", 3); add("Outono Profundo", 2); }
+
+  // Q10 Skin
+  if (ans.q10 === "A") { addList(allWinters, 1); addList(allSummers, 1); }
+  if (ans.q10 === "B") { addList(allAutumns, 1); addList(allSummers, 0); add("Primavera Quente", 2); }
+  if (ans.q10 === "C" || ans.q10 === "D") {
+    // Olivas often map to Autumn (Warm) or Winter (Cool)
+    if (ans.q10 === "C") add("Oliva Quente", 3);
+    if (ans.q10 === "D") add("Oliva Frio", 3);
+  }
+
+  // Count totals by family
+  const families = { spring: 0, summer: 0, autumn: 0, winter: 0 };
+
+  Object.keys(s).forEach(k => {
+    if (k.includes("Primavera")) families.spring += s[k];
+    if (k.includes("Verão") || k.includes("Verao")) families.summer += s[k];
+    if (k.includes("Outono") || k === "Oliva Quente") families.autumn += s[k];
+    if (k.includes("Inverno") || k === "Oliva Frio" || (k.includes("Oliva") && k.includes("Inverno"))) families.winter += s[k];
+  });
+
+  // Pick winner
+  let best = "winter";
+  let max = -1;
+  for (const [fam, val] of Object.entries(families)) {
+    if (val > max) { max = val; best = fam; }
+  }
+
+  return best;
+}
