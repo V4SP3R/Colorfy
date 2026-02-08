@@ -3931,15 +3931,15 @@
         ]
       },
       {
-        id: "q12",
-        title: "QUAL TOM DE PELE MAIS SE ASSEMELHA AO SEU?",
-        help: "Selecione o tom que mais se aproxima da sua pele em condições normais (sem bronzeado intenso).",
+        id: "q10",
+        title: "O tom natural da minha pele, quando NÃO estou bronzeada é...",
+        help: "Selecione a alternativa que descreve melhor como você percebe o tom da sua pele.",
         layout: "cols2",
         options: [
-          { key: "A", label: "CLARA", sub: "", swatch: { type: "block", bg: "#f5d5c8" } },
-          { key: "B", label: "MÉDIA", sub: "", swatch: { type: "block", bg: "#d4a68a" } },
-          { key: "C", label: "MORENA", sub: "", swatch: { type: "block", bg: "#9d6b53" } },
-          { key: "D", label: "PROFUNDA", sub: "", swatch: { type: "block", bg: "#6b4836" } }
+          { key: "A", label: "Um tom que tende ao rosado.", sub: "", swatch: { type: "block", bg: "linear-gradient(145deg, #fde3db, #f3cbb8)" } },
+          { key: "B", label: "Um tom que tende ao amarelo-dourado.", sub: "", swatch: { type: "block", bg: "linear-gradient(145deg, #e6cba8, #cfb08a)" } },
+          { key: "C", label: "Se eu ficar muito tempo sem tomar sol, minha pele fica em um tom amarelo-esverdeado.", sub: "", swatch: { type: "block", bg: "linear-gradient(145deg, #a8856c, #8f6e57)" } },
+          { key: "D", label: "Se eu ficar muito tempo sem tomar sol, minha pele fica em um tom levemente acinzentado.", sub: "", swatch: { type: "block", bg: "linear-gradient(145deg, #6b554b, #524039)" } }
         ]
       },
       {
@@ -3948,16 +3948,19 @@
         help: "Já ocorreu de algumas ficarem alaranjadas e outras, acinzentadas?",
         layout: "cols2",
         options: [
-          { key: "A", label: "Sim! Bases rosadas ficam cinzas, quentes ficam laranjas.", sub: "Aspecto estranho", swatch: { type: "block", bg: "#dfe6e9" } }, { key: "B", label: "Nunca percebi isso.", sub: "Neutro", swatch: { type: "block", bg: "#ecf0f1" } }, { key: "C", label: "Não. Sei que bases frias (rosadas) me representam.", sub: "Frio", swatch: { type: "block", bg: "#fab1a0" } }, { key: "D", label: "Não. Sei que bases quentes (douradas) me representam.", sub: "Quente", swatch: { type: "block", bg: "#fdcb6e" } }, { key: "E", label: "Não. Sei que bases neutras me representam.", sub: "Neutro", swatch: { type: "block", bg: "#ffeaa7" } }
+          { key: "A", label: "Já tive experiência do produto deixar minha pele acinzentada ou alaranjada.", sub: "Aspecto estranho", swatch: { type: "block", bg: "#dfe6e9" } }, { key: "B", label: "Não sei. ", sub: "Neutro", swatch: { type: "block", bg: "#ecf0f1" } }, { key: "C", label: "Sei que as bases com fundo rosado combinam com minha pele", sub: "Frio", swatch: { type: "block", bg: "#fab1a0" } }, { key: "D", label: "Sei que as bases com fundo dourado combinam com minha pele.", sub: "Quente", swatch: { type: "block", bg: "#fdcb6e" } }, { key: "E", label: "Sei que as bases com fundo neutro combinam com meu tom de pele.", sub: "Neutro", swatch: { type: "block", bg: "#ffeaa7" } }
         ]
       },
       {
-        id: "q10",
+        id: "q12",
         title: "“Minha pele não é rosada nem dourada; é um tom que não sei explicar bem.”",
         help: "Identificador de Oliva.",
         layout: "poster",
         options: [
-          { key: "A", label: "Minha pele é clara", sub: "", swatch: { bg: "url('assets/Q10-A.jpg') center/cover no-repeat" } }, { key: "B", label: "Minha pele é média.", sub: "", swatch: { bg: "url('assets/Q10-B.jpg') center/cover no-repeat" } }, { key: "C", label: "Minha pele é morena", sub: "", swatch: { bg: "url('assets/Q10-C.jpg') center/cover no-repeat" } }, { key: "D", label: "Minha pele é profunda", sub: "", swatch: { bg: "url('assets/Q10-D.jpg') center/cover no-repeat" } }
+          { key: "A", label: "Minha pele é clara", sub: "", swatch: { bg: "url('assets/Q12-A.jpg') center/cover no-repeat" } },
+          { key: "B", label: "Minha pele é média.", sub: "", swatch: { bg: "url('assets/Q12-B.jpg') center/cover no-repeat" } },
+          { key: "C", label: "Minha pele é morena", sub: "", swatch: { bg: "url('assets/Q12-C.jpg') center/cover no-repeat" } },
+          { key: "D", label: "Minha pele é profunda", sub: "", swatch: { bg: "url('assets/Q12-D.jpg') center/cover no-repeat" } }
         ]
       }
 
@@ -3969,37 +3972,38 @@
         title: "Teste final (Primaveras) — qual moldura suaviza sombras?",
         help: "Brilho máximo. Escolha a moldura que ilumina sem estourar.",
         options: [
-          { key: "A", label: "Primavera Clara", sub: "#ffb3a7 + #fff1b8", swatch: { type: "block", bg: "linear-gradient(135deg,#ffb3a7,#fff1b8)" } },
-          { key: "B", label: "Primavera Quente", sub: "#ffbf69 + #ff8e54", swatch: { type: "block", bg: "linear-gradient(135deg,#ffbf69,#ff8e54)" } },
-          { key: "C", label: "Primavera Brilhante", sub: "#ff3b30 + #ff7a5a", swatch: { type: "block", bg: "linear-gradient(135deg,#ff3b30,#ff7a5a)" } }
+          { key: "A", label: "Primavera Clara", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#ffb3a7,#fff1b8)" } },
+          { key: "B", label: "Primavera Quente", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#ffbf69,#ff8e54)" } },
+          { key: "C", label: "Primavera Brilhante", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#ff3b30,#ff7a5a)" } }
         ]
       },
       summer: {
         title: "Teste final (Verões) — qual moldura suaviza sombras?",
         help: "Brilho da tela no máximo. Escolha a moldura que deixa sombras menores e aparência mais leve.",
         options: [
-          { key: "A", label: "Verão Claro", sub: "#f2c6d1 + #E6DDEE", swatch: { type: "block", bg: "linear-gradient(135deg,#f2c6d1,#E6DDEE)" } },
-          { key: "B", label: "Verão Suave", sub: "#C9A3B0 + #AFC1CC", swatch: { type: "block", bg: "linear-gradient(135deg,#C9A3B0,#AFC1CC)" } },
-          { key: "C", label: "Verão Frio", sub: "#C48793 + #9E8BB5", swatch: { type: "block", bg: "linear-gradient(135deg,#C48793,#9E8BB5)" } }
+          { key: "A", label: "Verão Claro", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#f2c6d1,#E6DDEE)" } },
+          { key: "B", label: "Verão Suave", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#C9A3B0,#AFC1CC)" } },
+          { key: "C", label: "Verão Frio", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#C48793,#9E8BB5)" } }
         ]
       },
       autumn: {
         title: "Teste final (Outonos) — qual moldura suaviza sombras?",
         help: "Brilho máximo. Escolha a moldura que deixa o rosto mais harmonioso e “rico”, sem acinzentar.",
         options: [
-          { key: "A", label: "Outono Suave", sub: "#f3b096 + #eac792", swatch: { type: "block", bg: "linear-gradient(135deg,#f3b096,#eac792)" } },
-          { key: "B", label: "Outono Quente", sub: "#b87333 + #e05e16", swatch: { type: "block", bg: "linear-gradient(135deg,#b87333,#e05e16)" } },
-          { key: "C", label: "Outono Profundo", sub: "#ff3b30 + #ff7a5a", swatch: { type: "block", bg: "linear-gradient(135deg,#ff3b30,#ff7a5a)" } },
-          { key: "D", label: "Oliva Quente", sub: "#525834 + #908e17", swatch: { type: "block", bg: "linear-gradient(135deg,#525834,#908e17)" } }
+          { key: "A", label: "Outono Suave", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#f3b096,#eac792)" } },
+          { key: "B", label: "Outono Quente", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#b87333,#e05e16)" } },
+          { key: "C", label: "Outono Profundo", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#ff3b30,#ff7a5a)" } },
+          { key: "D", label: "Oliva Quente", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#525834,#908e17)" } }
         ]
       },
       winter: {
         title: "Teste final (Invernos) — qual moldura suaviza sombras?",
         help: "Brilho máximo. Escolha a moldura que deixa o rosto mais definido e elegante, sem apagar.",
         options: [
-          { key: "A", label: "Inverno Brilhante", sub: "#d81b81 + #930028", swatch: { type: "block", bg: "linear-gradient(135deg,#d81b81,#930028)" } },
-          { key: "B", label: "Inverno Frio (ou Oliva Frio)", sub: "#7b1e3a + #003b44", swatch: { type: "block", bg: "linear-gradient(135deg,#7b1e3a,#003b44)" } },
-          { key: "C", label: "Inverno Profundo", sub: "#4a0f24 + #3e1f47", swatch: { type: "block", bg: "linear-gradient(135deg,#4a0f24,#3e1f47)" } }
+          { key: "A", label: "Inverno Brilhante", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#d81b81,#930028)" } },
+          { key: "B", label: "Inverno Frio", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#ffbf69,#ff8e54)" } },
+          { key: "C", label: "Inverno Profundo (Não Oliva)", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#4a0f24,#3e1f47)" } },
+          { key: "D", label: "Inverno Profundo Oliva", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#7b1e67,#003b44)" } }
         ]
       }
     };
@@ -4043,12 +4047,10 @@
       q8: "Selecione a alternativa que descreve melhor a aparência das suas olheiras em dias normais.",
       q9: "Selecione a reação mais comum da sua pele ao sol (sem filtros).",
       q10: "Selecione a alternativa que descreve melhor como você percebe o tom da sua pele.",
-      q12: "Imagine essas duas amostras perto do rosto (luz natural). Qual deixa a pele mais uniforme e descansada?",
       frame: "Em luz natural, escolha a moldura que deixa o rosto mais iluminado e uniforme. Confie na primeira impressão."
     };
 
     function getPublicTitle(q) {
-      if (q.id === "q12") return "Teste de amostras — qual opção te favorece mais?";
       if (q.id === "frame") return "Teste final — escolha a moldura que harmoniza melhor";
       return q.title || "";
     }
@@ -4059,14 +4061,6 @@
 
     function getPublicOptionLabel(q, opt) {
       if (q.id === "frame") return `Moldura ${opt.key}`;
-      if (q.id === "q12") {
-        if (opt.key === "A") {
-          const bg = String(opt?.swatch?.bg || "").toLowerCase();
-          const isWarmSample = bg.includes("ffbf69") || bg.includes("ff8e54") || bg.includes("ffd7") || bg.includes("f8c0");
-          return `Amostra 1 (${isWarmSample ? "pêssego/dourado" : "rosado/azulado"})`;
-        }
-        return "Amostra 2 (acinzentado/esverdeado)";
-      }
       return opt.label || "";
     }
 
@@ -4120,8 +4114,9 @@
       Object.keys(s).forEach(k => {
         if (k.includes("Primavera")) families.spring += s[k];
         if (k.includes("Verão") || k.includes("Verao")) families.summer += s[k];
-        if (k.includes("Outono")) families.autumn += s[k];
-        if (k.includes("Inverno")) families.winter += s[k];
+        // CORREÇÃO: Olivas contam para Outono/Inverno para verem a moldura correta
+        if (k.includes("Outono") || k === "Oliva Quente") families.autumn += s[k];
+        if (k.includes("Inverno") || k === "Oliva Frio" || k.includes("Oliva") && k.includes("Inverno")) families.winter += s[k];
       });
 
       // Pick winner
@@ -4138,20 +4133,21 @@
       const q = currentQuestion();
       if (!q) return;
 
-      // --- Logic Update: Dynamic Q13 Handling ---
-      if (q.id === "frame" && q.options.length === 0) {
+      // --- Logic Update: Dynamic Q13 Handling (Unified) ---
+      if (q.id === "frame") {
         try {
-          // Use localized prediction
+          // Always recalculate to ensure consistency if user navigates back
           const group = predictSeasonGroup(state.quiz.answers);
+
+          // Persist frameGroup for backend
+          state.quiz.answers.frameGroup = group;
 
           const data = FRAMES_DATA[group] || FRAMES_DATA["winter"];
           q.title = data.title;
           q.help = data.help;
           q.options = data.options;
-          q.layout = (group === "autumn") ? "cols4" : "cols3";
 
-          // User request: "corrija o erro da segunda imagem" which showed empty. 
-          // We ensure a layout that renders images. 'grid-faces' is best for 4-up or 3-up with selfie.
+          // Don't apply stack-3 here, let CSS handle it via class or if necessary
           q.layout = "grid-faces";
 
         } catch (e) {
@@ -4289,15 +4285,9 @@
 
       // Q12 is now fixed (skin tone) - no dynamic injection needed
 
-      // After answering Q12, choose which frame test applies (spring/summer/autumn/winter)
-      if (q.id === "q12") {
-        const scores = computeScores(state.quiz.answers);
-        const dominant = dominantSeasonGroup(scores);
-        const idxFrame = state.quiz.flow.findIndex(x => x.id === "frame");
-        if (idxFrame !== -1) {
-          state.quiz.flow[idxFrame] = getFrameForGroup(dominant);
-        }
-      }
+      // Q12 is now fixed (skin tone) - no dynamic injection needed
+      // REMOVED: Competing logic that injected frame after Q12.
+      // Q13 (frame) is now always handled dynamically in renderQuestion().
 
       // advance
       if (state.quiz.cursor < state.quiz.flow.length - 1) {
