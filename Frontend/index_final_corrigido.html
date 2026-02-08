@@ -2982,8 +2982,8 @@
             <h3 style="margin:0; font-size:20px;">Envie sua selfie para análise</h3>
             <p class="muted" style="margin:8px 0 0; max-width:85ch;">
               Carregue uma foto de rosto sob luz natural, sem maquiagem e sem filtros para precisão máxima.
-              Retire <strong>brincos, piercings, óculos</strong>. Mantenha o <strong>cabelo afastado do
-                rosto</strong>.
+              Retire <strong>brincos, piercings, óculos</strong>. Prenda o <strong>seu cabelo para trás,
+                para não aparecer na imagem. </strong>.
               Use uma imagem <strong>nítida e de boa qualidade</strong>, com o rosto centralizado e <strong>sem
                 cortes</strong>.
             </p>
@@ -3532,7 +3532,7 @@
     /* ---------- State ---------- */
     const state = {
       user: { name: "", email: "", phone: "", goal: "" },
-      selfie: { file: null, dataUrl: "", approved: false, issues: [] },
+      selfie: { file: null, dataUrl: "", croppedDataUrl: "", approved: false, issues: [] },
       quiz: { answers: {}, cursor: 0, flow: [] },
       analysis: null,
       session_id: null
@@ -3600,6 +3600,13 @@
       if (state.selfie.dataUrl) {
         const v = await validateSelfieOval();
         if (v.issues.length) issues.push(...v.issues);
+
+        // Se aprovado, persiste o crop. Se não, limpa.
+        if (issues.length === 0 && v.cropDataUrl) {
+          state.selfie.croppedDataUrl = v.cropDataUrl;
+        } else {
+          state.selfie.croppedDataUrl = "";
+        }
       }
 
       state.selfie.issues = issues;
@@ -3639,7 +3646,7 @@
 
     async function validateSelfieOval() {
       const issues = [];
-      if (!ovalEditor || !previewImg || !previewImg.naturalWidth) return { issues: ["Sem imagem."] };
+      if (!ovalEditor || !previewImg || !previewImg.naturalWidth) return { issues: ["Sem imagem."], cropDataUrl: "" };
 
       // Render exatamente o enquadramento validado
       const cw = ovalEditor.clientWidth;
@@ -3672,9 +3679,23 @@
       const ovalBottom = ovalTop + ovalH;
       const ovalCenterX = ovalLeft + ovalW / 2;
 
+      // --- GERAR CROP (512x512) ---
+      let cropDataUrl = "";
+      try {
+        const s = 512;
+        const cc = document.createElement("canvas");
+        cc.width = s; cc.height = s;
+        const cctx = cc.getContext("2d");
+        // Recorta exatamente a área do oval do canvas principal (c)
+        cctx.drawImage(c, ovalLeft, ovalTop, ovalW, ovalH, 0, 0, s, s);
+        cropDataUrl = cc.toDataURL("image/jpeg", 0.92);
+      } catch (err) {
+        console.warn("Falha ao gerar crop", err);
+      }
+
       if (!("FaceDetector" in window)) {
         console.warn("FaceDetector API unavailable, skipping validation.");
-        return { issues: [] };
+        return { issues: [], cropDataUrl };
       }
 
       try {
@@ -3682,7 +3703,7 @@
         const faces = await fd.detect(c);
         if (!faces || !faces.length) {
           issues.push("Rosto não detectado. Ajuste enquadramento e iluminação.");
-          return { issues };
+          return { issues, cropDataUrl };
         }
         const f = faces[0];
         const box = f.boundingBox;
@@ -3715,7 +3736,7 @@
         issues.push("Não foi possível validar a foto. Ajuste e tente novamente.");
       }
 
-      return { issues };
+      return { issues, cropDataUrl };
     }
 
     // Drag + zoom (limitado)
@@ -3762,6 +3783,7 @@
       const reader = new FileReader();
       reader.onload = async () => {
         state.selfie.tx = 0; state.selfie.ty = 0; state.selfie.scale = 1;
+        state.selfie.croppedDataUrl = "";
         editorControls.style.display = "flex";
         applyEditorState();
         state.selfie.dataUrl = reader.result;
@@ -3896,7 +3918,7 @@
         help: "",
         layout: "cols2",
         options: [
-          { key: "A", label: "Não tenho sardas.", sub: "", swatch: { type: "block", bg: "#ecf0f1" } }, { key: "B", label: "Sim. Elas são claras, em um tom de dourado.", sub: "", swatch: { bg: "url('assets/Q6-B.jpg') center/cover no-repeat" } }, { key: "C", label: "Sim. Elas são na cor caramelo.", sub: "", swatch: { bg: "url('assets/Q6-C.jpg') center/cover no-repeat" } }, { key: "D", label: "Sim. Elas têm um tom de marrom acinzentado.", sub: "", swatch: { bg: "url('assets/Q6-D.jpg') center/cover no-repeat" } }
+          { key: "A", label: "Não tenho sardas.", sub: "", swatch: { bg: "url('assets/Q6-A.jpg') center/cover no-repeat" } }, { key: "B", label: "Sim. Elas são claras, em um tom de dourado.", sub: "", swatch: { bg: "url('assets/Q6-B.jpg') center/cover no-repeat" } }, { key: "C", label: "Sim. Elas são na cor caramelo.", sub: "", swatch: { bg: "url('assets/Q6-C.jpg') center/cover no-repeat" } }, { key: "D", label: "Sim. Elas têm um tom de marrom acinzentado.", sub: "", swatch: { bg: "url('assets/Q6-D.jpg') center/cover no-repeat" } }
         ]
       },
       {
@@ -3914,7 +3936,7 @@
         help: "",
         layout: "cols2",
         options: [
-          { key: "A", label: "Só tenho olheiras quando cansada.", sub: "", swatch: { bg: "#ecf0f1" } }, { key: "B", label: "Sim, mas são uma sombra por causa do formato natural.", sub: "", swatch: { bg: "url('assets/Q8-B.jpg') center/cover no-repeat" } }, { key: "C", label: "Sim, são castanhas ou caramelo.", sub: "", swatch: { bg: "url('assets/Q8-C.jpg') center/cover no-repeat" } }, { key: "D", label: "Sim, são levemente azuladas ou ameixa.", sub: "", swatch: { bg: "url('assets/Q8-D.jpg') center/cover no-repeat" } }, { key: "E", label: "Sim, são esverdeadas ou acinzentadas.", sub: "", swatch: { bg: "url('assets/Q8-E.jpg') center/cover no-repeat" } }
+          { key: "A", label: "Só tenho olheiras quando cansada.", sub: "", swatch: { bg: "url('assets/Q8-A.jpg') center/cover no-repeat" } }, { key: "B", label: "Sim, mas são uma sombra por causa do formato natural.", sub: "", swatch: { bg: "url('assets/Q8-B.jpg') center/cover no-repeat" } }, { key: "C", label: "Sim, são castanhas ou caramelo.", sub: "", swatch: { bg: "url('assets/Q8-C.jpg') center/cover no-repeat" } }, { key: "D", label: "Sim, são levemente azuladas ou ameixa.", sub: "", swatch: { bg: "url('assets/Q8-D.jpg') center/cover no-repeat" } }, { key: "E", label: "Sim, são esverdeadas ou acinzentadas.", sub: "", swatch: { bg: "url('assets/Q8-E.jpg') center/cover no-repeat" } }
         ]
       },
       {
@@ -4186,7 +4208,7 @@
           card.style.background = bg;
 
           const img = document.createElement("img");
-          img.src = state.selfie.dataUrl;
+          img.src = state.selfie.croppedDataUrl || state.selfie.dataUrl;
           img.alt = opt.label;
 
           card.appendChild(img);
@@ -4229,7 +4251,7 @@
         if (wantsFace) {
           const img = document.createElement("img");
           img.className = "swatchFace";
-          img.src = state.selfie.dataUrl;
+          img.src = state.selfie.croppedDataUrl || state.selfie.dataUrl;
           img.alt = "Rosto do usuário";
           sw.appendChild(img);
 
