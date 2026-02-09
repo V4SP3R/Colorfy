@@ -3686,8 +3686,28 @@
         const cc = document.createElement("canvas");
         cc.width = s; cc.height = s;
         const cctx = cc.getContext("2d");
-        // Recorta exatamente a área do oval do canvas principal (c)
-        cctx.drawImage(c, ovalLeft, ovalTop, ovalW, ovalH, 0, 0, s, s);
+
+        // SOLUÇÃO A (Fix): Snapshot quadrado centralizado no oval, sem distorção.
+        // Pega o maior lado do oval para garantir que cabe tudo no quadrado 512x512.
+        const cxOv = ovalLeft + ovalW / 2;
+        const cyOv = ovalTop + ovalH / 2;
+        const cropSize = Math.floor(Math.max(ovalW, ovalH)); // quadrado que engloba o oval
+
+        // Centraliza o quadrado no centro do oval.
+        // NOTA: Não clampamos srcX/srcY em 0 propositalmente. 
+        // Em telas estreitas (mobile), o cropSize (altura) pode ser maior que a largura (c.width).
+        // Se clampar srcX=0, o rosto desloca para a esquerda (desenquadra).
+        // Deixar negativo faz o drawImage preencher com transparente nas bordas, mantendo o rosto centralizado.
+        const srcX = Math.floor(cxOv - cropSize / 2);
+        const srcY = Math.floor(cyOv - cropSize / 2);
+
+        // Preenche o fundo com branco para evitar áreas transparentes/pretas se o crop sair das bordas
+        cctx.fillStyle = "#FFFFFF";
+        cctx.fillRect(0, 0, s, s);
+
+        // Desenha de 'c' (visual atual) para 'cc' (512x512) mantendo proporção (quadrado->quadrado)
+        cctx.drawImage(c, srcX, srcY, cropSize, cropSize, 0, 0, s, s);
+
         cropDataUrl = cc.toDataURL("image/jpeg", 0.92);
       } catch (err) {
         console.warn("Falha ao gerar crop", err);
