@@ -1595,6 +1595,7 @@
       flex-direction: column;
       gap: 4px;
       min-width: 0;
+      flex: 1;
     }
 
     .opt .txt strong {
@@ -1608,6 +1609,24 @@
       font-weight: 720;
       font-size: 12px;
       line-height: 1.2;
+    }
+
+    /* UX Improvement for text-only options (Q7, Q9, Q10, Q11) */
+    .opt.text-centered {
+      justify-content: center;
+      text-align: center;
+      padding: 18px 14px;
+      /* More padding for cleaner look */
+    }
+
+    .opt.text-centered .txt {
+      align-items: center;
+      gap: 6px;
+    }
+
+    .opt.text-centered .txt strong {
+      font-size: 14px;
+      /* Slightly larger for emphasis */
     }
 
     .opt.selected .txt span {
@@ -2736,7 +2755,7 @@
   <main class="app" id="app">
     <header class="topbar">
       <div class="brand" id="topbarBrand">
-        <img src="assets/Logo corrigida.png" alt="Colorfy" class="logo-img">
+        <img src="assets/logo-corrigida.png" alt="Colorfy" class="logo-img">
       </div>
 
       <div class="row">
@@ -2767,10 +2786,8 @@
               </p>
               <div class="ctaRow">
                 <button class="neu-btn primary pulse-btn magnet-btn" id="btnStart" type="button"
-                  style="padding: 18px 42px; font-size: 16px; box-shadow: var(--premium-shadow);">INICIAR
+                  style="padding: 18px 42px; font-size: 16px; box-shadow: var(--premium-shadow); flex: 1;">INICIAR
                   ANÁLISE</button>
-                <button class="btn-liquid" id="btnHow" type="button" style="margin-left: 8px;">Como
-                  funciona</button>
               </div>
               <p
                 style="margin-top: 24px; font-size: 13px; color: var(--muted); opacity: 0.8; max-width: 400px; line-height: 1.5;">
@@ -2902,19 +2919,12 @@
     <!-- REGISTER -->
     <section class="view-section" id="view-register">
       <div class="neu-card glass sectionPad">
-        <div class="row" style="justify-content:space-between;">
-          <div>
-            <h3 style="margin:0; font-size:20px;">Prepare sua análise</h3>
-            <p class="muted" style="margin:8px 0 0; max-width:70ch;">
-              Esses dados servem para assinar o relatório e ajustar recomendações (sem exageros). Leva menos de 20
-              segundos.
-            </p>
-          </div>
-          <div class="pillRow">
-            <span class="pill">Profissional</span>
-            <span class="pill">Sem misticismo</span>
-            <span class="pill">Visagismo</span>
-          </div>
+        <div style="text-align: center; margin-bottom: 28px;">
+          <h3 style="margin:0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main);">
+            Vamos começar</h3>
+          <p class="muted" style="margin: 8px auto 0; max-width: 48ch; font-size: 15px; line-height: 1.5;">
+            Personalize seu relatório com seus dados básicos. É rápido e essencial para a precisão da análise.
+          </p>
         </div>
 
         <div class="divider"></div>
@@ -2943,7 +2953,7 @@
               <option value="">Selecione…</option>
               <option>Roupas do dia a dia</option>
               <option>Maquiagem</option>
-              <option>Cabelo / Barba</option>
+              <option>Posicionamento</option>
               <option>Presença digital (fotos/redes)</option>
               <option>Consultoria / trabalho</option>
             </select>
@@ -2961,16 +2971,27 @@
     <!-- VIDEO -->
     <section class="view-section" id="view-video">
       <div class="neu-card glass sectionPad centerStack">
-        <h3 style="margin:0 0 16px;">Assista antes de continuar</h3>
-        <div style="width:100%; border-radius:18px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.15);">
-          <video controls style="width:100%; display:block;" id="introVideo">
-            <source src="assets/menor.mp4" type="video/mp4">
-            Seu navegador não suporta vídeos.
-          </video>
+        <h3
+          style="margin:0 0 24px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main);">
+          Orientações</h3>
+
+        <div id="intro-video-step" class="video-step">
+          <div class="video-wrapper" id="videoWrapper">
+            <video id="introVideo" playsinline preload="metadata" poster="assets/logo-corrigida.png">
+              <source src="https://pub-2027201114d84bf987b7b62e97adebab.r2.dev/video-colorfy.mp4" type="video/mp4">
+              Seu navegador não suporta vídeos.
+            </video>
+
+            <div class="video-overlay" id="videoOverlay" role="button" aria-label="Reproduzir vídeo">
+              <div class="play-button"></div>
+            </div>
+          </div>
+
+          <button id="startAfterVideoBtn" class="neu-btn primary" style="display:none; margin-top: 20px; width: 100%;">
+            Continuar
+          </button>
         </div>
-        <div class="row" style="justify-content:flex-end; margin-top: 20px; width:100%;">
-          <button class="neu-btn primary" id="btnAfterVideo" type="button">Continuar</button>
-        </div>
+
       </div>
     </section>
 
@@ -2988,17 +3009,13 @@
                 cortes</strong>.
             </p>
           </div>
-          <div class="pillRow">
-            <span class="pill">Luz natural</span>
-            <span class="pill">Sem filtros</span>
-            <span class="pill">Rosto central</span>
-          </div>
+
         </div>
 
         <div class="divider"></div>
 
         <div class="upload-zone neu-card glass" id="uploadZone" role="button" tabindex="0" aria-label="Área de upload">
-          <div class="inner neu-inset" id="uploadInner">
+          <div class="inner neu-inset" id="uploadInner" style="justify-content: center;">
             <div class="hint">
               <h3>Arraste e solte sua foto aqui</h3>
               <p>
@@ -3011,9 +3028,7 @@
                 </span>
               </div>
             </div>
-            <div class="frameGuide" aria-hidden="true">
-              <div class="oval"></div>
-            </div>
+
             <input id="fileInput" type="file" accept="image/*" />
           </div>
         </div>
@@ -3266,6 +3281,54 @@
             break-inside: avoid;
             page-break-inside: avoid;
           }
+        }
+
+        /* --- Video Player Styles --- */
+        .video-step {
+          width: 100%;
+          max-width: 520px;
+          margin: 0 auto;
+        }
+
+        .video-wrapper {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 9 / 16;
+          border-radius: 16px;
+          overflow: hidden;
+          background: #000;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .video-wrapper video {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .video-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.35);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          z-index: 10;
+          transition: opacity 0.3s ease;
+        }
+
+        .play-button {
+          width: 72px;
+          height: 72px;
+          background: rgba(255, 255, 255, 0.92);
+          clip-path: polygon(32% 22%, 32% 78%, 80% 50%);
+          transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .video-overlay:hover .play-button {
+          transform: scale(1.1);
+          background: #fff;
         }
       </style>
 
@@ -3539,7 +3602,7 @@
     };
 
     /* ---------- Buttons / Nav ---------- */
-    $("#btnHow").addEventListener("click", () => $("#howBlock").scrollIntoView({ behavior: "smooth", block: "start" }));
+
     $("#btnStart").addEventListener("click", () => goTo("view-register"));
     // $("#btnRestartTop").addEventListener("click", resetAll);
     // $("#btnRestart").addEventListener("click", resetAll);
@@ -3566,13 +3629,99 @@
       goTo("view-video");
     });
 
-    /* ---------- Video Step ---------- */
-    $("#btnAfterVideo")?.addEventListener("click", () => {
-      // Pause video if playing
-      const vid = document.getElementById("introVideo");
-      if (vid) vid.pause();
-      goTo("view-upload");
-    });
+    /* ---------- Video Step (Cloudflare R2) ---------- */
+    (function setupIntroVideoR2() {
+      const viewId = "view-video";
+      const videoId = "introVideo";
+      const overlayId = "videoOverlay";
+      const btnId = "startAfterVideoBtn";
+
+      // Logic to reset video state
+      function resetVideoState() {
+        const video = document.getElementById(videoId);
+        const overlay = document.getElementById(overlayId);
+        const btn = document.getElementById(btnId);
+
+        if (video && overlay && btn) {
+          video.pause();
+          video.currentTime = 0;
+          overlay.style.display = "flex"; // Show overlay
+          btn.style.display = "none";    // Hide continue button
+        }
+      }
+
+      // Logic to initialize listeners (run once)
+      function initVideoListeners() {
+        const video = document.getElementById(videoId);
+        const overlay = document.getElementById(overlayId);
+        const btn = document.getElementById(btnId);
+
+        if (!video || !overlay || !btn) return;
+
+        // Overlay click -> play
+        overlay.onclick = async () => {
+          overlay.style.display = "none";
+          try {
+            await video.play();
+          } catch (e) {
+            console.warn("Autoplay blocked", e);
+            overlay.style.display = "flex";
+          }
+        };
+
+        // Video click -> toggle play/pause
+        video.onclick = () => {
+          if (video.paused) {
+            video.play();
+            overlay.style.display = "none";
+          } else {
+            video.pause();
+            // Optional: show overlay on pause? Keeping it simple.
+          }
+        };
+
+        // Video ended -> show button
+        video.onended = () => {
+          btn.style.display = "block";
+        };
+
+        // Continue button -> next step
+        btn.onclick = () => {
+          goTo("view-upload");
+        };
+      }
+
+      // Observer to detect when view becomes active (class changes)
+      function setupObserver() {
+        const targetNode = document.getElementById(viewId);
+        if (!targetNode) return;
+
+        const config = { attributes: true, attributeFilter: ["class"] };
+        const callback = (mutationsList) => {
+          for (const mutation of mutationsList) {
+            if (mutation.type === "attributes" && mutation.attributeName === "class") {
+              if (targetNode.classList.contains("active")) {
+                resetVideoState();
+              }
+            }
+          }
+        };
+
+        const observer = new MutationObserver(callback);
+        observer.observe(targetNode, config);
+      }
+
+      // Initialize everything when DOM is ready
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+          initVideoListeners();
+          setupObserver();
+        });
+      } else {
+        initVideoListeners();
+        setupObserver();
+      }
+    })();
 
     /* ---------- Upload (drag & drop + magnetic hover) ---------- */
     const uploadZone = $("#uploadZone");
@@ -3898,16 +4047,16 @@
       },
       {
         id: "q2",
-        title: "OBSERVE A COR DA ESCLERA DOS SEUS OLHOS (O BRANCO DO OLHO).",
+        title: "Observe a cor da esclera dos seus olhos (o branco do olho).",
         help: "Ajuda a identificar o contraste.",
         layout: "cols2",
         options: [
-          { key: "A", label: "É BRANCA MUITO CLARA, ILUMINADA", sub: "", swatch: { bg: "url('assets/Q2-A.jpg') center/cover no-repeat" } }, { key: "B", label: "É MAIS SUAVE, COMO UM OFFWHITE OU MARFIM CLARO", sub: "", swatch: { bg: "url('assets/Q2-B.jpg') center/cover no-repeat" } }
+          { key: "A", label: "É branco muito claro, iluminado", sub: "", swatch: { bg: "url('assets/Q2-A.jpg') center/cover no-repeat" } }, { key: "B", label: "É mais suave, como um offwhite ou marfinho claro", sub: "", swatch: { bg: "url('assets/Q2-B.jpg') center/cover no-repeat" } }
         ]
       },
       {
         id: "q3",
-        title: "A BORDA DA ÍRIS DE TODOS NÓS TEM UM DESENHO. Como é a borda da sua íris, olhando de perto?",
+        title: "A borda da íris de todos nós tem um desenho. Como é a borda da sua íris, olhando de perto?",
         help: "Contraste vs Suavidade.",
         layout: "cols2",
         options: [
@@ -3916,8 +4065,7 @@
       },
       {
         id: "q4",
-        title: "A cor natural da RAÍZ do seu cabelo, sem tintura é?",
-        help: "Considere a cor que nasce na raiz.",
+        title: "A cor natural da raiz do seu cabelo, sem tintura é?",
         layout: "cols2",
         options: [
           { key: "a", label: "Preto azulado (vívido)", sub: "", swatch: { bg: "url('assets/Q4-A.jpg') center/cover no-repeat" } }, { key: "b", label: "Castanho escuro", sub: "", swatch: { bg: "url('assets/Q4-B.jpg') center/cover no-repeat" } }, { key: "c", label: "Castanho médio", sub: "", swatch: { bg: "url('assets/Q4-C.jpg') center/cover no-repeat" } }, { key: "d", label: "Castanho claro / mel", sub: "", swatch: { bg: "url('assets/Q4-D.jpg') center/cover no-repeat" } }, { key: "e", label: "Loiro escuro acinzentado", sub: "", swatch: { bg: "url('assets/Q4-E.jpg') center/cover no-repeat" } }, { key: "f", label: "Loiro médio / claro", sub: "", swatch: { bg: "url('assets/Q4-F.jpg') center/cover no-repeat" } }, { key: "g", label: "Ruivo claro alaranjado", sub: "", swatch: { bg: "url('assets/Q4-G.jpg') center/cover no-repeat" } }, { key: "h", label: "Ruivo médio", sub: "", swatch: { bg: "url('assets/Q4-H.jpg') center/cover no-repeat" } }
@@ -3947,7 +4095,7 @@
         help: "Reação vascular.",
         layout: "cols2",
         options: [
-          { key: "A", label: "Sim, facilmente", sub: "Fica rosada rápido", swatch: { type: "block", bg: "#ff9ff3" } }, { key: "B", label: "Às vezes, só com esforço extremo", sub: "", swatch: { type: "block", bg: "#feca57" } }, { key: "C", label: "Raramente / nunca", sub: "", swatch: { type: "block", bg: "#1dd1a1" } }, { key: "D", label: "Minha pele escurece ou fica arroxeada", sub: "", swatch: { type: "block", bg: "#5f27cd" } }
+          { key: "A", label: "Sim, facilmente", sub: "Fica rosada rápido" }, { key: "B", label: "Às vezes, só com esforço extremo", sub: "" }, { key: "C", label: "Raramente / nunca", sub: "" }, { key: "D", label: "Minha pele escurece ou fica arroxeada", sub: "" }
         ]
       },
       {
@@ -3965,11 +4113,11 @@
         help: "Pense em como sua pele fica após exposição ao sol, mesmo que você use protetor normalmente.",
         layout: "cols2",
         options: [
-          { key: "A", label: "Nunca consegui bronzear. Sempre fico rosa.", sub: "", swatch: { type: "block", bg: "#ffb6c1" } },
-          { key: "B", label: "Um tom opaco: mostarda escuro ou terracota", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg, #d4a574, #c87533)" } },
-          { key: "C", label: "Um tom levemente acinzentado ou sombreado, semelhante à argila", sub: "", swatch: { type: "block", bg: "#9fa8a3" } },
-          { key: "D", label: "Um tom dourado luminoso: folha seca de outono ou caramelo", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg, #daa520, #cd853f)" } },
-          { key: "E", label: "Fica vermelha e com um ou dois dias volta ao normal", sub: "", swatch: { type: "block", bg: "#ff6b6b" } }
+          { key: "A", label: "Nunca consegui bronzear. Sempre fico rosa.", sub: "" },
+          { key: "B", label: "Um tom opaco: mostarda escuro ou terracota", sub: "" },
+          { key: "C", label: "Um tom levemente acinzentado ou sombreado, semelhante à argila", sub: "" },
+          { key: "D", label: "Um tom dourado luminoso: folha seca de outono ou caramelo", sub: "" },
+          { key: "E", label: "Fica vermelha e com um ou dois dias volta ao normal", sub: "" }
         ]
       },
       {
@@ -3978,24 +4126,24 @@
         help: "Selecione a alternativa que descreve melhor como você percebe o tom da sua pele.",
         layout: "cols2",
         options: [
-          { key: "A", label: "Um tom que tende ao rosado.", sub: "", swatch: { type: "block", bg: "linear-gradient(145deg, #fde3db, #f3cbb8)" } },
-          { key: "B", label: "Um tom que tende ao amarelo-dourado.", sub: "", swatch: { type: "block", bg: "linear-gradient(145deg, #e6cba8, #cfb08a)" } },
-          { key: "C", label: "Se eu ficar muito tempo sem tomar sol, minha pele fica em um tom amarelo-esverdeado.", sub: "", swatch: { type: "block", bg: "linear-gradient(145deg, #a8856c, #8f6e57)" } },
-          { key: "D", label: "Se eu ficar muito tempo sem tomar sol, minha pele fica em um tom levemente acinzentado.", sub: "", swatch: { type: "block", bg: "linear-gradient(145deg, #6b554b, #524039)" } }
+          { key: "A", label: "Um tom que tende ao rosado.", sub: "" },
+          { key: "B", label: "Um tom que tende ao amarelo-dourado.", sub: "" },
+          { key: "C", label: "Se eu ficar muito tempo sem tomar sol, minha pele fica em um tom amarelo-esverdeado.", sub: "" },
+          { key: "D", label: "Se eu ficar muito tempo sem tomar sol, minha pele fica em um tom levemente acinzentado.", sub: "" }
         ]
       },
       {
         id: "q11",
-        title: "AO EXPERIMENTAR DIFERENTES CORES DE CORRETIVOS OU BASES...",
+        title: "Ao experimentar diferentes cores de corretivos ou bases...",
         help: "Já ocorreu de algumas ficarem alaranjadas e outras, acinzentadas?",
         layout: "cols2",
         options: [
-          { key: "A", label: "Já tive experiência do produto deixar minha pele acinzentada ou alaranjada.", sub: "Aspecto estranho", swatch: { type: "block", bg: "#dfe6e9" } }, { key: "B", label: "Não sei. ", sub: "Neutro", swatch: { type: "block", bg: "#ecf0f1" } }, { key: "C", label: "Sei que as bases com fundo rosado combinam com minha pele", sub: "Frio", swatch: { type: "block", bg: "#fab1a0" } }, { key: "D", label: "Sei que as bases com fundo dourado combinam com minha pele.", sub: "Quente", swatch: { type: "block", bg: "#fdcb6e" } }, { key: "E", label: "Sei que as bases com fundo neutro combinam com meu tom de pele.", sub: "Neutro", swatch: { type: "block", bg: "#ffeaa7" } }
+          { key: "A", label: "Já tive experiência do produto deixar minha pele acinzentada ou alaranjada.", sub: "Aspecto estranho" }, { key: "B", label: "Não sei. ", sub: "Neutro" }, { key: "C", label: "Sei que as bases com fundo rosado combinam com minha pele", sub: "Frio" }, { key: "D", label: "Sei que as bases com fundo dourado combinam com minha pele.", sub: "Quente" }, { key: "E", label: "Sei que as bases com fundo neutro combinam com meu tom de pele.", sub: "Neutro" }
         ]
       },
       {
         id: "q12",
-        title: "“Minha pele não é rosada nem dourada; é um tom que não sei explicar bem.”",
+        title: "Qual tom de pele mais se assemelha ao seu?",
         help: "Identificador de Oliva.",
         layout: "poster",
         options: [
@@ -4034,7 +4182,7 @@
         options: [
           { key: "A", label: "Outono Suave", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#f3b096,#eac792)" } },
           { key: "B", label: "Outono Quente", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#b87333,#e05e16)" } },
-          { key: "C", label: "Outono Profundo", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#ff3b30,#ff7a5a)" } },
+          { key: "C", label: "Outono Profundo", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#710f19,#714732)" } },
           { key: "D", label: "Oliva Quente", sub: "", swatch: { type: "block", bg: "linear-gradient(135deg,#525834,#908e17)" } }
         ]
       },
@@ -4061,8 +4209,8 @@
       // The options will be populated in renderQuestion based on preliminary score.
       base.push({
         id: "frame",
-        title: "Teste final — escolha a moldura que harmoniza melhor",
-        help: "Instrução por vídeo ou áudio: Aumente o brilho. Em qual opção as sombras (olheiras, bochecha) suavizaram?",
+        title: "Em qual imagem as sombras suavizaram e parecem mais iluminadas?",
+        help: "Perceba o tamanho de cada sombra no seu rosto (olheiras, bochechas, etc.)",
         layout: "grid-faces",
         options: [] // Filled dynamically
       });
@@ -4083,17 +4231,16 @@
 
     /* ---------- Public UI text (hide scoring hints) ---------- */
     const HELP_OVERRIDES = {
-      q5: "Observe as veias em luz branca (natural ou lâmpada fria) e escolha a opção mais próxima.",
       q6: "Se você tiver sardas, selecione a alternativa que mais se parece com as suas em luz natural.",
       q7: "Selecione a alternativa que descreve melhor sua reação ao esforço físico.",
       q8: "Selecione a alternativa que descreve melhor a aparência das suas olheiras em dias normais.",
       q9: "Selecione a reação mais comum da sua pele ao sol (sem filtros).",
       q10: "Selecione a alternativa que descreve melhor como você percebe o tom da sua pele.",
-      frame: "Em luz natural, escolha a moldura que deixa o rosto mais iluminado e uniforme. Confie na primeira impressão."
+      frame: "Perceba o tamanho de cada sombra no seu rosto (olheiras, bochechas, etc.)"
     };
 
     function getPublicTitle(q) {
-      if (q.id === "frame") return "Teste final — escolha a moldura que harmoniza melhor";
+      if (q.id === "frame") return "Qual moldura suaviza as sombras no seu rosto?";
       return q.title || "";
     }
 
@@ -4256,34 +4403,38 @@
         const publicLabel = getPublicOptionLabel(q, opt);
         btn.setAttribute("aria-label", publicLabel);
 
-        const sw = document.createElement("div");
         const wantsFace = Boolean(state?.selfie?.dataUrl) && (q.id === "frame");
-        sw.className = "swatch" + (opt.swatch?.type === "eye" ? " eye" : "") + (wantsFace ? " faceSwatch" : "");
-        sw.style.background = opt.swatch?.bg || "linear-gradient(135deg,#fff,#edf0f6)";
 
-        if (opt.swatch?.type === "icon" && opt.swatch?.svg) {
-          sw.style.background = "transparent";
-          sw.classList.add("iconSwatch");
-          sw.innerHTML = opt.swatch.svg;
-        }
+        if (opt.swatch || wantsFace) {
+          const sw = document.createElement("div");
+          sw.className = "swatch" + (opt.swatch?.type === "eye" ? " eye" : "") + (wantsFace ? " faceSwatch" : "");
+          sw.style.background = opt.swatch?.bg || "linear-gradient(135deg,#fff,#edf0f6)";
 
-
-        if (wantsFace) {
-          const img = document.createElement("img");
-          img.className = "swatchFace";
-          img.src = state.selfie.croppedDataUrl || state.selfie.dataUrl;
-          img.alt = "Rosto do usuário";
-          sw.appendChild(img);
-
-          if (q.id === "q11") {
-            const ov = document.createElement("div");
-            ov.className = "faceTint";
-            ov.style.background = opt.swatch?.tint || "rgba(0,0,0,.08)";
-            sw.appendChild(ov);
+          if (opt.swatch?.type === "icon" && opt.swatch?.svg) {
+            sw.style.background = "transparent";
+            sw.classList.add("iconSwatch");
+            sw.innerHTML = opt.swatch.svg;
           }
-        }
 
-        btn.appendChild(sw);
+          if (wantsFace) {
+            const img = document.createElement("img");
+            img.className = "swatchFace";
+            img.src = state.selfie.croppedDataUrl || state.selfie.dataUrl;
+            img.alt = "Rosto do usuário";
+            sw.appendChild(img);
+
+            if (q.id === "q11") {
+              const ov = document.createElement("div");
+              ov.className = "faceTint";
+              ov.style.background = opt.swatch?.tint || "rgba(0,0,0,.08)";
+              sw.appendChild(ov);
+            }
+          }
+          btn.appendChild(sw);
+        } else {
+          // No swatch -> Center text mode (UX request)
+          btn.classList.add("text-centered");
+        }
 
         const txt = document.createElement("div");
         txt.className = "txt";
