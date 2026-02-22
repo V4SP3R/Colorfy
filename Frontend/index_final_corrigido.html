@@ -3062,9 +3062,14 @@
     <!-- VIDEO -->
     <section class="view-section" id="view-video">
       <div class="neu-card glass sectionPad centerStack">
-        <h3
-          style="margin:0 0 24px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main);">
-          Orientações</h3>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
+          <h3 style="margin:0; font-size:28px; font-weight:800; letter-spacing:-0.5px; color:var(--text-main);">
+            Orientações</h3>
+          <button id="skipVideoBtn"
+            style="background:none; border:none; cursor:pointer; font-size:13px; color:#999; padding:4px 8px; border-radius:6px;"
+            onmouseover="this.style.color='var(--accent,#6c63ff)'" onmouseout="this.style.color='#999'">Pular vídeo
+            ›</button>
+        </div>
 
         <div id="intro-video-step" class="video-step">
           <!-- Vturb Smart Player -->
@@ -3074,12 +3079,15 @@
               style="display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></vturb-smartplayer>
           </div>
           <!-- Vturb player script is lazy-loaded when this view becomes active -->
-          <div id="vturbPlayerLoader" data-player-src="https://scripts.converteai.net/f19c8753-f7c1-411f-b413-7315d568c5f7/players/699505cebb2e3acf42b511e4/v4/player.js"></div>
+          <div id="vturbPlayerLoader"
+            data-player-src="https://scripts.converteai.net/f19c8753-f7c1-411f-b413-7315d568c5f7/players/699505cebb2e3acf42b511e4/v4/player.js">
+          </div>
+
 
           <button id="startAfterVideoBtn" class="neu-btn primary" style="display:none; margin-top: 20px; width: 100%;">
             Continuar
           </button>
-</div>
+        </div>
 
       </div>
     </section>
@@ -3540,7 +3548,7 @@
       <div class="neu-card glass sectionPad">
         <div id="resultContainer" class="premium-container"></div>
 
-        
+
       </div>
     </section>
     </div>
@@ -3716,86 +3724,120 @@
       goTo("view-video");
     });
 
-    /* ---------- Video Step (Cloudflare R2) ---------- */
-    (function setupIntroVideoR2() {
-      const viewId = "view-video";
-      const videoId = "introVideo";
-      const overlayId = "videoOverlay";
-      const btnId = "startAfterVideoBtn";
+    /* ---------- Video Step ---------- */
+    (function setupVideoStep() {
+      const VIEW_ID = "view-video";
+      const PLAYER_ID = "vid-699505cebb2e3acf42b511e4";
+      const BTN_ID = "startAfterVideoBtn";
+      const SKIP_ID = "skipVideoBtn";
 
-      // Logic to reset video state
-      function resetVideoState() {
-        // Vturb manages its own controls — just hide the continue button
-        const btn = document.getElementById(btnId);
-        if (btn) btn.style.display = "none";
+      let shown = false;
+      let fallback = null;   // timer de fallback (silencioso)
+
+
+
+      /* ── Mostra o botão Continuar ─────────────────────────────────── */
+      function revealBtn() {
+        if (shown) return;
+        shown = true;
+        clearTimeout(fallback);
+        const btn = document.getElementById(BTN_ID);
+        if (!btn) return;
+        btn.style.opacity = "0";
+        btn.style.display = "block";
+        btn.style.transition = "opacity .5s ease";
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          btn.style.opacity = "1";
+        }));
       }
 
-      
-      // Lazy-load the Vturb player script ONLY when this view becomes active
-      let vturbScriptLoaded = false;
-      function ensureVturbPlayerLoaded() {
-        if (vturbScriptLoaded) return;
+      /* ── Oculta o botão ao entrar na tela ────────────────────────── */
+      function hideBtn() {
+        shown = false;
+        clearTimeout(fallback);
+        const btn = document.getElementById(BTN_ID);
+        if (btn) { btn.style.display = "none"; btn.style.opacity = "0"; }
+      }
+
+      /* ── Timer silencioso de 3 min (fallback) ──────────────── */
+      function startTimer() {
+        clearTimeout(fallback);
+        fallback = setTimeout(revealBtn, 3 * 60 * 1000);
+      }
+
+      /* ── postMessage do player Vturb (sem filtro de origem) ──────── */
+      window.addEventListener("message", (ev) => {
+        let d = ev.data;
+        try { if (typeof d === "string") d = JSON.parse(d); } catch (_) { }
+        if (!d || typeof d !== "object") return;
+        const evName = String(d.event || d.action || d.type || "").toLowerCase();
+        if (["ended", "videocompleted", "complete", "finish"].includes(evName)) revealBtn();
+      });
+
+      /* ── Eventos diretos no elemento Vturb + <video> interno ─────── */
+      function bindPlayerEvents(el) {
+        if (!el || el._vsp_bound) return;
+        el._vsp_bound = true;
+        ["ended", "smartplayer:ended", "videoended", "complete", "finish"].forEach(n =>
+          el.addEventListener(n, revealBtn)
+        );
+        const vid = el.querySelector("video");
+        if (vid) vid.addEventListener("ended", revealBtn);
+      }
+
+      /* ── Lazy-load do script Vturb ──────────────────────────────── */
+      let scriptLoaded = false;
+      function loadVturb() {
         const loader = document.getElementById("vturbPlayerLoader");
         if (!loader) return;
-
         const src = loader.getAttribute("data-player-src");
         if (!src) return;
-
-        // Avoid double-inject
-        if (document.querySelector(`script[data-vturb-player="true"][src="${src}"]`)) {
-          vturbScriptLoaded = true;
+        if (document.querySelector(`script[src="${src}"]`)) {
+          scriptLoaded = true;
+          bindPlayerEvents(document.getElementById(PLAYER_ID) || document.querySelector("vturb-smartplayer"));
           return;
         }
-
+        if (scriptLoaded) return;
+        scriptLoaded = true;
         const s = document.createElement("script");
         s.src = src;
         s.async = true;
-        s.setAttribute("data-vturb-player", "true");
+        s.onload = () => setTimeout(() => {
+          bindPlayerEvents(document.getElementById(PLAYER_ID) || document.querySelector("vturb-smartplayer"));
+        }, 300);
         document.head.appendChild(s);
-        vturbScriptLoaded = true;
       }
-// Logic to initialize listeners (run once)
-      function initVideoListeners() {
-        const btn = document.getElementById(btnId);
-        if (!btn) return;
 
-        // Continue button -> next step
-        btn.onclick = () => {
-          goTo("view-upload");
-        };
-
-      // Observer to detect when view becomes active (class changes)
-      function setupObserver() {
-        const targetNode = document.getElementById(viewId);
-        if (!targetNode) return;
-
-        const config = { attributes: true, attributeFilter: ["class"] };
-        const callback = (mutationsList) => {
-          for (const mutation of mutationsList) {
-            if (mutation.type === "attributes" && mutation.attributeName === "class") {
-              if (targetNode.classList.contains("active")) {
-                ensureVturbPlayerLoaded();
-                resetVideoState();
-              }
-            }
+      /* ── MutationObserver: ativa quando view-video recebe .active ── */
+      function observe() {
+        const view = document.getElementById(VIEW_ID);
+        if (!view) return;
+        new MutationObserver(() => {
+          if (view.classList.contains("active")) {
+            hideBtn();
+            loadVturb();
+            startTimer();
           }
-        };
-
-        const observer = new MutationObserver(callback);
-        observer.observe(targetNode, config);
+        }).observe(view, { attributes: true, attributeFilter: ["class"] });
       }
 
-      // Initialize everything when DOM is ready
+      /* ── Botão Continuar → próxima etapa ────────────────────────── */
+      function bindContinue() {
+        const btn = document.getElementById(BTN_ID);
+        if (btn) btn.onclick = () => goTo("view-upload");
+        const skip = document.getElementById(SKIP_ID);
+        if (skip) skip.onclick = () => goTo("view-upload");
+      }
+
+      /* ── Init ────────────────────────────────────────────────────── */
       if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => {
-          initVideoListeners();
-          setupObserver();
-        });
+        document.addEventListener("DOMContentLoaded", () => { bindContinue(); observe(); });
       } else {
-        initVideoListeners();
-        setupObserver();
+        bindContinue();
+        observe();
       }
     })();
+
 
     /* ---------- Upload (drag & drop + magnetic hover) ---------- */
     const uploadZone = $("#uploadZone");
@@ -5239,7 +5281,7 @@
     }
 
     /* ---------- Main Render ---------- */
-    
+
     function renderResult(analysis) {
       // 1) Tradução segura (não mexe nos cálculos, só no display)
       const map = {
@@ -5274,8 +5316,8 @@
       // Rótulos rápidos (apenas UI)
       const family =
         seasonKey.includes("spring") ? "Primavera" :
-        seasonKey.includes("summer") ? "Verão" :
-        seasonKey.includes("autumn") ? "Outono" : "Inverno";
+          seasonKey.includes("summer") ? "Verão" :
+            seasonKey.includes("autumn") ? "Outono" : "Inverno";
 
       const tempLabel = (data?.subtones || "").split(",")[0]?.trim() || "—";
 
