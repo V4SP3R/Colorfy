@@ -3062,14 +3062,8 @@
     <!-- VIDEO -->
     <section class="view-section" id="view-video">
       <div class="neu-card glass sectionPad centerStack">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
-          <h3 style="margin:0; font-size:28px; font-weight:800; letter-spacing:-0.5px; color:var(--text-main);">
-            Orientações</h3>
-          <button id="skipVideoBtn"
-            style="background:none; border:none; cursor:pointer; font-size:13px; color:#999; padding:4px 8px; border-radius:6px;"
-            onmouseover="this.style.color='var(--accent,#6c63ff)'" onmouseout="this.style.color='#999'">Pular vídeo
-            ›</button>
-        </div>
+        <h3 style="margin:0 0 24px; font-size:28px; font-weight:800; letter-spacing:-0.5px; color:var(--text-main);">
+          Orientações</h3>
 
         <div id="intro-video-step" class="video-step">
           <!-- Vturb Smart Player -->
@@ -3729,7 +3723,6 @@
       const VIEW_ID = "view-video";
       const PLAYER_ID = "vid-699505cebb2e3acf42b511e4";
       const BTN_ID = "startAfterVideoBtn";
-      const SKIP_ID = "skipVideoBtn";
 
       let shown = false;
       let fallback = null;   // timer de fallback (silencioso)
@@ -3825,8 +3818,6 @@
       function bindContinue() {
         const btn = document.getElementById(BTN_ID);
         if (btn) btn.onclick = () => goTo("view-upload");
-        const skip = document.getElementById(SKIP_ID);
-        if (skip) skip.onclick = () => goTo("view-upload");
       }
 
       /* ── Init ────────────────────────────────────────────────────── */
