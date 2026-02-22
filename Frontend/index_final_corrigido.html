@@ -3073,22 +3073,13 @@
             <vturb-smartplayer id="vid-699505cebb2e3acf42b511e4"
               style="display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></vturb-smartplayer>
           </div>
-          <script type="text/javascript">
-            var s = document.createElement("script");
-            s.src = "https://scripts.converteai.net/f19c8753-f7c1-411f-b413-7315d568c5f7/players/699505cebb2e3acf42b511e4/v4/player.js";
-            s.async = true;
-            document.head.appendChild(s);
-          </script>
+          <!-- Vturb player script is lazy-loaded when this view becomes active -->
+          <div id="vturbPlayerLoader" data-player-src="https://scripts.converteai.net/f19c8753-f7c1-411f-b413-7315d568c5f7/players/699505cebb2e3acf42b511e4/v4/player.js"></div>
 
           <button id="startAfterVideoBtn" class="neu-btn primary" style="display:none; margin-top: 20px; width: 100%;">
             Continuar
           </button>
-
-          <button id="skipVideoBtn" class="neu-btn"
-            style="margin-top: 12px; width: 100%; opacity: 0.75; font-size: 13px;" type="button">
-            Pular vídeo →
-          </button>
-        </div>
+</div>
 
       </div>
     </section>
@@ -3739,7 +3730,31 @@
         if (btn) btn.style.display = "none";
       }
 
-      // Logic to initialize listeners (run once)
+      
+      // Lazy-load the Vturb player script ONLY when this view becomes active
+      let vturbScriptLoaded = false;
+      function ensureVturbPlayerLoaded() {
+        if (vturbScriptLoaded) return;
+        const loader = document.getElementById("vturbPlayerLoader");
+        if (!loader) return;
+
+        const src = loader.getAttribute("data-player-src");
+        if (!src) return;
+
+        // Avoid double-inject
+        if (document.querySelector(`script[data-vturb-player="true"][src="${src}"]`)) {
+          vturbScriptLoaded = true;
+          return;
+        }
+
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.setAttribute("data-vturb-player", "true");
+        document.head.appendChild(s);
+        vturbScriptLoaded = true;
+      }
+// Logic to initialize listeners (run once)
       function initVideoListeners() {
         const btn = document.getElementById(btnId);
         if (!btn) return;
@@ -3748,15 +3763,6 @@
         btn.onclick = () => {
           goTo("view-upload");
         };
-
-        // Skip button -> go directly to next step
-        const skipBtn = document.getElementById("skipVideoBtn");
-        if (skipBtn) {
-          skipBtn.onclick = () => {
-            goTo("view-upload");
-          };
-        }
-      }
 
       // Observer to detect when view becomes active (class changes)
       function setupObserver() {
@@ -3768,6 +3774,7 @@
           for (const mutation of mutationsList) {
             if (mutation.type === "attributes" && mutation.attributeName === "class") {
               if (targetNode.classList.contains("active")) {
+                ensureVturbPlayerLoaded();
                 resetVideoState();
               }
             }
