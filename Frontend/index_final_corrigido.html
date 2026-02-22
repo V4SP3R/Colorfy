@@ -3752,10 +3752,10 @@
         if (btn) { btn.style.display = "none"; btn.style.opacity = "0"; }
       }
 
-      /* ── Timer silencioso de 3 min (fallback) ──────────────── */
+      /* ── Timer silencioso de 2 min (fallback) ──────────────── */
       function startTimer() {
         clearTimeout(fallback);
-        fallback = setTimeout(revealBtn, 3 * 60 * 1000);
+        fallback = setTimeout(revealBtn, 2 * 60 * 1000);
       }
 
       /* ── postMessage do player Vturb (sem filtro de origem) ──────── */
