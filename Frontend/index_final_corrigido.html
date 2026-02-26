@@ -9,11 +9,11 @@
   <!-- Vturb performance preloads -->
   <script>!function (i, n) { i._plt = i._plt || (n && n.timeOrigin ? n.timeOrigin + n.now() : Date.now()) }(window, performance);</script>
   <link rel="preload"
-    href="https://scripts.converteai.net/f19c8753-f7c1-411f-b413-7315d568c5f7/players/699505cebb2e3acf42b511e4/v4/player.js"
+    href="https://scripts.converteai.net/f19c8753-f7c1-411f-b413-7315d568c5f7/players/699f535b0e852cd8ae298448/v4/player.js"
     as="script">
   <link rel="preload" href="https://scripts.converteai.net/lib/js/smartplayer-wc/v4/smartplayer.js" as="script">
   <link rel="preload"
-    href="https://cdn.converteai.net/f19c8753-f7c1-411f-b413-7315d568c5f7/699505be958dc46586dcd3d0/main.m3u8"
+    href="https://cdn.converteai.net/f19c8753-f7c1-411f-b413-7315d568c5f7/699f53480e852cd8ae29841e/main.m3u8"
     as="fetch">
   <link rel="dns-prefetch" href="https://cdn.converteai.net">
   <link rel="dns-prefetch" href="https://scripts.converteai.net">
@@ -3067,14 +3067,14 @@
 
         <div id="intro-video-step" class="video-step">
           <!-- Vturb Smart Player -->
-          <div
-            style="height: min(70vh, 560px); width: calc(min(70vh, 560px) * 9 / 16); margin: 0 auto; position: relative; overflow: hidden; border-radius: 16px;">
-            <vturb-smartplayer id="vid-699505cebb2e3acf42b511e4"
-              style="display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></vturb-smartplayer>
-          </div>
+          <vturb-smartplayer id="vid-699f535b0e852cd8ae298448"
+            style="display: block; margin: 0 auto; width: 100%; max-width: 400px;"></vturb-smartplayer>
+          <script type="text/javascript">
+            var s = document.createElement("script"); s.src = "https://scripts.converteai.net/f19c8753-f7c1-411f-b413-7315d568c5f7/players/699f535b0e852cd8ae298448/v4/player.js", s.async = !0, document.head.appendChild(s);
+          </script>
           <!-- Vturb player script is lazy-loaded when this view becomes active -->
           <div id="vturbPlayerLoader"
-            data-player-src="https://scripts.converteai.net/f19c8753-f7c1-411f-b413-7315d568c5f7/players/699505cebb2e3acf42b511e4/v4/player.js">
+            data-player-src="https://scripts.converteai.net/f19c8753-f7c1-411f-b413-7315d568c5f7/players/699f535b0e852cd8ae298448/v4/player.js">
           </div>
 
 
@@ -3721,7 +3721,7 @@
     /* ---------- Video Step ---------- */
     (function setupVideoStep() {
       const VIEW_ID = "view-video";
-      const PLAYER_ID = "vid-699505cebb2e3acf42b511e4";
+      const PLAYER_ID = "vid-699f535b0e852cd8ae298448";
       const BTN_ID = "startAfterVideoBtn";
 
       let shown = false;
@@ -5291,6 +5291,28 @@
       const data = getSeasonData(seasonKey);
       const isOlive = String(seasonName).includes("Oliva");
 
+      const BASE_PDF = "https://pub-052c43c68222425fadd8ccfdb6fe9cd9.r2.dev/";
+      const pdfMap = {
+        "Primavera Clara": BASE_PDF + "10_Primavera%20Clara.pdf",
+        "Primavera Quente": BASE_PDF + "4_Primavera%20Quente.pdf",
+        "Primavera Brilhante": BASE_PDF + "13_Primavera%20Brilhante.pdf",
+        "Verão Claro": BASE_PDF + "16_VER%C3%83O%20Claro.pdf",
+        "Verão Suave": BASE_PDF + "3_VER%C3%83O%20Suave.pdf",
+        "Verão Frio": BASE_PDF + "14_VER%C3%83O%20Frio.pdf",
+        "Outono Suave": BASE_PDF + "1_Outono%20Suave.pdf",
+        "Outono Quente": BASE_PDF + "11_Outono%20Quente.pdf",
+        "Outono Profundo": BASE_PDF + "12_Outono%20Profundo.pdf",
+        "Inverno Brilhante": BASE_PDF + "8_INVERNO%20Brilhante.pdf",
+        "Inverno Profundo": BASE_PDF + "7_Inverno%20Profundo.pdf",
+        "Inverno Frio": BASE_PDF + "2_INVERNO%20Frio.pdf",
+        "Primavera Quente Oliva": BASE_PDF + "15_Oliva%20Primavera%20Quente%20.pdf",
+        "Outono Quente Oliva": BASE_PDF + "5_Oliva%20Outono%20Quente.pdf",
+        "Outono Profundo Oliva": BASE_PDF + "6_Oliva%20Outono%20Profundo.pdf",
+        "Inverno Profundo Oliva": BASE_PDF + "9_Oliva%20Inverno%20Profundo.pdf",
+        "Inverno Frio Oliva": BASE_PDF + "17_Oliva%20Inverno%20Frio.pdf",
+      };
+      const pdfUrl = pdfMap[seasonName] || null;
+
       // Foto do usuário (enviada no início do fluxo)
       let userImg = state?.selfie?.dataUrl;
       if (!userImg) userImg = localStorage.getItem("colorfy_user_photo");
@@ -5503,6 +5525,16 @@
                   <i class="fa-solid fa-print mr-2"></i>Salvar / Imprimir
                 </button>
               </div>
+
+              ${pdfUrl ? `
+              <div class="mt-3">
+                <a href="${pdfUrl}" download target="_blank" style="display:block;">
+                  <button type="button" class="neu-btn primary w-full" style="background: linear-gradient(135deg, var(--seasonA), var(--seasonB)); border: none; color: #fff; box-shadow: 0 10px 28px rgba(20,30,50,.18);">
+                    <i class="fa-solid fa-file-pdf mr-2"></i>Baixar Guia Completo em PDF
+                  </button>
+                </a>
+              </div>
+              ` : ''}
             </div>
           </section>
 
