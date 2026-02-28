@@ -3611,15 +3611,21 @@
       const next = document.getElementById(id);
       if (!next) return;
 
-      // Pause Vturb video/audio when leaving the video view
+      // Pause ALL media when leaving the video view
       if (currentView === "view-video" && id !== "view-video") {
-        const vEl = document.getElementById("view-video");
-        if (vEl) {
-          vEl.querySelectorAll("video, audio").forEach(m => { m.pause(); m.currentTime = 0; });
-          vEl.querySelectorAll("iframe").forEach(f => {
-            try { f.contentWindow.postMessage('{"method":"pause"}', "*"); } catch (_) { }
-          });
-        }
+        document.querySelectorAll("video, audio").forEach(m => {
+          try { m.pause(); m.currentTime = 0; m.muted = true; } catch (_) { }
+        });
+        document.querySelectorAll("iframe").forEach(f => {
+          try {
+            f.contentWindow.postMessage('{"method":"pause"}', "*");
+            f.contentWindow.postMessage('{"event":"command","func":"pauseVideo"}', "*");
+            f.contentDocument?.querySelectorAll("video, audio").forEach(m => { m.pause(); m.muted = true; });
+          } catch (_) { }
+        });
+        // Remove Vturb player content to guarantee silence
+        const sp = document.querySelector("vturb-smartplayer");
+        if (sp) sp.innerHTML = "";
       }
 
       const header = document.querySelector("header.topbar");
@@ -3865,18 +3871,31 @@
 
       /* ── Pausa o player Vturb (vídeo + áudio) ────────────────────── */
       function pauseVturb() {
-        const el = document.getElementById(PLAYER_ID) || document.querySelector("vturb-smartplayer");
-        if (el) {
-          const vids = el.querySelectorAll("video");
-          vids.forEach(v => { v.pause(); v.currentTime = 0; });
-          const audios = el.querySelectorAll("audio");
-          audios.forEach(a => { a.pause(); a.currentTime = 0; });
-        }
-        // Also catch any top-level iframes the player may use
-        const iframes = document.querySelectorAll("#view-video iframe");
-        iframes.forEach(f => {
-          try { f.contentWindow.postMessage('{"method":"pause"}', "*"); } catch (_) { }
+        // 1. Pause ALL video and audio elements on the entire page
+        //    Vturb can inject media elements anywhere (body, divs, etc.)
+        document.querySelectorAll("video").forEach(v => {
+          try { v.pause(); v.currentTime = 0; v.muted = true; } catch (_) { }
         });
+        document.querySelectorAll("audio").forEach(a => {
+          try { a.pause(); a.currentTime = 0; a.muted = true; } catch (_) { }
+        });
+
+        // 2. Pause inside all iframes on the page
+        document.querySelectorAll("iframe").forEach(f => {
+          try {
+            // Standard postMessage pause commands
+            f.contentWindow.postMessage('{"method":"pause"}', "*");
+            f.contentWindow.postMessage('{"event":"command","func":"pauseVideo"}', "*");
+            // Also try to access iframe media elements directly (same-origin only)
+            f.contentDocument?.querySelectorAll("video, audio").forEach(m => {
+              m.pause(); m.muted = true;
+            });
+          } catch (_) { }
+        });
+
+        // 3. Remove the Vturb script/player entirely to guarantee silence
+        const playerEl = document.getElementById(PLAYER_ID) || document.querySelector("vturb-smartplayer");
+        if (playerEl) playerEl.innerHTML = "";
       }
 
       /* ── Botão Continuar → próxima etapa ────────────────────────── */
