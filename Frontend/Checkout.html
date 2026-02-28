@@ -53,63 +53,28 @@
             <div class="text-2xl font-extrabold tracking-tight">
                 <img src="assets/logo.png" alt="Colorfy" class="h-8 w-auto">
             </div>
-            <a href="https://buy.stripe.com/8x26oH8Hd0IZbOj6crgfu00"
-                class="gradient-bg text-white px-4 py-2 rounded-full text-xs font-bold hover:scale-105 transition-transform">
+            <button type="button"
+                class="btn-checkout gradient-bg text-white px-4 py-2 rounded-full text-xs font-bold hover:scale-105 transition-transform">
                 COMPRAR AGORA
-            </a>
+            </button>
             <a id="btnReturnToResult" href="/"
                 class="ml-2 bg-white text-black border border-gray-200 px-4 py-2 rounded-full text-xs font-bold hover:scale-105 transition-transform">
                 JÁ PAGUEI — VER RESULTADO
             </a>
 
         </div>
-        </div>
     </nav>
     <script>
-        // Preserve session_id in Stripe links
         document.addEventListener("DOMContentLoaded", () => {
-            // Hide "return to result" button if session id is missing
             const returnBtn = document.getElementById('btnReturnToResult');
             if (returnBtn) returnBtn.style.display = 'none';
+
             const params = new URLSearchParams(window.location.search);
             const sessionId = params.get('session_id');
-            if (sessionId) {
-                // Set return-to-result link
-                const returnBtn = document.getElementById('btnReturnToResult');
-                if (returnBtn) {
-                    returnBtn.href = `/?session_id=${encodeURIComponent(sessionId)}`;
-                }
 
-                const links = document.querySelectorAll('a[href^="https://buy.stripe.com"]');
-                links.forEach(link => {
-                    const url = new URL(link.href);
-                    // Pass session_id to Stripe via client_reference_id or similar standard param if supported,
-                    // OR just rely on the user coming back. 
-                    // IMPORTANT: For basic Stripe Payment Links, you cannot easily pass dynamic metadata without creating a session via API.
-                    // HOWEVER, we can stick it in the redirect URL if we configured Stripe to redirect to {CHECKOUT_SESSION_ID} and we don't need to link THIS specific record yet.
-                    // PROBLEM: We need to know WHICH record to unlock.
-                    // SOLUTION: We ideally need a proper Stripe Checkout Session creation on backend. 
-                    // BUT given constraints, we will assume the user has a way to map payment to this ID, OR we just trust the return flow.
-                    // Let's at least try to append it for tracking if Stripe supports url params passthrough (it often doesn't for Payment Links).
-
-                    // BETTER APPROACH for this constrained environment:
-                    // Since we use a static Stripe Link, we CANNOT pass the `session_id` (our UUID) into it easily to get it back via webhook without backend code generating the Stripe Session.
-                    // The user logic is: Quiz -> Save (get ID) -> Checkout Page -> Stripe -> Redirect Back -> Page (with ID).
-                    // To make the "Redirect Back" work with the correct ID, the Stripe success URL must include it.
-                    // Since the Stripe Link is static, we can't change the success URL per user unless we use the Stripe API.
-
-                    // WORKAROUND:
-                    // The user must manually 'verify' or we just 'simulate' the flow. 
-                    // OR, we assume the user configured the Stripe Link to redirect to a generic success page?
-                    // The valid flow with a STATIC LINK is tricky. 
-                    // We will append it as a query param just in case the user has some custom setup, 
-                    // but effectively we might lose the ID if the user closes the tab.
-
-                    // For now, let's just keep the ID in the URL of this page so if they reload, they stay here.
-                    // And IF the stripe link supports `?client_reference_id=...` we add it.
-                    url.searchParams.set('client_reference_id', sessionId);
-                    link.href = url.toString();
-                });
+            if (sessionId && returnBtn) {
+                returnBtn.style.display = '';
+                returnBtn.href = `/?session_id=${encodeURIComponent(sessionId)}`;
             }
         });
     </script>
@@ -256,7 +221,7 @@
                 <h3 class="text-xl font-medium text-gray-300 mb-2">Oferta Especial Limitada</h3>
                 <div class="flex items-center justify-center gap-3 mb-6">
                     <span class="text-gray-500 line-through text-lg">R$ 197,00</span>
-                    <span class="text-4xl font-extrabold text-white">R$ 47,90</span>
+                    <span class="text-4xl font-extrabold text-white">R$ 67,90</span>
                 </div>
 
                 <ul class="text-left space-y-3 mb-8 text-sm text-gray-300 mx-auto max-w-[220px]">
@@ -268,10 +233,10 @@
                         Especializado</li>
                 </ul>
 
-                <a href="https://buy.stripe.com/8x26oH8Hd0IZbOj6crgfu00"
-                    class="block w-full bg-white text-slate-900 font-bold text-lg py-4 rounded-xl hover:bg-gray-100 transition-colors">
+                <button type="button"
+                    class="btn-checkout block w-full bg-white text-slate-900 font-bold text-lg py-4 rounded-xl hover:bg-gray-100 transition-colors">
                     PEGAR OFERTA AGORA
-                </a>
+                </button>
             </div>
         </section>
 
@@ -370,18 +335,16 @@
     <!-- Sticky Bottom CTA for Mobile -->
     <div
         class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40 md:hidden">
-        <a href="https://buy.stripe.com/8x26oH8Hd0IZbOj6crgfu00"
-            class="block w-full gradient-bg text-white text-center font-bold py-3.5 rounded-xl shadow-lg animate-pulse">
+        <button type="button"
+            class="btn-checkout block w-full gradient-bg text-white text-center font-bold py-3.5 rounded-xl shadow-lg animate-pulse">
             QUERO COMEÇAR AGORA
-        </a>
+        </button>
     </div>
 
     <script>
-        document.getElementById('btnBuy').addEventListener('click', async () => {
-            const btn = document.getElementById('btnBuy');
-            const originalText = btn.innerHTML;
+        async function startCheckout(triggerBtn) {
+            const originalText = triggerBtn.innerHTML;
 
-            // 1. Recuperar o session_id da URL
             const params = new URLSearchParams(window.location.search);
             const sessionId = params.get('session_id');
 
@@ -391,12 +354,12 @@
                 return;
             }
 
-            // 2. Feedback visual de carregamento
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processando...';
-            btn.disabled = true;
+            // Disable all checkout buttons while processing
+            const allBtns = document.querySelectorAll('.btn-checkout, #btnBuy');
+            allBtns.forEach(b => { b.disabled = true; });
+            triggerBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processando...';
 
             try {
-                // 3. Chamar a API para criar o checkout dinâmico
                 const response = await fetch('/api/create-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -406,7 +369,6 @@
                 const data = await response.json();
 
                 if (response.ok && data.url) {
-                    // 4. Redirecionar para o Stripe
                     window.location.href = data.url;
                 } else {
                     throw new Error(data.error || 'Erro ao criar checkout');
@@ -414,55 +376,21 @@
             } catch (error) {
                 console.error(error);
                 alert('Ocorreu um erro ao iniciar o pagamento. Tente novamente.');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                triggerBtn.innerHTML = originalText;
+                allBtns.forEach(b => { b.disabled = false; });
             }
+        }
+
+        // Attach to the main CTA button
+        document.getElementById('btnBuy').addEventListener('click', function () {
+            startCheckout(this);
         });
-    </script>
-    <script>
-        document.getElementById('btnBuy').addEventListener('click', async () => {
-            const btn = document.getElementById('btnBuy');
-            const originalText = btn.innerHTML;
 
-            // 1. Pega o ID da sessão atual na URL
-            const params = new URLSearchParams(window.location.search);
-            const sessionId = params.get('session_id');
-
-            if (!sessionId) {
-                alert('Erro: Sessão não encontrada. Por favor, refaça a análise.');
-                window.location.href = '/';
-                return;
-            }
-
-            // 2. Trava o botão e mostra carregando
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processando...';
-            btn.disabled = true;
-
-            try {
-                // 3. Pede para o Backend criar o link da Stripe COM o ID da sessão
-                const response = await fetch('/api/create-checkout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ session_id: sessionId })
-                });
-
-                const data = await response.json();
-
-                if (data.url) {
-                    // 4. Redireciona para o pagamento correto
-                    window.location.href = data.url;
-                } else {
-                    console.error('Erro API:', data);
-                    alert('Erro ao criar pagamento. Tente novamente.');
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }
-            } catch (error) {
-                console.error(error);
-                alert('Erro de conexão. Verifique sua internet.');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
+        // Attach to all .btn-checkout buttons (navbar, offer section, sticky bottom)
+        document.querySelectorAll('.btn-checkout').forEach(btn => {
+            btn.addEventListener('click', function () {
+                startCheckout(this);
+            });
         });
     </script>
 </body>

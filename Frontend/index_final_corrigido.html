@@ -1300,6 +1300,40 @@
       width: 100%;
       max-width: 400px;
       margin: 0 auto;
+      /* Force light rendering - ignore OS dark mode for color accuracy */
+      color-scheme: light only;
+    }
+
+    /* Force faceCards to render gradients at full saturation regardless of OS settings */
+    .faceCard {
+      -webkit-filter: saturate(1) brightness(1);
+      filter: saturate(1) brightness(1);
+    }
+
+    /* Compensate for dark mode: boost saturation and brightness */
+    @media (prefers-color-scheme: dark) {
+      .grid-faces .faceCard {
+        -webkit-filter: saturate(1.15) brightness(1.1);
+        filter: saturate(1.15) brightness(1.1);
+      }
+    }
+
+    /* Subtle inline tip shown on Q13 */
+    .display-tip {
+      background: rgba(99, 102, 241, 0.06);
+      border-left: 3px solid var(--brand, #6366f1);
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--text-sub, #64748b);
+      max-width: 400px;
+      margin-inline: auto;
+    }
+    .display-tip strong {
+      color: var(--text-main, #1e293b);
+      font-weight: 600;
     }
 
     .faceCard {
@@ -3062,8 +3096,12 @@
     <!-- VIDEO -->
     <section class="view-section" id="view-video">
       <div class="neu-card glass sectionPad centerStack">
-        <h3 style="margin:0 0 24px; font-size:28px; font-weight:800; letter-spacing:-0.5px; color:var(--text-main);">
+        <h3 style="margin:0 0 12px; font-size:28px; font-weight:800; letter-spacing:-0.5px; color:var(--text-main);">
           Orientações</h3>
+
+        <button id="skipVideoBtn" class="neu-btn" type="button" style="margin-bottom: 16px; font-size: 14px;">
+          Pular vídeo e continuar
+        </button>
 
         <div id="intro-video-step" class="video-step">
           <!-- Vturb Smart Player -->
@@ -3148,6 +3186,7 @@
               <li><span class="dot"></span><span>Sem maquiagem pesada, sem filtro, sem modo “beauty”.</span></li>
               <li><span class="dot"></span><span>Retire óculos, brincos grandes e piercings chamativos.</span></li>
               <li><span class="dot"></span><span>Cabelo fora do rosto, sobrancelhas visíveis.</span></li>
+              <li><span class="dot"></span><span><strong>Desative o modo noturno, economia de bateria e filtro de luz azul.</strong> Esses modos alteram as cores da tela e prejudicam a análise.</span></li>
             </ul>
             <div class="error" id="errPhoto" style="display:block; margin-top:12px;">
               Envie uma imagem para continuarmos.
@@ -3519,8 +3558,7 @@
               </button>
             </div>
             <div class="text-center mt-4">
-              <a href="https://buy.stripe.com/test_dRmbJ31LOcBI7jB3vy1Jm00" target="_blank"
-                class="text-sm text-gray-400 underline hover:text-gray-600">Link original de pagamento (Stripe)</a>
+              <span class="text-sm text-gray-400">Pagamento seguro via Stripe</span>
             </div>
           </section>
 
@@ -3572,6 +3610,17 @@
       const cur = document.getElementById(currentView);
       const next = document.getElementById(id);
       if (!next) return;
+
+      // Pause Vturb video/audio when leaving the video view
+      if (currentView === "view-video" && id !== "view-video") {
+        const vEl = document.getElementById("view-video");
+        if (vEl) {
+          vEl.querySelectorAll("video, audio").forEach(m => { m.pause(); m.currentTime = 0; });
+          vEl.querySelectorAll("iframe").forEach(f => {
+            try { f.contentWindow.postMessage('{"method":"pause"}', "*"); } catch (_) { }
+          });
+        }
+      }
 
       const header = document.querySelector("header.topbar");
       const progress = document.querySelector(".progressWrap");
@@ -3814,10 +3863,28 @@
         }).observe(view, { attributes: true, attributeFilter: ["class"] });
       }
 
+      /* ── Pausa o player Vturb (vídeo + áudio) ────────────────────── */
+      function pauseVturb() {
+        const el = document.getElementById(PLAYER_ID) || document.querySelector("vturb-smartplayer");
+        if (el) {
+          const vids = el.querySelectorAll("video");
+          vids.forEach(v => { v.pause(); v.currentTime = 0; });
+          const audios = el.querySelectorAll("audio");
+          audios.forEach(a => { a.pause(); a.currentTime = 0; });
+        }
+        // Also catch any top-level iframes the player may use
+        const iframes = document.querySelectorAll("#view-video iframe");
+        iframes.forEach(f => {
+          try { f.contentWindow.postMessage('{"method":"pause"}', "*"); } catch (_) { }
+        });
+      }
+
       /* ── Botão Continuar → próxima etapa ────────────────────────── */
       function bindContinue() {
         const btn = document.getElementById(BTN_ID);
-        if (btn) btn.onclick = () => goTo("view-upload");
+        if (btn) btn.onclick = () => { pauseVturb(); goTo("view-upload"); };
+        const skipBtn = document.getElementById("skipVideoBtn");
+        if (skipBtn) skipBtn.onclick = () => { pauseVturb(); goTo("view-upload"); };
       }
 
       /* ── Init ────────────────────────────────────────────────────── */
@@ -4462,6 +4529,14 @@
       const wrap = $("#qOptions");
       wrap.innerHTML = "";
 
+      // Remove Q13 warning banner if navigating to a different question
+      if (q.id !== "frame") {
+        const oldWarning = document.getElementById("displayWarning");
+        if (oldWarning) oldWarning.remove();
+        const quizSection = document.getElementById("view-quiz");
+        if (quizSection) { quizSection.style.colorScheme = ""; quizSection.style.backgroundColor = ""; }
+      }
+
       // Special layout for face grid (Second Image Style)
       if (q.layout === "grid-faces") {
         wrap.className = "grid-faces";
@@ -4469,6 +4544,28 @@
         // Se houver exatamente 3 opções, empilhamos verticalmente para dar foco total às cores
         if (q.options.length === 3) {
           wrap.classList.add("stack-3");
+        }
+
+        // Show subtle tip about display settings on Q13
+        const existingWarning = document.getElementById("displayWarning");
+        if (existingWarning) existingWarning.remove();
+
+        const tip = document.createElement("div");
+        tip.id = "displayWarning";
+        tip.className = "display-tip";
+        tip.innerHTML = `Para garantir precisão, desative <strong>modo noturno</strong>, <strong>economia de bateria</strong> e <strong>filtro de luz azul</strong> — eles alteram as cores da tela.`;
+        wrap.parentNode.insertBefore(tip, wrap);
+
+        // Force light color-scheme on the quiz section
+        const quizSection = document.getElementById("view-quiz");
+        if (quizSection) {
+          quizSection.style.colorScheme = "light only";
+          quizSection.style.backgroundColor = "#fff";
+        }
+
+        // Try to request screen wake lock to prevent dimming
+        if ("wakeLock" in navigator) {
+          navigator.wakeLock.request("screen").catch(() => {});
         }
 
         q.options.forEach(opt => {
