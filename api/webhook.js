@@ -65,7 +65,11 @@ export default async function handler(req, res) {
 
     if (event.type === "checkout.session.completed") {
         const session = event.data.object;
-        const internalId = session.metadata?.internal_session_id;
+
+        // Payment Link uses client_reference_id, dynamic checkout uses metadata
+        const internalId =
+            session.client_reference_id ||
+            session.metadata?.internal_session_id;
 
         if (internalId) {
             const { error } = await supabase
