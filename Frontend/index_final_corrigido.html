@@ -5672,27 +5672,39 @@
 
       container.innerHTML = html;
 
-      // Bind PDF download button to force download via fetch (avoids opening in browser)
+      // Bind PDF download button
       const pdfBtn = document.getElementById("btnDownloadPdf");
       if (pdfBtn) {
         pdfBtn.addEventListener("click", async function () {
           const url = this.dataset.pdfUrl;
+          if (!url) return;
           const originalHtml = this.innerHTML;
           this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Baixando...';
           this.disabled = true;
+
+          // Open window BEFORE async work (preserves user gesture for popup blockers)
+          let newTab = null;
           try {
-            const resp = await fetch(url);
+            const resp = await fetch(url, { mode: "cors" });
+            if (!resp.ok) throw new Error("HTTP " + resp.status);
             const blob = await resp.blob();
+            const blobUrl = URL.createObjectURL(blob);
             const a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
+            a.href = blobUrl;
             a.download = "Colorfy-Guia-Completo.pdf";
             document.body.appendChild(a);
             a.click();
-            a.remove();
-            URL.revokeObjectURL(a.href);
+            setTimeout(() => { a.remove(); URL.revokeObjectURL(blobUrl); }, 1000);
           } catch (e) {
-            // Fallback: open in new tab if fetch fails (CORS)
-            window.open(url, "_blank");
+            // CORS or network error: use direct link (works without CORS)
+            const a = document.createElement("a");
+            a.href = url;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.download = "Colorfy-Guia-Completo.pdf";
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => a.remove(), 100);
           }
           this.innerHTML = originalHtml;
           this.disabled = false;
