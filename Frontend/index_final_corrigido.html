@@ -3675,6 +3675,7 @@
         next.classList.add("active");
         currentView = id;
         updateProgress();
+        saveProgress();
 
         // Final cleanup helper
         $$(".view-section").forEach(el => {
@@ -3747,6 +3748,39 @@
       session_id: null
     };
 
+    /* ---------- State Persistence (localStorage) ---------- */
+    const PROGRESS_KEY = 'colorfy_progress';
+
+    function saveProgress() {
+      try {
+        const data = {
+          view: currentView,
+          user: state.user,
+          selfie: {
+            dataUrl: state.selfie.dataUrl,
+            croppedDataUrl: state.selfie.croppedDataUrl,
+            approved: state.selfie.approved
+          },
+          quiz: {
+            answers: state.quiz.answers,
+            cursor: state.quiz.cursor
+          }
+        };
+        localStorage.setItem(PROGRESS_KEY, JSON.stringify(data));
+      } catch (e) { console.warn('Erro ao salvar progresso:', e); }
+    }
+
+    function loadProgress() {
+      try {
+        const raw = localStorage.getItem(PROGRESS_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) { return null; }
+    }
+
+    function clearProgress() {
+      localStorage.removeItem(PROGRESS_KEY);
+    }
+
     /* ---------- Buttons / Nav ---------- */
 
     $("#btnStart").addEventListener("click", () => goTo("view-register"));
@@ -3772,6 +3806,7 @@
       if (!name || !okEmail || !goal) return;
 
       state.user = { name, email, phone, goal };
+      saveProgress();
       goTo("view-video");
     });
 
@@ -3976,6 +4011,7 @@
       }
 
       setPhotoReady(state.selfie.approved);
+      if (state.selfie.approved) saveProgress();
     }
 
 
@@ -4619,6 +4655,7 @@
             $$(".faceCard", wrap).forEach(c => c.classList.remove("selected"));
             card.classList.add("selected");
             $("#qHint").classList.remove("show");
+            saveProgress();
           };
 
           wrap.appendChild(card);
@@ -4681,6 +4718,7 @@
           state.quiz.answers[q.id] = opt.key;
           $$(".opt", wrap).forEach(b => b.classList.toggle("selected", b.getAttribute("data-key") === opt.key));
           $("#qHint").classList.remove("show");
+          saveProgress();
           // ripple
           addRipple(btn, ev);
         });
@@ -4716,6 +4754,7 @@
       // advance
       if (state.quiz.cursor < state.quiz.flow.length - 1) {
         state.quiz.cursor++;
+        saveProgress();
         renderQuestion();
       } else {
         // finish quiz -> loading -> scanner -> result
@@ -5973,6 +6012,7 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
           renderResult(state.analysis);
           goTo("view-result");
 
+          clearProgress();
           localStorage.removeItem('colorfy_pending_session');
           return true;
         }
@@ -6014,6 +6054,48 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
         if (handled) return;
       }
 
+      // Tenta restaurar progresso salvo
+      const saved = loadProgress();
+      if (saved && saved.view && saved.view !== "view-landing") {
+        // Restaura dados do usuário
+        if (saved.user) {
+          state.user = saved.user;
+          if ($("#name")) $("#name").value = saved.user.name || "";
+          if ($("#email")) $("#email").value = saved.user.email || "";
+          if ($("#phone")) $("#phone").value = saved.user.phone || "";
+          if ($("#goal")) $("#goal").value = saved.user.goal || "";
+        }
+
+        // Restaura selfie
+        if (saved.selfie && saved.selfie.dataUrl) {
+          state.selfie.dataUrl = saved.selfie.dataUrl;
+          state.selfie.croppedDataUrl = saved.selfie.croppedDataUrl || "";
+          state.selfie.approved = saved.selfie.approved || false;
+          previewImg.src = state.selfie.dataUrl;
+          previewCard.style.display = "block";
+          if ($("#scanImg")) $("#scanImg").src = state.selfie.dataUrl;
+          if ($("#resultImg")) $("#resultImg").src = state.selfie.dataUrl;
+          setPhotoReady(state.selfie.approved);
+        }
+
+        // Determina view segura para restaurar (não restaura loading/scanner/checkout)
+        const safeViews = ["view-register", "view-video", "view-upload", "view-quiz"];
+        let targetView = safeViews.includes(saved.view) ? saved.view : "view-upload";
+
+        // Se vai para o quiz, reconstrói o flow e restaura respostas
+        if (targetView === "view-quiz" && saved.quiz) {
+          buildQuizFlow();
+          state.quiz.answers = saved.quiz.answers || {};
+          state.quiz.cursor = saved.quiz.cursor || 0;
+          goTo("view-quiz");
+          renderQuestion();
+          return;
+        }
+
+        goTo(targetView);
+        return;
+      }
+
       // Inicialização padrão (só vai para Home se realmente não tiver sessão)
       const current = document.querySelector(".view-section.active")?.id;
       if (!current || current === "view-loading") {
@@ -6024,6 +6106,7 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
     // Inicializa o App
     window.addEventListener("load", initApp);
     function resetAll() {
+      clearProgress();
       location.reload();
     }
 
