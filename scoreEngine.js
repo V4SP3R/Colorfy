@@ -180,7 +180,7 @@ export function computeFinalResult({ quizAnswers, vision }) {
     }
   } else {
     const gates = {
-      "Primavera Clara": 7, "Primavera Quente": 11, "Primavera Brilhante": 3,
+      "Primavera Clara": 7, "Primavera Quente": 11, "Primavera Brilhante": 7,
       "Outono Suave": 8, "Outono Quente": 12, "Outono Profundo": 11,
       "Verão Claro": 5, "Verão Suave": 7, "Verão Frio": 5,
       "Inverno Brilhante": 6, "Inverno Frio": 4, "Inverno Profundo": 8
@@ -199,6 +199,18 @@ export function computeFinalResult({ quizAnswers, vision }) {
     } else {
       finalSeason = winner;
     }
+  }
+
+  // --- 7. APLICAR SUFIXO OLIVA ---
+  if (isOliva && s["Oliva Quente"] >= 13) {
+    if (finalSeason === "Outono Quente") finalSeason = "Outono Quente Oliva";
+    if (finalSeason === "Outono Profundo") finalSeason = "Outono Profundo Oliva";
+    if (finalSeason === "Primavera Quente") finalSeason = "Primavera Quente Oliva";
+  }
+  if (isOliva && s["Oliva Frio"] >= 13) {
+    if (finalSeason === "Verão Frio") finalSeason = "Verão Frio Oliva";
+    if (finalSeason === "Inverno Frio") finalSeason = "Inverno Frio Oliva";
+    if (finalSeason === "Inverno Profundo") finalSeason = "Inverno Profundo Oliva";
   }
 
   // Get full season data
