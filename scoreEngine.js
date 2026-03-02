@@ -62,10 +62,10 @@ export function computeFinalResult({ quizAnswers, vision }) {
   if (q8 === "E") { s["Oliva Frio"] += 3; s["Oliva Quente"] += 3; }
 
   const q9 = quizAnswers["q9"];
-  if (q9 === "A") { allWinters.forEach(k => s[k] += 2); allSummers.forEach(k => s[k] += 2); }
-  if (q9 === "B") { s["Oliva Quente"] += 2; s["Oliva Frio"] += 2; }
+  if (q9 === "A") { allWinters.forEach(k => s[k] += 1); allSummers.forEach(k => s[k] += 1); }
+  if (q9 === "B") { s["Oliva Quente"] += 2; }
   if (q9 === "C") { s["Oliva Frio"] += 3; }
-  if (q9 === "D") { s["Oliva Quente"] += 3; }
+  if (q9 === "D") { groupWarm.forEach(k => s[k] += 3); }
   if (q9 === "E") { allSummers.forEach(k => s[k] += 1); s["Inverno Brilhante"] += 1; }
 
   const q10 = quizAnswers["q10"];
@@ -95,6 +95,7 @@ export function computeFinalResult({ quizAnswers, vision }) {
       if (frameAns === "A") s["Primavera Clara"] += 3;
       if (frameAns === "B") s["Primavera Quente"] += 3;
       if (frameAns === "C") s["Primavera Brilhante"] += 3;
+      if (frameAns === "D") { s["Oliva Quente"] += 3; s["Primavera Quente"] += 1; }
     } else if (fGroup === "summer") {
       if (frameAns === "A") s["Verão Claro"] += 3;
       if (frameAns === "B") s["Verão Suave"] += 3;
@@ -109,7 +110,7 @@ export function computeFinalResult({ quizAnswers, vision }) {
       if (frameAns === "B") s["Inverno Frio"] += 3;
       if (frameAns === "C") s["Inverno Profundo"] += 3;
       if (frameAns === "D") {
-        s["Inverno Profundo Oliva"] += 3;
+        s["Oliva Frio"] += 3;
       }
     }
   }
@@ -151,9 +152,9 @@ export function computeFinalResult({ quizAnswers, vision }) {
   // Gate Oliva Frio
   if (s["Oliva Frio"] >= 13) {
     isOliva = true;
-    // LISTA ESTRITA: Verão Frio, Verão Suave, Inverno Frio, Inverno Profundo, Inverno Profundo Oliva
+    // LISTA ESTRITA: Verão Frio, Verão Suave, Inverno Frio, Inverno Profundo
     const candidates = [
-      "Verão Frio", "Verão Suave", "Inverno Frio", "Inverno Profundo", "Inverno Profundo Oliva"
+      "Verão Frio", "Verão Suave", "Inverno Frio", "Inverno Profundo"
     ];
     finalSeason = pickWinner(s, candidates);
 
@@ -180,7 +181,7 @@ export function computeFinalResult({ quizAnswers, vision }) {
     }
   } else {
     const gates = {
-      "Primavera Clara": 7, "Primavera Quente": 11, "Primavera Brilhante": 7,
+      "Primavera Clara": 7, "Primavera Quente": 11, "Primavera Brilhante": 3,
       "Outono Suave": 8, "Outono Quente": 12, "Outono Profundo": 11,
       "Verão Claro": 5, "Verão Suave": 7, "Verão Frio": 5,
       "Inverno Brilhante": 6, "Inverno Frio": 4, "Inverno Profundo": 8
@@ -271,13 +272,55 @@ function pickWinner(scores, candidates) {
 }
 
 function resolveTie(ties, qa) {
+  // Critério 1 — Esclera + Recorte da Íris (~60% dos empates)
   const isSharp = (qa["q2"] === "A" || qa["q3"] === "B");
-  const sharpSeasons = ties.filter(t => t.includes("Brilhante") || t.includes("Profundo") || t.includes("Frio"));
+  const sharpSeasons = ties.filter(t => t.includes("Brilhante") || t.includes("Profundo"));
   const softSeasons = ties.filter(t => t.includes("Suave") || t.includes("Claro"));
 
-  if (isSharp && sharpSeasons.length > 0) return sharpSeasons[0];
-  if (!isSharp && softSeasons.length > 0) return softSeasons[0];
-  return ties[0];
+  if (isSharp && sharpSeasons.length === 1) return sharpSeasons[0];
+  if (!isSharp && softSeasons.length === 1) return softSeasons[0];
+
+  // Se Critério 1 reduziu candidatos mas ainda há empate, usar o subgrupo filtrado
+  let remaining = ties;
+  if (isSharp && sharpSeasons.length > 1) remaining = sharpSeasons;
+  if (!isSharp && softSeasons.length > 1) remaining = softSeasons;
+
+  // Critério 2 — Reação de Rubor (Q7)
+  // Rubor rápido/rosado (Q7=A) → favorece Primaveras claras / Verões
+  // Escurece/bronzeia/acinzenta (Q7=C ou Q7=D) → favorece Outonos
+  if (remaining.length > 1) {
+    if (qa["q7"] === "A") {
+      const ruborFav = remaining.filter(t => t.includes("Clara") || t.includes("Claro") || t.includes("Verão"));
+      if (ruborFav.length === 1) return ruborFav[0];
+      if (ruborFav.length > 1) remaining = ruborFav;
+    }
+    if (qa["q7"] === "C" || qa["q7"] === "D") {
+      const outonos = remaining.filter(t => t.includes("Outono"));
+      if (outonos.length === 1) return outonos[0];
+      if (outonos.length > 1) remaining = outonos;
+    }
+  }
+
+  // Critério 3 — Olheiras + Sardas (Q8 + Q6)
+  // Castanhas/caramelo (Q8=C) → Outonos
+  // Azuladas/rosadas (Q8=D) → Primaveras
+  // Acinzentadas (Q8=E) → Profundas
+  if (remaining.length > 1) {
+    if (qa["q8"] === "C") {
+      const outonos = remaining.filter(t => t.includes("Outono"));
+      if (outonos.length >= 1) return outonos[0];
+    }
+    if (qa["q8"] === "D") {
+      const primaveras = remaining.filter(t => t.includes("Primavera"));
+      if (primaveras.length >= 1) return primaveras[0];
+    }
+    if (qa["q8"] === "E") {
+      const profundas = remaining.filter(t => t.includes("Profundo"));
+      if (profundas.length >= 1) return profundas[0];
+    }
+  }
+
+  return remaining[0];
 }
 
 const SEASON_DATA = {
