@@ -5634,32 +5634,39 @@
           this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Baixando...';
           this.disabled = true;
 
-          // Open window BEFORE async work (preserves user gesture for popup blockers)
-          let newTab = null;
-          try {
-            const resp = await fetch(url, { mode: "cors" });
-            if (!resp.ok) throw new Error("HTTP " + resp.status);
-            const blob = await resp.blob();
-            const blobUrl = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = blobUrl;
-            a.download = "Colorfy-Guia-Completo.pdf";
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => { a.remove(); URL.revokeObjectURL(blobUrl); }, 1000);
-          } catch (e) {
-            // CORS or network error: use direct link (works without CORS)
-            const a = document.createElement("a");
-            a.href = url;
-            a.target = "_blank";
-            a.rel = "noopener noreferrer";
-            a.download = "Colorfy-Guia-Completo.pdf";
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => a.remove(), 100);
+          const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+          if (isMobile) {
+            // Mobile: abrir link direto preservando gesto do usuario
+            // window.open no contexto sincrono do click funciona em mobile
+            const w = window.open(url, "_blank");
+            if (!w) {
+              // Popup bloqueado: fallback com location
+              window.location.href = url;
+            }
+          } else {
+            // Desktop: fetch blob para forcar download com nome correto
+            try {
+              const resp = await fetch(url, { mode: "cors" });
+              if (!resp.ok) throw new Error("HTTP " + resp.status);
+              const blob = await resp.blob();
+              const blobUrl = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = blobUrl;
+              a.download = "Colorfy-Guia-Completo.pdf";
+              document.body.appendChild(a);
+              a.click();
+              setTimeout(() => { a.remove(); URL.revokeObjectURL(blobUrl); }, 1000);
+            } catch (e) {
+              // Fallback desktop: link direto
+              window.open(url, "_blank") || (window.location.href = url);
+            }
           }
-          this.innerHTML = originalHtml;
-          this.disabled = false;
+
+          setTimeout(() => {
+            this.innerHTML = originalHtml;
+            this.disabled = false;
+          }, 2000);
         });
       }
     }
