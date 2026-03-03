@@ -4,8 +4,4 @@ export function validatePayload(body) {
   if (!body.quizAnswers) {
     throw new Error("Respostas do quiz ausentes");
   }
-
-  if (!body.image || !body.image.base64) {
-    throw new Error("Imagem não enviada");
-  }
 }
