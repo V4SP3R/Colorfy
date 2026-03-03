@@ -313,6 +313,27 @@
       box-shadow: var(--focus), 16px 16px 30px rgba(20, 30, 50, .22), -16px -16px 30px rgba(255, 255, 255, .60);
     }
 
+    .confirm-photo-btn {
+      color: #fff;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      box-shadow:
+        8px 8px 18px rgba(20, 30, 50, .15),
+        -8px -8px 18px rgba(255, 255, 255, .50);
+      font-weight: 600;
+      font-size: 15px;
+      padding: 12px 28px;
+      transition: all .2s ease;
+    }
+    .confirm-photo-btn:hover {
+      filter: brightness(1.08);
+      transform: translateY(-2px) scale(1.02);
+    }
+    .confirm-photo-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      filter: grayscale(.4);
+    }
+
     .neu-btn.ghost {
       background: transparent;
       box-shadow: none;
@@ -3194,6 +3215,24 @@
           </div>
         </div>
 
+        <!-- Botões Confirmar / Trocar foto -->
+        <div id="photoActionRow" class="row" style="justify-content:center; gap:12px; margin-top:16px; display:none;">
+          <button class="neu-btn confirm-photo-btn" id="btnConfirmPhoto" type="button">
+            <i class="fa-solid fa-check" style="margin-right:6px;"></i>Confirmar foto
+          </button>
+          <button class="neu-btn" id="btnChangePhoto" type="button" style="display:none;">
+            <i class="fa-solid fa-camera-rotate" style="margin-right:6px;"></i>Trocar foto
+          </button>
+        </div>
+
+        <!-- Mensagem de foto confirmada -->
+        <div id="photoConfirmedMsg" style="display:none; text-align:center; margin-top:12px;">
+          <span style="color:var(--ok); font-weight:600; font-size:14px;">
+            <i class="fa-solid fa-circle-check" style="margin-right:4px;"></i>
+            Foto confirmada — esta imagem será usada na sua análise.
+          </span>
+        </div>
+
         <div class="row" style="justify-content:space-between; margin-top: 14px;">
           <button class="neu-btn" type="button" data-nav="back">Voltar</button>
           <button class="neu-btn primary" id="btnToQuiz" type="button" disabled
@@ -3742,7 +3781,7 @@
     /* ---------- State ---------- */
     const state = {
       user: { name: "", email: "", phone: "", goal: "" },
-      selfie: { file: null, dataUrl: "", croppedDataUrl: "", approved: false, issues: [] },
+      selfie: { file: null, dataUrl: "", croppedDataUrl: "", approved: false, confirmed: false, issues: [] },
       quiz: { answers: {}, cursor: 0, flow: [] },
       analysis: null,
       session_id: null
@@ -3759,7 +3798,8 @@
           selfie: {
             dataUrl: state.selfie.dataUrl,
             croppedDataUrl: state.selfie.croppedDataUrl,
-            approved: state.selfie.approved
+            approved: state.selfie.approved,
+            confirmed: state.selfie.confirmed
           },
           quiz: {
             answers: state.quiz.answers,
@@ -3974,9 +4014,34 @@
     const btnToQuiz = $("#btnToQuiz");
 
     function setPhotoReady(ready) {
-      btnToQuiz.disabled = !ready;
-      btnToQuiz.style.opacity = ready ? "1" : ".6";
-      btnToQuiz.style.cursor = ready ? "pointer" : "not-allowed";
+      // "Continuar" só habilita após foto CONFIRMADA
+      const confirmed = state.selfie.confirmed;
+      btnToQuiz.disabled = !confirmed;
+      btnToQuiz.style.opacity = confirmed ? "1" : ".6";
+      btnToQuiz.style.cursor = confirmed ? "pointer" : "not-allowed";
+
+      const actionRow = $("#photoActionRow");
+      const btnConfirm = $("#btnConfirmPhoto");
+      const btnChange = $("#btnChangePhoto");
+      const confirmedMsg = $("#photoConfirmedMsg");
+
+      if (confirmed) {
+        // Foto já confirmada: esconder botão confirmar, mostrar trocar
+        actionRow.style.display = "flex";
+        btnConfirm.style.display = "none";
+        btnChange.style.display = "inline-flex";
+        confirmedMsg.style.display = "block";
+      } else if (ready) {
+        // Foto validada mas não confirmada: mostrar botão confirmar
+        actionRow.style.display = "flex";
+        btnConfirm.style.display = "inline-flex";
+        btnChange.style.display = "none";
+        confirmedMsg.style.display = "none";
+      } else {
+        // Sem foto ou não validada
+        actionRow.style.display = "none";
+        confirmedMsg.style.display = "none";
+      }
     }
 
     async function photoQualityGate() {
@@ -4192,13 +4257,12 @@
       reader.onload = async () => {
         state.selfie.tx = 0; state.selfie.ty = 0; state.selfie.scale = 1;
         state.selfie.croppedDataUrl = "";
+        state.selfie.confirmed = false;
         editorControls.style.display = "flex";
         applyEditorState();
         state.selfie.dataUrl = reader.result;
         previewImg.src = state.selfie.dataUrl;
         previewCard.style.display = "block";
-        $("#scanImg").src = state.selfie.dataUrl;
-        $("#resultImg").src = state.selfie.dataUrl;
         photoQualityGate();
       };
       reader.readAsDataURL(file);
@@ -4237,8 +4301,51 @@
       });
     }
 
-    btnToQuiz.addEventListener("click", () => {
+    // --- Confirmar Foto ---
+    $("#btnConfirmPhoto").addEventListener("click", () => {
       if (!state.selfie.approved) return;
+      state.selfie.confirmed = true;
+
+      // Definir imagem confirmada para Q13 e resultados
+      $("#scanImg").src = state.selfie.croppedDataUrl || state.selfie.dataUrl;
+      if ($("#resultImg")) $("#resultImg").src = state.selfie.dataUrl;
+
+      // Salvar foto no localStorage para a página de resultados
+      try { localStorage.setItem("colorfy_user_photo", state.selfie.dataUrl); } catch (e) {}
+
+      setPhotoReady(true);
+      saveProgress();
+    });
+
+    // --- Trocar Foto ---
+    $("#btnChangePhoto").addEventListener("click", () => {
+      state.selfie.confirmed = false;
+      state.selfie.approved = false;
+      state.selfie.dataUrl = "";
+      state.selfie.croppedDataUrl = "";
+      state.selfie.file = null;
+      state.selfie.tx = 0;
+      state.selfie.ty = 0;
+      state.selfie.scale = 1;
+
+      previewImg.src = "";
+      previewCard.style.display = "none";
+      editorControls.style.display = "none";
+      uploadZone.classList.remove("valid");
+      fileInput.value = "";
+
+      errPhoto.textContent = "Envie uma imagem para continuarmos.";
+      errPhoto.style.color = "var(--bad)";
+
+      setPhotoReady(false);
+      saveProgress();
+
+      // Abrir seletor de arquivo automaticamente
+      fileInput.click();
+    });
+
+    btnToQuiz.addEventListener("click", () => {
+      if (!state.selfie.confirmed) return;
       buildQuizFlow();
       goTo("view-quiz");
       renderQuestion();
@@ -6078,9 +6185,10 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
           state.selfie.dataUrl = saved.selfie.dataUrl;
           state.selfie.croppedDataUrl = saved.selfie.croppedDataUrl || "";
           state.selfie.approved = saved.selfie.approved || false;
+          state.selfie.confirmed = saved.selfie.confirmed || false;
           previewImg.src = state.selfie.dataUrl;
           previewCard.style.display = "block";
-          if ($("#scanImg")) $("#scanImg").src = state.selfie.dataUrl;
+          if ($("#scanImg")) $("#scanImg").src = state.selfie.croppedDataUrl || state.selfie.dataUrl;
           if ($("#resultImg")) $("#resultImg").src = state.selfie.dataUrl;
           setPhotoReady(state.selfie.approved);
         }
