@@ -472,66 +472,101 @@ const SEASON_DATA = {
 
 // --- HELPER: Deterministic Season Group Prediction (Exact Backend Copy) ---
 function predictSeasonGroupBackend(ans) {
-  // Simplified scoring to determine just the season family (Standard vs Dynamic Frame)
+  // Scoring completo Q1-Q11 (espelho fiel do computeFinalResult)
   const s = {};
   const PALETTES = [
     "Primavera Clara", "Primavera Quente", "Primavera Quente Oliva", "Primavera Brilhante",
     "Outono Suave", "Outono Quente", "Outono Quente Oliva", "Outono Profundo", "Outono Profundo Oliva",
-    "Verão Claro", "Verão Suave", "Verão Frio", "Verão Frio Oliva",
+    "Ver\u00e3o Claro", "Ver\u00e3o Suave", "Ver\u00e3o Frio", "Ver\u00e3o Frio Oliva",
     "Inverno Brilhante", "Inverno Frio", "Inverno Frio Oliva", "Inverno Profundo", "Inverno Profundo Oliva",
     "Oliva Quente", "Oliva Frio"
   ];
   PALETTES.forEach(p => s[p] = 0);
 
-  // Helper to add points
   const add = (p, v) => { if (s[p] !== undefined) s[p] += v; };
   const addList = (list, v) => list.forEach(p => add(p, v));
 
+  const groupWarm = ["Primavera Clara", "Primavera Quente", "Primavera Brilhante", "Outono Suave", "Outono Quente", "Outono Profundo"];
   const allAutumns = ["Outono Suave", "Outono Quente", "Outono Profundo", "Outono Quente Oliva", "Outono Profundo Oliva"];
-  const allSummers = ["Verão Claro", "Verão Suave", "Verão Frio", "Verão Frio Oliva"];
+  const allSummers = ["Ver\u00e3o Claro", "Ver\u00e3o Suave", "Ver\u00e3o Frio", "Ver\u00e3o Frio Oliva"];
   const allWinters = ["Inverno Brilhante", "Inverno Frio", "Inverno Profundo", "Inverno Frio Oliva", "Inverno Profundo Oliva"];
 
-  if (ans.q1 === "A") { add("Inverno Profundo", 2); add("Outono Profundo", 2); }
-  if (ans.q1 === "B") { add("Primavera Quente", 1); add("Outono Quente", 1); add("Oliva Quente", 1); }
-  if (ans.q1 === "C") { addList(allAutumns, 1); add("Primavera Quente", 1); }
-  if (ans.q1 === "D") { add("Primavera Quente", 1); addList(allSummers, 1); } // Green eyes -> diverse
+  // Q1
+  if (ans.q1 === "A") { add("Inverno Profundo", 2); add("Outono Profundo", 2); add("Outono Quente", 1); }
+  if (ans.q1 === "B") { add("Primavera Quente", 1); add("Outono Quente", 1); add("Oliva Quente", 1); add("Outono Suave", 1); }
+  if (ans.q1 === "C") { addList(allAutumns, 1); add("Oliva Quente", 1); add("Primavera Quente", 1); }
+  if (ans.q1 === "D") { add("Outono Suave", 1); add("Primavera Clara", 1); add("Primavera Quente", 1); }
   if (ans.q1 === "E") { addList(allSummers, 1); addList(allWinters, 1); }
 
-  // Q4 Hair is strong indicator
+  // Q2
+  if (ans.q2 === "A") { add("Inverno Brilhante", 1); add("Inverno Profundo", 1); add("Inverno Frio", 1); add("Primavera Quente", 1); add("Outono Profundo", 1); }
+
+  // Q3
+  if (ans.q3 === "B") { add("Inverno Brilhante", 1); add("Inverno Profundo", 1); add("Inverno Frio", 1); add("Primavera Quente", 1); add("Outono Profundo", 1); }
+
+  // Q4
   if (ans.q4 === "a") { add("Inverno Profundo", 3); add("Inverno Brilhante", 2); }
   if (ans.q4 === "b") { add("Inverno Profundo", 2); add("Outono Profundo", 2); }
   if (ans.q4 === "c") { add("Outono Quente", 1); add("Primavera Quente", 1); }
   if (ans.q4 === "d") { add("Primavera Quente", 2); add("Outono Suave", 1); }
-  if (ans.q4 === "e") { add("Verão Suave", 2); add("Verão Frio", 1); }
-  if (ans.q4 === "f") { add("Primavera Clara", 2); add("Verão Claro", 2); }
-  if (ans.q4 === "g") { add("Primavera Quente", 3); }
+  if (ans.q4 === "e") { add("Ver\u00e3o Suave", 2); add("Ver\u00e3o Frio", 1); }
+  if (ans.q4 === "f") { add("Primavera Clara", 2); add("Ver\u00e3o Claro", 2); }
+  if (ans.q4 === "g") { add("Primavera Quente", 3); add("Primavera Clara", 1); }
   if (ans.q4 === "h") { add("Outono Quente", 3); add("Outono Profundo", 2); }
 
-  // Q10 Skin
-  if (ans.q10 === "A") { addList(allWinters, 1); addList(allSummers, 1); }
-  if (ans.q10 === "B") { addList(allAutumns, 1); addList(allSummers, 0); add("Primavera Quente", 2); }
-  if (ans.q10 === "C" || ans.q10 === "D") {
-    // Olivas often map to Autumn (Warm) or Winter (Cool)
-    if (ans.q10 === "C") add("Oliva Quente", 3);
-    if (ans.q10 === "D") add("Oliva Frio", 3);
-  }
+  // Q5
+  if (ans.q5 === "A") { add("Oliva Frio", 2); addList(allWinters, 2); addList(allSummers, 2); }
+  if (ans.q5 === "B") { add("Oliva Quente", 2); add("Oliva Frio", 2); addList(groupWarm, 2); }
+  if (ans.q5 === "C") { add("Oliva Quente", 3); add("Oliva Frio", 3); }
 
-  // Count totals by family
+  // Q6
+  if (ans.q6 === "B") { add("Primavera Clara", 3); add("Primavera Quente", 3); add("Primavera Brilhante", 3); addList(allAutumns, 3); }
+  if (ans.q6 === "C") { addList(allAutumns, 3); add("Primavera Quente", 1); }
+  if (ans.q6 === "D") { add("Oliva Frio", 3); add("Oliva Quente", 1); }
+
+  // Q7
+  if (ans.q7 === "A") { addList(allSummers, 2); addList(allWinters, 2); }
+  if (ans.q7 === "B") { add("Primavera Clara", 1); add("Primavera Quente", 1); add("Primavera Brilhante", 1); addList(allAutumns, 1); }
+  if (ans.q7 === "C") { add("Outono Quente", 2); add("Oliva Quente", 2); add("Outono Profundo", 1); }
+  if (ans.q7 === "D") { add("Oliva Frio", 2); }
+
+  // Q8
+  if (ans.q8 === "C") { add("Primavera Quente", 2); add("Primavera Brilhante", 2); add("Outono Suave", 1); add("Outono Quente", 3); add("Outono Profundo", 2); add("Oliva Quente", 2); }
+  if (ans.q8 === "D") { add("Oliva Frio", 2); add("Ver\u00e3o Claro", 2); add("Inverno Brilhante", 2); }
+  if (ans.q8 === "E") { add("Oliva Frio", 3); add("Oliva Quente", 3); }
+
+  // Q9
+  if (ans.q9 === "A") { addList(allWinters, 1); addList(allSummers, 1); }
+  if (ans.q9 === "B") { add("Oliva Quente", 2); }
+  if (ans.q9 === "C") { add("Oliva Frio", 3); }
+  if (ans.q9 === "D") { addList(groupWarm, 3); }
+  if (ans.q9 === "E") { addList(allSummers, 1); add("Inverno Brilhante", 1); }
+
+  // Q10
+  if (ans.q10 === "A") { addList(allWinters, 3); addList(allSummers, 3); }
+  if (ans.q10 === "B") { addList(allAutumns, 3); add("Primavera Quente", 3); add("Primavera Clara", 3); add("Primavera Brilhante", 3); }
+  if (ans.q10 === "C") { add("Oliva Quente", 3); }
+  if (ans.q10 === "D") { add("Oliva Frio", 3); }
+
+  // Q11
+  if (ans.q11 === "A") { add("Oliva Quente", 3); add("Oliva Frio", 3); }
+  if (ans.q11 === "C") { addList(allSummers, 4); addList(allWinters, 4); }
+  if (ans.q11 === "D") { add("Primavera Quente", 4); add("Primavera Clara", 4); add("Primavera Brilhante", 4); addList(allAutumns, 4); }
+  if (ans.q11 === "E") { addList(allSummers, 4); addList(allAutumns, 4); }
+
+  // Agregar por familia
   const families = { spring: 0, summer: 0, autumn: 0, winter: 0 };
-
   Object.keys(s).forEach(k => {
     if (k.includes("Primavera")) families.spring += s[k];
-    if (k.includes("Verão") || k.includes("Verao")) families.summer += s[k];
+    if (k.includes("Ver\u00e3o")) families.summer += s[k];
     if (k.includes("Outono") || k === "Oliva Quente") families.autumn += s[k];
-    if (k.includes("Inverno") || k === "Oliva Frio" || (k.includes("Oliva") && k.includes("Inverno"))) families.winter += s[k];
+    if (k.includes("Inverno") || k === "Oliva Frio") families.winter += s[k];
   });
 
-  // Pick winner
   let best = "winter";
   let max = -1;
   for (const [fam, val] of Object.entries(families)) {
     if (val > max) { max = val; best = fam; }
   }
-
   return best;
 }
