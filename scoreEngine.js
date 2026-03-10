@@ -145,33 +145,38 @@ export function computeFinalResult({ quizAnswers, vision }) {
   }
 
 
+  // --- FASE 4: BLOQUEIO POR ESTACAO (Q13 determina paletas permitidas) ---
+  // Se Q13 mostrou Outono, resultado SO pode ser Outono. Idem para as outras.
+  const seasonLock = {
+    spring: ["Primavera Clara", "Primavera Quente", "Primavera Brilhante"],
+    summer: ["Ver\u00e3o Claro", "Ver\u00e3o Suave", "Ver\u00e3o Frio"],
+    autumn: ["Outono Suave", "Outono Quente", "Outono Profundo"],
+    winter: ["Inverno Brilhante", "Inverno Frio", "Inverno Profundo"]
+  };
+  const allowed = fGroup && seasonLock[fGroup] ? seasonLock[fGroup] : null;
+
   // --- 6. GATING & WINNER SELECTION ---
   let isOliva = false;
   let finalSeason = null;
 
-  // Gate Oliva Frio
-  if (s["Oliva Frio"] >= 13) {
+  // Gate Oliva Frio (so aplica se Q13 e estacao fria)
+  if (s["Oliva Frio"] >= 13 && (fGroup === "summer" || fGroup === "winter")) {
     isOliva = true;
-    // LISTA ESTRITA: Verão Frio, Verão Suave, Inverno Frio, Inverno Profundo
-    const candidates = [
-      "Verão Frio", "Verão Suave", "Inverno Frio", "Inverno Profundo"
-    ];
+    const allOlivaCold = ["Ver\u00e3o Frio", "Ver\u00e3o Suave", "Inverno Frio", "Inverno Profundo"];
+    const candidates = allowed ? allOlivaCold.filter(c => allowed.includes(c)) : allOlivaCold;
     finalSeason = pickWinner(s, candidates);
 
-    // Desempate
     const topScore = s[finalSeason] || 0;
     const tied = candidates.filter(c => (s[c] || 0) === topScore);
     if (tied.length > 1) {
       finalSeason = resolveTie(tied, quizAnswers);
     }
   }
-  // Gate Oliva Quente
-  else if (s["Oliva Quente"] >= 13) {
+  // Gate Oliva Quente (so aplica se Q13 e estacao quente)
+  else if (s["Oliva Quente"] >= 13 && (fGroup === "spring" || fGroup === "autumn")) {
     isOliva = true;
-    // LISTA ESTRITA: Primavera Quente, Outono Suave, Outono Quente, Outono Profundo
-    const candidates = [
-      "Primavera Quente", "Outono Suave", "Outono Quente", "Outono Profundo"
-    ];
+    const allOlivaWarm = ["Primavera Quente", "Outono Suave", "Outono Quente", "Outono Profundo"];
+    const candidates = allowed ? allOlivaWarm.filter(c => allowed.includes(c)) : allOlivaWarm;
     finalSeason = pickWinner(s, candidates);
 
     const topScore = s[finalSeason] || 0;
@@ -183,12 +188,17 @@ export function computeFinalResult({ quizAnswers, vision }) {
     const gates = {
       "Primavera Clara": 7, "Primavera Quente": 11, "Primavera Brilhante": 3,
       "Outono Suave": 8, "Outono Quente": 12, "Outono Profundo": 11,
-      "Verão Claro": 5, "Verão Suave": 7, "Verão Frio": 5,
+      "Ver\u00e3o Claro": 5, "Ver\u00e3o Suave": 7, "Ver\u00e3o Frio": 5,
       "Inverno Brilhante": 6, "Inverno Frio": 4, "Inverno Profundo": 8
     };
 
-    let valid = Object.keys(gates).filter(k => s[k] >= gates[k]);
-    if (valid.length === 0) valid = Object.keys(gates);
+    // Filtrar por bloqueio de estacao: so considera paletas da estacao da Q13
+    const lockedKeys = allowed
+      ? Object.keys(gates).filter(k => allowed.includes(k))
+      : Object.keys(gates);
+
+    let valid = lockedKeys.filter(k => s[k] >= gates[k]);
+    if (valid.length === 0) valid = lockedKeys;
 
     valid.sort((a, b) => s[b] - s[a]);
     const winner = valid[0];
