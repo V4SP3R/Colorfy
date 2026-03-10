@@ -62,11 +62,11 @@ export function computeFinalResult({ quizAnswers, vision }) {
   if (q8 === "E") { s["Oliva Frio"] += 3; s["Oliva Quente"] += 3; }
 
   const q9 = quizAnswers["q9"];
-  if (q9 === "A") { allWinters.forEach(k => s[k] += 1); allSummers.forEach(k => s[k] += 1); }
-  if (q9 === "B") { s["Oliva Quente"] += 2; }
+  if (q9 === "A") { allWinters.forEach(k => s[k] += 2); allSummers.forEach(k => s[k] += 2); }
+  if (q9 === "B") { s["Oliva Quente"] += 2; s["Oliva Frio"] += 2; }
   if (q9 === "C") { s["Oliva Frio"] += 3; }
-  if (q9 === "D") { groupWarm.forEach(k => s[k] += 3); }
-  if (q9 === "E") { allSummers.forEach(k => s[k] += 1); s["Inverno Brilhante"] += 1; }
+  if (q9 === "D") { s["Oliva Quente"] += 3; }
+  // Q9-E: Não pontua (conforme PDF)
 
   const q10 = quizAnswers["q10"];
   if (q10 === "A") { allWinters.forEach(k => s[k] += 3); allSummers.forEach(k => s[k] += 3); }
@@ -536,11 +536,11 @@ function predictSeasonGroupBackend(ans) {
   if (ans.q8 === "E") { add("Oliva Frio", 3); add("Oliva Quente", 3); }
 
   // Q9
-  if (ans.q9 === "A") { addList(allWinters, 1); addList(allSummers, 1); }
-  if (ans.q9 === "B") { add("Oliva Quente", 2); }
+  if (ans.q9 === "A") { addList(allWinters, 2); addList(allSummers, 2); }
+  if (ans.q9 === "B") { add("Oliva Quente", 2); add("Oliva Frio", 2); }
   if (ans.q9 === "C") { add("Oliva Frio", 3); }
-  if (ans.q9 === "D") { addList(groupWarm, 3); }
-  if (ans.q9 === "E") { addList(allSummers, 1); add("Inverno Brilhante", 1); }
+  if (ans.q9 === "D") { add("Oliva Quente", 3); }
+  // Q9-E: N\u00e3o pontua (conforme PDF)
 
   // Q10
   if (ans.q10 === "A") { addList(allWinters, 3); addList(allSummers, 3); }
@@ -553,6 +553,23 @@ function predictSeasonGroupBackend(ans) {
   if (ans.q11 === "C") { addList(allSummers, 4); addList(allWinters, 4); }
   if (ans.q11 === "D") { add("Primavera Quente", 4); add("Primavera Clara", 4); add("Primavera Brilhante", 4); addList(allAutumns, 4); }
   if (ans.q11 === "E") { addList(allSummers, 4); addList(allAutumns, 4); }
+
+  // --- PREMISSAS (mesmas regras de computeFinalResult) ---
+  // Premissa 1: Esclera branca + cabelo escuro -> Inverno
+  if (ans.q2 === "A" && (ans.q4 === "a" || ans.q4 === "b")) {
+    add("Inverno Brilhante", 3); add("Inverno Profundo", 3);
+    if (ans.q12 === "A" || ans.q12 === "B") {
+      add("Inverno Brilhante", 4); add("Inverno Profundo", 4);
+    }
+  }
+  // Premissa 2: Olhos verdes + cabelo ruivo claro + sardas -> Primavera
+  if (ans.q1 === "D" && ans.q4 === "g" && ans.q6 === "B") {
+    add("Primavera Brilhante", 3); add("Primavera Quente", 3);
+  }
+  // Premissa 3: Esclera suave + cabelo claro/medio + pele morena/profunda -> misto
+  if (ans.q2 === "B" && (ans.q4 === "d" || ans.q4 === "e" || ans.q4 === "f") && (ans.q12 === "C" || ans.q12 === "D")) {
+    add("Ver\u00e3o Suave", 3); add("Primavera Clara", 3); add("Outono Suave", 3);
+  }
 
   // Agregar por familia
   const families = { spring: 0, summer: 0, autumn: 0, winter: 0 };
