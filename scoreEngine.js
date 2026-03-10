@@ -80,50 +80,14 @@ export function computeFinalResult({ quizAnswers, vision }) {
   if (q11 === "D") { s["Primavera Quente"] += 4; s["Primavera Clara"] += 4; s["Primavera Brilhante"] += 4; allAutumns.forEach(k => s[k] += 4); }
   if (q11 === "E") { allSummers.forEach(k => s[k] += 4); allAutumns.forEach(k => s[k] += 4); }
 
-  // --- 4. LÓGICA DE FRAME (MOLDURA) - FALLBACK DETERMINÍSTICO ---
-  let fGroup = quizAnswers.frameGroup;
-
-  // Se não veio do frontend, derivamos deterministicamente (Cópia exata do Frontend)
-  if (!fGroup) {
-    fGroup = predictSeasonGroupBackend(quizAnswers);
-  }
-
-  // Pontuação do Frame (Q13)
-  const frameAns = quizAnswers["frame"];
-  if (frameAns) {
-    if (fGroup === "spring") {
-      if (frameAns === "A") s["Primavera Clara"] += 3;
-      if (frameAns === "B") s["Primavera Quente"] += 3;
-      if (frameAns === "C") s["Primavera Brilhante"] += 3;
-      if (frameAns === "D") { s["Oliva Quente"] += 3; s["Primavera Quente"] += 1; }
-    } else if (fGroup === "summer") {
-      if (frameAns === "A") s["Verão Claro"] += 3;
-      if (frameAns === "B") s["Verão Suave"] += 3;
-      if (frameAns === "C") s["Verão Frio"] += 3;
-    } else if (fGroup === "autumn") {
-      if (frameAns === "A") s["Outono Suave"] += 3;
-      if (frameAns === "B") s["Outono Quente"] += 3;
-      if (frameAns === "C") s["Outono Profundo"] += 3;
-      if (frameAns === "D") s["Oliva Quente"] += 3;
-    } else { // winter
-      if (frameAns === "A") s["Inverno Brilhante"] += 3;
-      if (frameAns === "B") s["Inverno Frio"] += 3;
-      if (frameAns === "C") s["Inverno Profundo"] += 3;
-      if (frameAns === "D") {
-        s["Oliva Frio"] += 3;
-      }
-    }
-  }
-
-  // --- 5. PREMISSAS DE LÓGICA ESTRITA (USER RULES) ---
+  // --- 4. PREMISSAS (aplicadas ANTES da detecção de estação) ---
+  const q12 = quizAnswers["q12"];
 
   // Premissa 1: Esclera branca (Q2=A) + cabelo escuro (Q4=a ou b) -> Inverno Brilhante e Profundo ganham +3.
-  // Regra extra: Se Q12 (pele) for A ou B, ganham +4. (NÃO USAR FRAME)
-  const q12 = quizAnswers["q12"];
+  // Regra extra: Se Q12 (pele) for A ou B, ganham +4.
   if (q2 === "A" && (q4 === "a" || q4 === "b")) {
     s["Inverno Brilhante"] += 3;
     s["Inverno Profundo"] += 3;
-
     if (q12 === "A" || q12 === "B") {
       s["Inverno Brilhante"] += 4;
       s["Inverno Profundo"] += 4;
@@ -137,11 +101,43 @@ export function computeFinalResult({ quizAnswers, vision }) {
   }
 
   // Premissa 3: Esclera suave (Q2=B) + cabelo claro/médio (Q4=d/e/f) + Q12 morena/profunda (C/D)
-  // CONDICIONAL EXATA: (q2 === "B") AND (q4 === "d" OR "e" OR "f") AND (q12 === "C" OR "D")
   if (q2 === "B" && (q4 === "d" || q4 === "e" || q4 === "f") && (q12 === "C" || q12 === "D")) {
-    s["Verão Suave"] += 3;
+    s["Ver\u00e3o Suave"] += 3;
     s["Primavera Clara"] += 3;
     s["Outono Suave"] += 3;
+  }
+
+  // --- 5. LÓGICA DE FRAME (MOLDURA) - usa s com premissas já aplicadas ---
+  let fGroup = quizAnswers.frameGroup;
+
+  // Se não veio do frontend, detectamos a estação a partir dos pontos reais (Q1-Q12 + premissas)
+  if (!fGroup) {
+    fGroup = detectSeason(s);
+  }
+
+  // Pontuação do Frame (Q13)
+  const frameAns = quizAnswers["frame"];
+  if (frameAns) {
+    if (fGroup === "spring") {
+      if (frameAns === "A") s["Primavera Clara"] += 3;
+      if (frameAns === "B") s["Primavera Quente"] += 3;
+      if (frameAns === "C") s["Primavera Brilhante"] += 3;
+      if (frameAns === "D") { s["Oliva Quente"] += 3; s["Primavera Quente"] += 1; }
+    } else if (fGroup === "summer") {
+      if (frameAns === "A") s["Ver\u00e3o Claro"] += 3;
+      if (frameAns === "B") s["Ver\u00e3o Suave"] += 3;
+      if (frameAns === "C") s["Ver\u00e3o Frio"] += 3;
+    } else if (fGroup === "autumn") {
+      if (frameAns === "A") s["Outono Suave"] += 3;
+      if (frameAns === "B") s["Outono Quente"] += 3;
+      if (frameAns === "C") s["Outono Profundo"] += 3;
+      if (frameAns === "D") s["Oliva Quente"] += 3;
+    } else { // winter
+      if (frameAns === "A") s["Inverno Brilhante"] += 3;
+      if (frameAns === "B") s["Inverno Frio"] += 3;
+      if (frameAns === "C") s["Inverno Profundo"] += 3;
+      if (frameAns === "D") s["Oliva Frio"] += 3;
+    }
   }
 
 
@@ -279,6 +275,18 @@ function pickWinner(scores, candidates) {
     }
   });
   return best;
+}
+
+// Detecta a estação dominante a partir dos pontos já calculados (inclui premissas)
+function detectSeason(s) {
+  const families = { spring: 0, summer: 0, autumn: 0, winter: 0 };
+  Object.keys(s).forEach(k => {
+    if (k.includes("Primavera")) families.spring += s[k];
+    if (k.includes("Ver\u00e3o")) families.summer += s[k];
+    if (k.includes("Outono") || k === "Oliva Quente") families.autumn += s[k];
+    if (k.includes("Inverno") || k === "Oliva Frio") families.winter += s[k];
+  });
+  return Object.entries(families).sort((a, b) => b[1] - a[1])[0][0];
 }
 
 function resolveTie(ties, qa) {
