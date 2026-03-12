@@ -62,11 +62,11 @@ export function computeFinalResult({ quizAnswers, vision }) {
   if (q8 === "E") { s["Oliva Frio"] += 3; s["Oliva Quente"] += 3; }
 
   const q9 = quizAnswers["q9"];
-  if (q9 === "A") { allWinters.forEach(k => s[k] += 2); allSummers.forEach(k => s[k] += 2); }
-  if (q9 === "B") { s["Oliva Quente"] += 2; s["Oliva Frio"] += 2; }
+  if (q9 === "A") { allWinters.forEach(k => s[k] += 1); allSummers.forEach(k => s[k] += 1); }
+  if (q9 === "B") { s["Oliva Quente"] += 2; }
   if (q9 === "C") { s["Oliva Frio"] += 3; }
-  if (q9 === "D") { s["Oliva Quente"] += 3; }
-  // Q9-E: Não pontua (conforme PDF)
+  if (q9 === "D") { groupWarm.forEach(k => s[k] += 3); }
+  if (q9 === "E") { allSummers.forEach(k => s[k] += 1); s["Inverno Brilhante"] += 1; }
 
   const q10 = quizAnswers["q10"];
   if (q10 === "A") { allWinters.forEach(k => s[k] += 3); allSummers.forEach(k => s[k] += 3); }
@@ -278,14 +278,16 @@ function pickWinner(scores, candidates) {
 }
 
 // Detecta a estação dominante a partir dos pontos já calculados (inclui premissas)
+// Oliva Quente e Oliva Frio sao excluidas: aparecem como opcao D em DUAS estacoes diferentes
+// (OlivaQ = spring D e autumn D / OlivaF = summer D e winter D), portanto nao devem
+// puxar a deteccao para nenhuma estacao especifica
 function detectSeason(s) {
-  const families = { spring: 0, summer: 0, autumn: 0, winter: 0 };
-  Object.keys(s).forEach(k => {
-    if (k.includes("Primavera")) families.spring += s[k];
-    if (k.includes("Ver\u00e3o")) families.summer += s[k];
-    if (k.includes("Outono") || k === "Oliva Quente") families.autumn += s[k];
-    if (k.includes("Inverno") || k === "Oliva Frio") families.winter += s[k];
-  });
+  const families = {
+    spring: (s["Primavera Clara"]||0) + (s["Primavera Quente"]||0) + (s["Primavera Brilhante"]||0),
+    summer: (s["Ver\u00e3o Claro"]||0) + (s["Ver\u00e3o Suave"]||0) + (s["Ver\u00e3o Frio"]||0),
+    autumn: (s["Outono Suave"]||0) + (s["Outono Quente"]||0) + (s["Outono Profundo"]||0),
+    winter: (s["Inverno Brilhante"]||0) + (s["Inverno Frio"]||0) + (s["Inverno Profundo"]||0)
+  };
   return Object.entries(families).sort((a, b) => b[1] - a[1])[0][0];
 }
 
@@ -554,11 +556,11 @@ function predictSeasonGroupBackend(ans) {
   if (ans.q8 === "E") { add("Oliva Frio", 3); add("Oliva Quente", 3); }
 
   // Q9
-  if (ans.q9 === "A") { addList(allWinters, 2); addList(allSummers, 2); }
-  if (ans.q9 === "B") { add("Oliva Quente", 2); add("Oliva Frio", 2); }
+  if (ans.q9 === "A") { addList(allWinters, 1); addList(allSummers, 1); }
+  if (ans.q9 === "B") { add("Oliva Quente", 2); }
   if (ans.q9 === "C") { add("Oliva Frio", 3); }
-  if (ans.q9 === "D") { add("Oliva Quente", 3); }
-  // Q9-E: N\u00e3o pontua (conforme PDF)
+  if (ans.q9 === "D") { addList(groupWarm, 3); }
+  if (ans.q9 === "E") { addList(allSummers, 1); add("Inverno Brilhante", 1); }
 
   // Q10
   if (ans.q10 === "A") { addList(allWinters, 3); addList(allSummers, 3); }
@@ -589,14 +591,13 @@ function predictSeasonGroupBackend(ans) {
     add("Ver\u00e3o Suave", 3); add("Primavera Clara", 3); add("Outono Suave", 3);
   }
 
-  // Agregar por familia
-  const families = { spring: 0, summer: 0, autumn: 0, winter: 0 };
-  Object.keys(s).forEach(k => {
-    if (k.includes("Primavera")) families.spring += s[k];
-    if (k.includes("Ver\u00e3o")) families.summer += s[k];
-    if (k.includes("Outono") || k === "Oliva Quente") families.autumn += s[k];
-    if (k.includes("Inverno") || k === "Oliva Frio") families.winter += s[k];
-  });
+  // Agregar por familia (apenas 12 paletas base, sem variantes Oliva)
+  const families = {
+    spring: (s["Primavera Clara"]||0) + (s["Primavera Quente"]||0) + (s["Primavera Brilhante"]||0),
+    summer: (s["Ver\u00e3o Claro"]||0) + (s["Ver\u00e3o Suave"]||0) + (s["Ver\u00e3o Frio"]||0),
+    autumn: (s["Outono Suave"]||0) + (s["Outono Quente"]||0) + (s["Outono Profundo"]||0),
+    winter: (s["Inverno Brilhante"]||0) + (s["Inverno Frio"]||0) + (s["Inverno Profundo"]||0)
+  };
 
   let best = "winter";
   let max = -1;
