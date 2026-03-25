@@ -4059,6 +4059,7 @@
       const btnConfirm = $("#btnConfirmPhoto");
       const btnChange = $("#btnChangePhoto");
       const confirmedMsg = $("#photoConfirmedMsg");
+      const hasPhoto = !!state.selfie.dataUrl;
 
       if (confirmed) {
         // Foto já confirmada: esconder botão confirmar, mostrar trocar
@@ -4066,14 +4067,14 @@
         btnConfirm.style.display = "none";
         btnChange.style.display = "inline-flex";
         confirmedMsg.style.display = "block";
-      } else if (ready) {
-        // Foto validada mas não confirmada: mostrar botão confirmar
+      } else if (hasPhoto) {
+        // Foto carregada: sempre mostrar botão confirmar
         actionRow.style.display = "flex";
         btnConfirm.style.display = "inline-flex";
         btnChange.style.display = "none";
         confirmedMsg.style.display = "none";
       } else {
-        // Sem foto ou não validada
+        // Sem foto
         actionRow.style.display = "none";
         confirmedMsg.style.display = "none";
       }
@@ -4298,6 +4299,15 @@
         state.selfie.dataUrl = reader.result;
         previewImg.src = state.selfie.dataUrl;
         previewCard.style.display = "block";
+
+        // Mostrar botão confirmar imediatamente ao adicionar foto
+        const actionRow = $("#photoActionRow");
+        const btnConfirm = $("#btnConfirmPhoto");
+        actionRow.style.display = "flex";
+        btnConfirm.style.display = "inline-flex";
+        $("#btnChangePhoto").style.display = "none";
+        $("#photoConfirmedMsg").style.display = "none";
+
         photoQualityGate();
       };
       reader.readAsDataURL(file);
@@ -4337,8 +4347,12 @@
     }
 
     // --- Confirmar Foto ---
-    $("#btnConfirmPhoto").addEventListener("click", () => {
-      if (!state.selfie.approved) return;
+    $("#btnConfirmPhoto").addEventListener("click", async () => {
+      // Se ainda não validou, rodar validação primeiro
+      if (!state.selfie.approved) {
+        await photoQualityGate();
+        if (!state.selfie.approved) return;
+      }
       state.selfie.confirmed = true;
 
       // Definir imagem confirmada para Q13 e resultados
@@ -4528,7 +4542,7 @@
           { key: "A", label: "Minha pele é clara", sub: "", swatch: { bg: "url('assets/Q12-A.jpg') center/cover no-repeat" } },
           { key: "B", label: "Minha pele é média.", sub: "", swatch: { bg: "url('assets/Q12-B.jpg') center/cover no-repeat" } },
           { key: "C", label: "Minha pele é morena", sub: "", swatch: { bg: "url('assets/Q12-C.jpg') center/cover no-repeat" } },
-          { key: "D", label: "Minha pele é escura", sub: "", swatch: { bg: "url('assets/Q12-D.jpg') center/cover no-repeat" } }
+          { key: "D", label: "Minha pele é profunda", sub: "", swatch: { bg: "url('assets/Q12-D.jpg') center/cover no-repeat" } }
         ]
       }
 
@@ -4727,6 +4741,11 @@
       // Premissa 3: Esclera suave + cabelo claro/medio + pele morena/profunda -> misto
       if (ans.q2 === "B" && (ans.q4 === "d" || ans.q4 === "e" || ans.q4 === "f") && (ans.q12 === "C" || ans.q12 === "D")) {
         add("Ver\u00e3o Suave", 3); add("Primavera Clara", 3); add("Outono Suave", 3);
+      }
+
+      // Premissa 4: Resgate de Outono — base quente (Q1=C) + cores quentes favorecem (Q9=D)
+      if (ans.q1 === "C" && ans.q9 === "D") {
+        add("Outono Suave", 4); add("Outono Quente", 4); add("Outono Profundo", 4);
       }
 
       // Agregar por familia (apenas 12 paletas base, sem variantes Oliva)
@@ -5682,7 +5701,7 @@
         "Inverno Brilhante": BASE_PDF + "8_INVERNO%20Brilhante.pdf",
         "Inverno Profundo": BASE_PDF + "7_Inverno%20Profundo.pdf",
         "Inverno Frio": BASE_PDF + "2_INVERNO%20Frio.pdf",
-        "Primavera Quente Oliva": BASE_PDF + "15_Oliva%20Primavera%20Quente.pdf",
+        "Primavera Quente Oliva": BASE_PDF + "15_Oliva%20Primavera%20Quente%20.pdf",
         "Outono Quente Oliva": BASE_PDF + "5_Oliva%20Outono%20Quente.pdf",
         "Outono Profundo Oliva": BASE_PDF + "6_Oliva%20Outono%20Profundo.pdf",
         "Inverno Profundo Oliva": BASE_PDF + "9_Oliva%20Inverno%20Profundo.pdf",
@@ -5787,7 +5806,6 @@
 
               <div class="flex flex-wrap items-center justify-center gap-2">
                 <span class="cfy-pill"><i class="fa-solid fa-leaf"></i> <strong>${family}</strong></span>
-                <span class="cfy-pill"><i class="fa-solid fa-temperature-half"></i> ${tempLabel}</span>
                 ${isOlive ? `<span class="cfy-pill"><i class="fa-solid fa-seedling"></i> <strong>Oliva</strong></span>` : ``}
               </div>
 
