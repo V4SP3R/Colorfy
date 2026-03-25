@@ -107,6 +107,13 @@ export function computeFinalResult({ quizAnswers, vision }) {
     s["Outono Suave"] += 3;
   }
 
+  // Premissa 4: Resgate de Outono — base quente (Q1=C) + cores quentes favorecem (Q9=D)
+  if (q1 === "C" && q9 === "D") {
+    s["Outono Suave"] += 4;
+    s["Outono Quente"] += 4;
+    s["Outono Profundo"] += 4;
+  }
+
   // --- 5. LÓGICA DE FRAME (MOLDURA) - usa s com premissas já aplicadas ---
   let fGroup = quizAnswers.frameGroup;
 
@@ -589,6 +596,11 @@ function predictSeasonGroupBackend(ans) {
   // Premissa 3: Esclera suave + cabelo claro/medio + pele morena/profunda -> misto
   if (ans.q2 === "B" && (ans.q4 === "d" || ans.q4 === "e" || ans.q4 === "f") && (ans.q12 === "C" || ans.q12 === "D")) {
     add("Ver\u00e3o Suave", 3); add("Primavera Clara", 3); add("Outono Suave", 3);
+  }
+
+  // Premissa 4: Resgate de Outono — base quente (Q1=C) + cores quentes favorecem (Q9=D)
+  if (ans.q1 === "C" && ans.q9 === "D") {
+    add("Outono Suave", 4); add("Outono Quente", 4); add("Outono Profundo", 4);
   }
 
   // Agregar por familia (apenas 12 paletas base, sem variantes Oliva)
