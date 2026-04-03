@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     const body = req.body;
     validatePayload(body);
 
-    const { quizAnswers } = body;
+    const { quizAnswers, user } = body;
 
     const vision = { raw: "" };
 
@@ -39,7 +39,11 @@ export default async function handler(req, res) {
           result_token: resultToken,
           answers_json: quizAnswers,
           result: finalResult,
-          payment_status: "pending"
+          payment_status: "pending",
+          nome: user?.name || null,
+          email: user?.email || null,
+          telefone: user?.phone || null,
+          objetivo_principal: user?.goal || null
         }
       ])
       .select("result_token")
