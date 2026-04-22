@@ -21,6 +21,7 @@ app.use(express.static(join(__dirname, 'Frontend')));
 // API Routes
 app.post('/api/analyze', handler);
 app.get('/api/get-result', (await import('./api/get-result.js')).default);
+app.get('/api/get-price', (await import('./api/get-price.js')).default);
 
 // Fallback for root
 app.get('/', (req, res) => {
