@@ -3596,8 +3596,8 @@
 
               <h3 class="text-xl font-medium text-gray-300 mb-2">Oferta Especial Limitada</h3>
               <div class="flex items-center justify-center gap-3 mb-6">
-                <span class="text-gray-500 line-through text-lg">R$ 197,00</span>
-                <span class="text-4xl font-extrabold text-white">R$ 67,00</span>
+                <span id="priceOriginal" class="text-gray-500 line-through text-lg">R$ 197,00</span>
+                <span id="priceNow" class="text-4xl font-extrabold text-white">R$ 67,90</span>
               </div>
 
               <button id="btnCheckoutOffer" type="button"
@@ -6456,6 +6456,23 @@ A paleta "${palette}" apresentou maior coerência com contraste, valor e respost
       });
     });
 
+
+    // Busca preço dinâmico da Stripe
+    (async function loadPrice() {
+      try {
+        const r = await fetch("/api/get-price");
+        if (!r.ok) return;
+        const d = await r.json();
+        if (d.price) {
+          const el = document.getElementById("priceNow");
+          if (el) el.textContent = "R$ " + d.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+        }
+        if (d.original) {
+          const el = document.getElementById("priceOriginal");
+          if (el) el.textContent = "R$ " + d.original.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+        }
+      } catch (e) { /* mantém fallback hardcoded */ }
+    })();
 
   </script>
 </body>

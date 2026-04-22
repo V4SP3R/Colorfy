@@ -220,8 +220,8 @@
 
                 <h3 class="text-xl font-medium text-gray-300 mb-2">Oferta Especial Limitada</h3>
                 <div class="flex items-center justify-center gap-3 mb-6">
-                    <span class="text-gray-500 line-through text-lg">R$ 197,00</span>
-                    <span class="text-4xl font-extrabold text-white">R$ 67,90</span>
+                    <span id="priceOriginal" class="text-gray-500 line-through text-lg">R$ 197,00</span>
+                    <span id="priceNow" class="text-4xl font-extrabold text-white">R$ 67,90</span>
                 </div>
 
                 <ul class="text-left space-y-3 mb-8 text-sm text-gray-300 mx-auto max-w-[220px]">
@@ -392,6 +392,23 @@
                 startCheckout(this);
             });
         });
+
+        // Busca preço dinâmico da Stripe
+        (async function loadPrice() {
+            try {
+                const r = await fetch("/api/get-price");
+                if (!r.ok) return;
+                const d = await r.json();
+                if (d.price) {
+                    const fmt = d.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+                    document.getElementById("priceNow").textContent = "R$ " + fmt;
+                }
+                if (d.original) {
+                    const fmt = d.original.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+                    document.getElementById("priceOriginal").textContent = "R$ " + fmt;
+                }
+            } catch (e) { /* mantém fallback hardcoded */ }
+        })();
     </script>
 </body>
 
